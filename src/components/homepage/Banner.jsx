@@ -70,7 +70,7 @@ const Banner = () => {
                         </Link>
 
                         <Link
-                            href="https://wa.me/923326688403"
+                            href="https://wa.me/923260882255"
                             target="_blank"
                             className="flex items-center gap-2 rounded-md border border-[#E8BB44] px-6 py-3 font-semibold text-[#E8BB44] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08] lg:px-5 lg:py-2.5 lg:text-sm xl:px-6 xl:py-3 xl:text-base"
                         >

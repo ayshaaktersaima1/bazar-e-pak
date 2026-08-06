@@ -10,44 +10,66 @@ import {
 import { FaLocationDot } from "react-icons/fa6";
 
 const Footer = () => {
+    const phoneNumber = "03260882255";
+    const whatsappNumber = "923260882255";
+
     return (
         <footer className="bg-[#001B08] text-base text-white md:text-lg">
             {/* Top Contact Section */}
             <div className="border-b border-[#E8BB44]/20">
                 <div className="mx-auto grid w-[90%] gap-6 py-7 md:grid-cols-3">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44]">
+                    {/* Call */}
+                    <Link
+                        href={`tel:${phoneNumber}`}
+                        className="flex items-center gap-4"
+                    >
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44] transition hover:bg-[#E8BB44] hover:text-[#001B08]">
                             <FaPhoneAlt />
                         </div>
 
                         <div>
-                            <h3 className="font-semibold">03260882255</h3>
+                            <h3 className="font-semibold transition hover:text-[#E8BB44]">
+                                {phoneNumber}
+                            </h3>
+
                             <p className="text-sm text-gray-300">
                                 Mon - Sun: 9:00 AM - 9:00 PM
                             </p>
                         </div>
-                    </div>
+                    </Link>
 
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-xl text-[#E8BB44]">
+                    {/* WhatsApp */}
+                    <Link
+                        href={`https://wa.me/${whatsappNumber}`}
+                        target="_blank"
+                        className="flex items-center gap-4"
+                    >
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-xl text-[#E8BB44] transition hover:bg-[#E8BB44] hover:text-[#001B08]">
                             <FaWhatsapp />
                         </div>
 
                         <div>
-                            <h3 className="font-semibold">Chat on WhatsApp</h3>
+                            <h3 className="font-semibold transition hover:text-[#E8BB44]">
+                                Chat on WhatsApp
+                            </h3>
+
                             <p className="text-sm text-gray-300">
                                 Contact us for quick assistance
                             </p>
                         </div>
-                    </div>
+                    </Link>
 
+                    {/* Location */}
                     <div className="flex items-center gap-4">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-xl text-[#E8BB44]">
                             <FaLocationDot />
                         </div>
 
                         <div>
-                            <h3 className="font-semibold">All Over Pakistan</h3>
+                            <h3 className="font-semibold">
+                                All Over Pakistan
+                            </h3>
+
                             <p className="text-sm text-gray-300">
                                 Fast Delivery Nationwide
                             </p>
@@ -70,7 +92,10 @@ const Footer = () => {
                         />
 
                         <div>
-                            <h2 className="font-semibold">BAZAAR E PAK</h2>
+                            <h2 className="font-semibold">
+                                BAZAAR E PAK
+                            </h2>
+
                             <p className="mt-2 text-sm leading-6 text-gray-300">
                                 Trusted Digital Marketplace of Pakistan.
                             </p>
@@ -79,7 +104,9 @@ const Footer = () => {
 
                     <div className="mt-5 flex gap-3">
                         <Link
-                            href="#"
+                            href={`https://wa.me/${whatsappNumber}`}
+                            target="_blank"
+                            aria-label="Chat on WhatsApp"
                             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44] transition hover:bg-[#E8BB44] hover:text-[#001B08]"
                         >
                             <FaWhatsapp />
@@ -87,6 +114,7 @@ const Footer = () => {
 
                         <Link
                             href="#"
+                            aria-label="Facebook"
                             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44] transition hover:bg-[#E8BB44] hover:text-[#001B08]"
                         >
                             <FaFacebookF />
@@ -94,6 +122,7 @@ const Footer = () => {
 
                         <Link
                             href="#"
+                            aria-label="Instagram"
                             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44] transition hover:bg-[#E8BB44] hover:text-[#001B08]"
                         >
                             <FaInstagram />
@@ -101,6 +130,7 @@ const Footer = () => {
 
                         <Link
                             href="#"
+                            aria-label="YouTube"
                             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44] transition hover:bg-[#E8BB44] hover:text-[#001B08]"
                         >
                             <FaYoutube />
@@ -114,24 +144,36 @@ const Footer = () => {
                         Quick Links
                     </h6>
 
-                    <Link href="/" className="link-hover link">
+                    <Link href="/" className="link link-hover">
                         Home
                     </Link>
 
-                    <Link href="/products" className="link-hover link">
+                    <Link
+                        href="/products"
+                        className="link link-hover"
+                    >
                         All Products
                     </Link>
 
-                    <Link href="/categories" className="link-hover link">
+                    <Link
+                        href="/categories"
+                        className="link link-hover"
+                    >
                         Categories
                     </Link>
 
-                    <Link href="/about" className="link-hover link">
+                    <Link
+                        href="/about"
+                        className="link link-hover"
+                    >
                         About Us
                     </Link>
 
-                    <Link href="/contact" className="link-hover link">
-                        Contact Us
+                    <Link
+                        href={`tel:${phoneNumber}`}
+                        className="link link-hover"
+                    >
+                        Call Us
                     </Link>
                 </nav>
 
@@ -141,23 +183,38 @@ const Footer = () => {
                         Customer Service
                     </h6>
 
-                    <Link href="/orders" className="link-hover link">
+                    <Link
+                        href="/orders"
+                        className="link link-hover"
+                    >
                         My Orders
                     </Link>
 
-                    <Link href="/returns" className="link-hover link">
+                    <Link
+                        href="/returns"
+                        className="link link-hover"
+                    >
                         Returns & Refunds
                     </Link>
 
-                    <Link href="/shipping-policy" className="link-hover link">
+                    <Link
+                        href="/shipping-policy"
+                        className="link link-hover"
+                    >
                         Shipping Policy
                     </Link>
 
-                    <Link href="/terms" className="link-hover link">
+                    <Link
+                        href="/terms"
+                        className="link link-hover"
+                    >
                         Terms & Conditions
                     </Link>
 
-                    <Link href="/privacy-policy" className="link-hover link">
+                    <Link
+                        href="/privacy-policy"
+                        className="link link-hover"
+                    >
                         Privacy Policy
                     </Link>
                 </nav>
@@ -169,8 +226,8 @@ const Footer = () => {
                     </h6>
 
                     <p className="mt-3 text-sm leading-6 text-gray-300">
-                        Get the latest updates and offers straight to your
-                        inbox.
+                        Get the latest updates and offers straight to
+                        your inbox.
                     </p>
 
                     <div className="join mt-5 w-full">
