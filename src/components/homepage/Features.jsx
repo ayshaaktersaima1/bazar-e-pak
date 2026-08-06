@@ -40,7 +40,7 @@ const features = [
 
 const Features = () => {
     return (
-        <section className="bg-[#F7F5EF] py-10">
+        <section className="hidden lg:block bg-[#F7F5EF] py-10">
             <div className="mx-auto grid w-[90%] grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5 lg:gap-3 xl:gap-8">
                 {features.map((feature) => {
                     const Icon = feature.icon;

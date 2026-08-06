@@ -1,2 +1,15 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+
+body {
+    font-family: var(--font-inter);
+    background-color: #F7F5EF;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-lora);
+}

@@ -1,4 +1,5 @@
 import Footer from '@/components/shared/Footer';
+import LenisProvider from '@/components/shared/LenisProvider';
 import Navbar from '@/components/shared/Navbar';
 import React from 'react';
 
@@ -6,9 +7,9 @@ const layout = ({ children }) => {
     return (
         <div>
             <Navbar></Navbar>
-            <main>
+            <LenisProvider>
                 {children}
-            </main>
+            </LenisProvider>
             <Footer></Footer>
         </div>
     );

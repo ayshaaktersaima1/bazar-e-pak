@@ -9,7 +9,7 @@ const AllProductsPage = () => {
             <PageBanner
                 title="All Products"
                 description="Explore honey, fragrances, mobile accessories and furniture products available at Bazaar E Pak."
-                imageClass="bg-[url('/images/all-products-banner.webp')]"
+                imageClass="bg-[url('/images/p1Honey.webp')]"
             />
 
             <section className="bg-[#F7F5EF] py-16">
