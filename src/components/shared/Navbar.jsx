@@ -164,7 +164,7 @@ const Navbar = () => {
                 {/* Navbar End */}
                 <div className="navbar-end gap-2 md:gap-3">
                     <Link
-                        href="https://wa.me/923326688403"
+                        href="https://wa.me/03260882255"
                         target="_blank"
                         className="btn btn-circle btn-ghost text-[#E8BB44]"
                         aria-label="Contact on WhatsApp"

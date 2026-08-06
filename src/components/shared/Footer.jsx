@@ -21,7 +21,7 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h3 className="font-semibold">0332-6688403</h3>
+                            <h3 className="font-semibold">03260882255</h3>
                             <p className="text-sm text-gray-300">
                                 Mon - Sun: 9:00 AM - 9:00 PM
                             </p>
