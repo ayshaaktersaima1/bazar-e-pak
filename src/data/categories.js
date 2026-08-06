@@ -29,7 +29,7 @@ const categories = [
         description:
             "Explore our collection of body sprays, perfumes and pen perfumes designed for everyday freshness and long-lasting fragrance.",
         cardDescription: "Body Spray, Perfumes and Pen Perfume",
-        image: "/images/mehekCollection.webp",
+        image: "/images/p1Honey.webp",
         imageClass: "bg-[url('/images/mehekCollection.webp')]",
         href: "/collection/mehak",
         icon: FaPumpSoap,
@@ -43,7 +43,7 @@ const categories = [
         description:
             "Explore useful mobile accessories including chargers, Air Pods, headphones, storage devices, power banks and phone holders.",
         cardDescription: "Chargers, Headphones, Power Bank and more",
-        image: "/images/mblAccessories.webp",
+        image: "/images/p1Honey.webp",
         imageClass: "bg-[url('/images/mblAccessories.webp')]",
         href: "/collection/mobile",
         icon: FaHeadphones,
@@ -57,7 +57,7 @@ const categories = [
         description:
             "Explore practical and comfortable furniture for offices, classrooms and study spaces.",
         cardDescription: "Office Table, Chairs, Sofa and more",
-        image: "/images/furnitures.webp",
+        image: "/images/p1Honey.webp",
         imageClass: "bg-[url('/images/furnitures.webp')]",
         href: "/collection/furniture",
         icon: FaChair,
