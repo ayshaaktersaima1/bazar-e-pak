@@ -15,7 +15,7 @@ const categories = [
         description:
             "Discover our natural Berry Honey and Acacia Honey, carefully selected for rich taste and premium quality.",
         cardDescription: "Berry Honey, Acacia Honey and more",
-        image: "/images/b1.webp",
+        image: "/images/p1Honey.webp",
         imageClass: "bg-[url('/images/p1Honey.webp')]",
         href: "/collection/honey",
         icon: GiHoneyJar,
@@ -29,8 +29,8 @@ const categories = [
         description:
             "Explore our collection of body sprays, perfumes and pen perfumes designed for everyday freshness and long-lasting fragrance.",
         cardDescription: "Body Spray, Perfumes and Pen Perfume",
-        image: "/images/b1.webp",
-        imageClass: "bg-[url('/images/mehak-page-banner.webp')]",
+        image: "/images/mehekCollection.webp",
+        imageClass: "bg-[url('/images/mehekCollection.webp')]",
         href: "/collection/mehak",
         icon: FaPumpSoap,
     },
@@ -43,8 +43,8 @@ const categories = [
         description:
             "Explore useful mobile accessories including chargers, Air Pods, headphones, storage devices, power banks and phone holders.",
         cardDescription: "Chargers, Headphones, Power Bank and more",
-        image: "/images/b1.webp",
-        imageClass: "bg-[url('/images/mobile-page-banner.webp')]",
+        image: "/images/mblAccessories.webp",
+        imageClass: "bg-[url('/images/mblAccessories.webp')]",
         href: "/collection/mobile",
         icon: FaHeadphones,
     },
@@ -57,8 +57,8 @@ const categories = [
         description:
             "Explore practical and comfortable furniture for offices, classrooms and study spaces.",
         cardDescription: "Office Table, Chairs, Sofa and more",
-        image: "/images/b1.webp",
-        imageClass: "bg-[url('/images/furniture-page-banner.webp')]",
+        image: "/images/furnitures.webp",
+        imageClass: "bg-[url('/images/furnitures.webp')]",
         href: "/collection/furniture",
         icon: FaChair,
     },
