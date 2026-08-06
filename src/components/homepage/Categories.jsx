@@ -26,7 +26,7 @@ const Categories = () => {
                 </div>
 
                 {/* Category Cards */}
-                <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-4 xl:gap-8">
+                <div className="mt-12 grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-4 xl:gap-8">
                     {categoryList?.map((category) => {
                         const Icon = category?.icon;
 
