@@ -1,22 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const IndependenceSaleBanner = () => {
+const BannerDiscount = () => {
     return (
         <section className="relative h-[85vh] min-h-[520px] overflow-hidden lg:h-[82vh] lg:min-h-[560px] xl:min-h-[620px]">
-            {/* Background */}
+            {/* Mobile Background */}
+            <Image
+                src="/images/discountBannerMbll.png"
+                alt="14 August Independence Day Sale"
+                fill
+                priority
+                className="object-cover object-center md:hidden"
+            />
+
+            {/* Tablet + Desktop Background */}
             <Image
                 src="/images/discountBanner1.webp"
                 alt="14 August Independence Day Sale"
                 fill
                 priority
-                className="object-cover object-left md:object-center lg:object-right"
+                className="hidden object-cover object-center md:block lg:object-right"
             />
 
             {/* Content */}
             <div className="relative mx-auto flex h-full w-[90%] items-center">
                 {/* Left Content */}
-                <div className="mx-auto w-full max-w-md text-center md:mx-0 md:w-[52%] md:max-w-lg lg:w-[45%] lg:max-w-xl">
+                <div className="mx-auto w-full max-w-md text-center md:mx-0 md:w-[60%] md:max-w-xl lg:w-[45%] lg:max-w-xl">
 
                     <p className="text-xs font-semibold uppercase tracking-widest text-[#001B08] md:text-sm lg:text-base">
                         14 August Independence Day Sale
@@ -82,13 +91,13 @@ const IndependenceSaleBanner = () => {
                 </div>
 
                 {/* Badge */}
-                <div className="absolute right-3 top-5 hidden md:block lg:right-[3%] lg:top-[6%]">
+                <div className="absolute right-2 top-3 md:right-3 md:top-5 lg:right-[3%] lg:top-[6%]">
                     <Image
                         src="/images/discount.webp"
                         alt="Limited Time Only 14 August Mega Deals"
                         width={300}
                         height={300}
-                        className="h-50 w-50 object-contain lg:h-60 lg:w-60 xl:h-70 xl:w-70"
+                        className="h-26 w-26 object-contain sm:h-28 sm:w-28 md:h-50 md:w-50 lg:h-60 lg:w-60 xl:h-70 xl:w-70"
                     />
                 </div>
             </div>
@@ -96,4 +105,4 @@ const IndependenceSaleBanner = () => {
     );
 };
 
-export default IndependenceSaleBanner;
+export default BannerDiscount;
