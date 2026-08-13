@@ -1,4 +1,5 @@
-import Banner from "@/components/homepage/Banner";
+// import Banner from "@/components/homepage/Banner";
+
 import BestSellers from "@/components/homepage/BestSellers";
 import Categories from "@/components/homepage/Categories";
 import Features from "@/components/homepage/Features";
@@ -6,11 +7,13 @@ import WhyChooseUs from "@/components/homepage/WhyChooseUs";
 import FadeUp from "@/components/shared/FadeUp";
 import Image from "next/image";
 import ShopsSection from "../../components/homepage/ShopsSection";
+import BannerDiscount from "@/components/homepage/BannerDiscount";
 
 export default function Home() {
   return (
     <div>
-      <Banner></Banner>
+      {/* <Banner></Banner> */}
+      <BannerDiscount></BannerDiscount>
       <FadeUp>
         <Features />
       </FadeUp>
