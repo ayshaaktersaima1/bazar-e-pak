@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { FaBars, FaSearch, FaShoppingCart, FaWhatsapp } from "react-icons/fa";
 import CartButton from "./CartButton";
+import ProductSearch from "./ProductSearch";
 
 const Navbar = ({ needAuth = false }) => {
   const pathname = usePathname();
@@ -168,21 +169,7 @@ const Navbar = ({ needAuth = false }) => {
             >
               {/* Mobile Search */}
               <li className="mb-2 block">
-                <div className="grid w-full grid-cols-[1fr_auto]">
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="h-11 min-w-0 rounded-l-md border border-r-0 border-[#E8BB44] bg-white px-3 text-sm text-[#001B08] outline-none"
-                  />
-
-                  <button
-                    type="button"
-                    aria-label="Search products"
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-r-md bg-[#E8BB44] text-[#001B08] sm:w-12"
-                  >
-                    <FaSearch className="text-sm sm:text-base" />
-                  </button>
-                </div>
+                <ProductSearch />
               </li>
 
               {renderNavItems(true)}
@@ -212,22 +199,9 @@ const Navbar = ({ needAuth = false }) => {
         {/* Right: Search + Icons */}
         <div className="flex shrink-0 items-center justify-end gap-0 sm:gap-1 md:gap-2">
           {/* Desktop Search */}
-          <div className="hidden shrink-0 lg:flex">
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="h-10 w-28 rounded-l-md border border-r-0 border-[#E8BB44] bg-white px-2.5 text-xs text-[#001B08] outline-none xl:w-44 xl:px-3 xl:text-sm 2xl:w-52"
-            />
-
-            <button
-              type="button"
-              aria-label="Search products"
-              className="flex h-10 w-9 shrink-0 items-center justify-center rounded-r-md bg-[#E8BB44] text-[#001B08] transition hover:bg-white xl:w-11"
-            >
-              <FaSearch className="text-sm xl:text-base" />
-            </button>
+          <div className="hidden w-full max-w-[280px] shrink-0 lg:block xl:max-w-[320px] 2xl:max-w-[350px]">
+            <ProductSearch />
           </div>
-
           {/* WhatsApp */}
           <Link
             href="https://wa.me/923260882255"
