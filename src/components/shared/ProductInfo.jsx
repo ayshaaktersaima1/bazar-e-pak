@@ -8,8 +8,6 @@ import {
 } from "react-icons/fa";
 import { useCart } from "../../hooks/use-cart";
 
-
-
 const ProductInfo = ({ product, onAdded }) => {
     const { addToCart } = useCart();
 
@@ -24,10 +22,7 @@ const ProductInfo = ({ product, onAdded }) => {
     };
 
     const handleAddToCart = () => {
-        for (let i = 0; i < quantity; i++) {
-            addToCart(product);
-        }
-
+        addToCart(product, quantity);
         onAdded?.();
     };
 
@@ -74,7 +69,6 @@ const ProductInfo = ({ product, onAdded }) => {
 
             <div className="my-8 h-px bg-gray-300" />
 
-            {/* Quantity */}
             <div>
                 <p className="mb-3 font-semibold text-[#001B08]">
                     Quantity
@@ -105,7 +99,6 @@ const ProductInfo = ({ product, onAdded }) => {
                 </div>
             </div>
 
-            {/* Add to Cart */}
             <button
                 type="button"
                 onClick={handleAddToCart}

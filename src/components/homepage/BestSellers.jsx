@@ -67,7 +67,7 @@ const BestSellers = () => {
           >
             {products.map((product) => (
               <SwiperSlide key={product.id} className="h-auto">
-                <ProductCard product={product} variant="homepage" />
+                <ProductCard product={product} variant="product" />
               </SwiperSlide>
             ))}
           </Swiper>
