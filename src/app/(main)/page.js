@@ -5,6 +5,7 @@ import Features from "@/components/homepage/Features";
 import WhyChooseUs from "@/components/homepage/WhyChooseUs";
 import FadeUp from "@/components/shared/FadeUp";
 import Image from "next/image";
+import ShopsSection from "../../components/homepage/ShopsSection";
 
 export default function Home() {
   return (
@@ -14,6 +15,9 @@ export default function Home() {
         <Features />
       </FadeUp>
 
+      <FadeUp>
+        <ShopsSection />
+      </FadeUp>
       <FadeUp>
         <Categories />
       </FadeUp>
