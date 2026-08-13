@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { FaBars, FaSearch, FaShoppingCart, FaWhatsapp } from "react-icons/fa";
+import CartButton from "./CartButton";
 
 const Navbar = ({ needAuth = false }) => {
   const pathname = usePathname();
@@ -27,7 +28,7 @@ const Navbar = ({ needAuth = false }) => {
     document.activeElement?.blur();
 
     navbarRef.current?.querySelectorAll("details[open]")?.forEach((details) => {
-      details?.removeAttribute("open");
+      details.removeAttribute("open");
     });
   };
 
@@ -85,11 +86,11 @@ const Navbar = ({ needAuth = false }) => {
           </summary>
 
           <ul
-            className={`${
+            className={
               isMobile
                 ? "mt-2 gap-2 bg-[#001B08] p-2"
                 : "z-50 mt-3 w-60 gap-2 rounded-md bg-[#001B08] p-3 text-base shadow-lg"
-            }`}
+            }
           >
             {categories?.map((category) => (
               <li key={category?.id}>
@@ -147,28 +148,25 @@ const Navbar = ({ needAuth = false }) => {
   );
 
   return (
-    <nav
-      ref={navbarRef}
-      className="sticky top-0 z-50 bg-[#001B08] text-base text-white md:text-lg"
-    >
-      <div className="mx-auto grid w-[90%] grid-cols-[auto_1fr_auto] items-center gap-2 py-2 lg:gap-1 xl:gap-4">
-        {/* Left: Mobile Menu and Logo */}
-        <div className="flex items-center">
-          {/* Mobile Dropdown */}
+    <nav ref={navbarRef} className="sticky top-0 z-50 bg-[#001B08] text-white">
+      <div className="mx-auto flex min-h-20 w-[90%] items-center justify-between gap-2 py-1.5 sm:gap-3 lg:gap-4">
+        {/* Left: Mobile Menu + Logo */}
+        <div className="flex min-w-0 shrink-0 items-center">
+          {/* Mobile / Tablet Menu */}
           <div className="dropdown lg:hidden">
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost px-2 text-white"
+              className="btn btn-ghost h-10 min-h-10 w-10 px-0 text-white sm:h-11 sm:min-h-11 sm:w-11"
             >
-              <FaBars className="text-xl" />
+              <FaBars className="text-lg sm:text-xl" />
             </div>
 
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content z-50 mt-3 w-72 gap-2 rounded-md bg-[#001B08] p-4 text-base shadow-lg md:text-lg"
+              className="menu menu-sm dropdown-content z-50 mt-3 w-[calc(100vw-32px)] max-w-72 gap-2 rounded-md bg-[#001B08] p-4 text-base shadow-lg sm:text-lg"
             >
-              {/* Mobile Search UI */}
+              {/* Mobile Search */}
               <li className="mb-2 block">
                 <div className="grid w-full grid-cols-[1fr_auto]">
                   <input
@@ -180,9 +178,9 @@ const Navbar = ({ needAuth = false }) => {
                   <button
                     type="button"
                     aria-label="Search products"
-                    className="flex h-11 w-12 shrink-0 items-center justify-center rounded-r-md bg-[#E8BB44] text-[#001B08]"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-r-md bg-[#E8BB44] text-[#001B08] sm:w-12"
                   >
-                    <FaSearch className="text-base" />
+                    <FaSearch className="text-sm sm:text-base" />
                   </button>
                 </div>
               </li>
@@ -192,61 +190,57 @@ const Navbar = ({ needAuth = false }) => {
           </div>
 
           {/* Logo */}
-          <Link href="/" onClick={closeDropdowns} className="block">
+          <Link href="/" onClick={closeDropdowns} className="block shrink-0">
             <Image
               src="/images/logo.webp"
               alt="Bazaar E Pak"
               width={110}
               height={110}
-              className="h-16 w-16 object-contain md:h-20 md:w-20 lg:h-20 lg:w-20 xl:h-24 xl:w-24"
+              className="h-14 w-14 object-contain sm:h-16 sm:w-16 md:h-18 md:w-18 lg:h-20 lg:w-20 xl:h-24 xl:w-24"
               priority
             />
           </Link>
         </div>
 
-        {/* Middle: Desktop Navigation */}
-        <div className="hidden min-w-0 justify-center lg:flex">
-          <ul className="menu menu-horizontal flex-nowrap items-center gap-0 whitespace-nowrap px-0 text-base font-medium lg:gap-5 lg:text-lg">
+        {/* Desktop Navigation */}
+        <div className="hidden min-w-0 flex-1 justify-center lg:flex">
+          <ul className="menu menu-horizontal flex-nowrap items-center gap-3 whitespace-nowrap px-0 text-sm font-medium lg:text-base xl:gap-5 xl:text-lg">
             {renderNavItems(false)}
           </ul>
         </div>
 
-        {/* Right: Search and Icons */}
-        <div className="flex items-center justify-end gap-1 md:gap-2">
-          {/* Desktop Search UI */}
+        {/* Right: Search + Icons */}
+        <div className="flex shrink-0 items-center justify-end gap-0 sm:gap-1 md:gap-2">
+          {/* Desktop Search */}
           <div className="hidden shrink-0 lg:flex">
             <input
               type="text"
               placeholder="Search products..."
-              className="w-32 rounded-l-md border border-r-0 border-[#E8BB44] bg-white px-3 py-2 text-sm text-[#001B08] outline-none xl:w-52"
+              className="h-10 w-28 rounded-l-md border border-r-0 border-[#E8BB44] bg-white px-2.5 text-xs text-[#001B08] outline-none xl:w-44 xl:px-3 xl:text-sm 2xl:w-52"
             />
 
             <button
               type="button"
               aria-label="Search products"
-              className="flex w-11 shrink-0 items-center justify-center rounded-r-md bg-[#E8BB44] text-[#001B08] transition hover:bg-white"
+              className="flex h-10 w-9 shrink-0 items-center justify-center rounded-r-md bg-[#E8BB44] text-[#001B08] transition hover:bg-white xl:w-11"
             >
-              <FaSearch />
+              <FaSearch className="text-sm xl:text-base" />
             </button>
           </div>
 
+          {/* WhatsApp */}
           <Link
             href="https://wa.me/923260882255"
             target="_blank"
-            className="btn btn-circle btn-ghost text-[#E8BB44]"
+            rel="noopener noreferrer"
+            className="btn btn-circle btn-ghost h-10 min-h-10 w-10 px-0 text-[#E8BB44] sm:h-11 sm:min-h-11 sm:w-11"
             aria-label="Contact on WhatsApp"
           >
-            <FaWhatsapp className="text-2xl xl:text-3xl" />
+            <FaWhatsapp className="text-xl sm:text-2xl xl:text-3xl" />
           </Link>
 
-          <Link
-            href="/cart"
-            onClick={closeDropdowns}
-            className="btn btn-circle btn-ghost text-[#E8BB44]"
-            aria-label="Shopping cart"
-          >
-            <FaShoppingCart className="text-2xl xl:text-3xl" />
-          </Link>
+          {/* Cart */}
+          <CartButton />
         </div>
       </div>
     </nav>

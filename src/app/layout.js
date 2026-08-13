@@ -14,9 +14,21 @@ const lora = Lora({
   weight: ["500", "600", "700"],
   variable: "--font-lora",
 });
+
 export const metadata = {
   title: "Bazar-e-Pak",
-  description: "Bazar-e-Pak is intended to become a professional Pakistani business discovery, promotion, and digital marketplace platform.",
+  description:
+    "Bazar-e-Pak is intended to become a professional Pakistani business discovery, promotion, and digital marketplace platform.",
+  authors: [
+    {
+      name: "Aysha Akter Saima",
+      url: "https://github.com/ayshaaktersaima1",
+    },
+    {
+      name: "Abdur Rahman Adil",
+      url: "https://github.com/SyntaxAdil?tab=repositories",
+    },
+  ],
 };
 
 export default function RootLayout({ children }) {
@@ -25,14 +37,13 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${inter.variable} ${lora.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <main className="flex-1">
           <ShopProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
+            <CartProvider>{children}</CartProvider>
           </ShopProvider>
-          <Toaster position="bottom-right"></Toaster>
+
+          <Toaster position="bottom-right" />
         </main>
       </body>
     </html>

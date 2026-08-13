@@ -4,9 +4,27 @@ import DiscountPrice from "../../utils/discount-price";
 
 import Image from "next/image";
 import Link from "next/link";
-import { FaShoppingCart, FaTrash, FaPlus, FaMinus } from "react-icons/fa";
+import {
+  FaShoppingCart,
+  FaTrash,
+  FaPlus,
+  FaMinus,
+  FaEye,
+} from "react-icons/fa";
 
 import { useCart } from "@/hooks/use-cart";
+
+const DiscountBadge = ({ discount }) => {
+  if (typeof discount !== "number" || discount <= 0) {
+    return null;
+  }
+
+  return (
+    <span className="absolute right-3 top-3 z-10 rounded-full bg-[#E8BB44] px-2.5 py-1 text-xs font-bold text-[#001B08] shadow-sm">
+      -{discount}%
+    </span>
+  );
+};
 
 const ProductCard = ({ product, variant = "product" }) => {
   const { addToCart, increaseQuantity, decreaseQuantity, removeFromCart } =
@@ -25,14 +43,13 @@ const ProductCard = ({ product, variant = "product" }) => {
             className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
           />
 
+          <DiscountBadge discount={product.discount} />
+
           {/* Hover Overlay */}
-          <div
-            
-            className="absolute inset-0 flex items-center justify-center bg-[#001B08]/50 opacity-0 transition duration-300 group-hover:opacity-100"
-          >
+          <div className="absolute inset-0 flex items-center justify-center bg-[#001B08]/50 opacity-0 transition duration-300 group-hover:opacity-100">
             <Link
               href={`/products/${product.id}`}
-              className="inline-flex items-center justify-center gap-2 rounded-md  bg-white px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
             >
               View Details
             </Link>
@@ -50,7 +67,7 @@ const ProductCard = ({ product, variant = "product" }) => {
           <button
             type="button"
             onClick={() => addToCart(product)}
-            className="mt-auto inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
+            className=" mt-auto inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
           >
             <FaShoppingCart />
             Add to Cart
@@ -64,7 +81,7 @@ const ProductCard = ({ product, variant = "product" }) => {
     return (
       <div className="flex w-full items-center gap-4 rounded-xl bg-white p-4 shadow-sm">
         {/* Product Image */}
-        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#FAFAFA]">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#FAFAFA]">
           <Image
             src={product.image}
             alt={product.name}
@@ -81,7 +98,12 @@ const ProductCard = ({ product, variant = "product" }) => {
           </h3>
 
           <div className="mt-1">
-            <DiscountPrice product={product} />
+            <div className="flex gap-2">
+              <DiscountPrice product={product} variant="cart" />
+              {product.discount && <span className="rounded-full bg-[#E8BB44] px-2.5 py-1 text-xs font-bold text-[#001B08] shadow-sm w-fit">
+                -{product.discount}%
+              </span>}
+            </div>
           </div>
         </div>
 
@@ -121,16 +143,21 @@ const ProductCard = ({ product, variant = "product" }) => {
   }
 
   return (
-    <div className="flex h-full flex-col rounded-xl bg-white p-4 shadow-sm">
+    <Link
+      href={`/products/${product.id}`}
+      className="group flex h-full flex-col rounded-xl bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+    >
       {/* Product Image */}
-      <div className="aspect-square overflow-hidden rounded-lg bg-[#FAFAFA]">
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-[#FAFAFA]">
         <Image
           src={product.image}
           alt={product.name}
           width={500}
           height={500}
-          className="h-full w-full object-contain p-3 transition duration-500 hover:scale-105"
+          className="h-full w-full object-contain p-3 transition duration-500 group-hover:scale-105"
         />
+
+        <DiscountBadge discount={product.discount} />
       </div>
 
       {/* Product Information */}
@@ -139,29 +166,24 @@ const ProductCard = ({ product, variant = "product" }) => {
           {product.name}
         </h3>
 
-        <div className="flex min-h-[32px] items-center justify-center">
+        <div className="flex min-h-[32px] mb-2 items-center justify-center ">
           <DiscountPrice product={product} />
         </div>
 
-        <div className="mt-auto flex flex-col gap-2 pt-5">
-          <Link
-            href={`/products/${product.id}`}
-            className="inline-flex items-center justify-center gap-2 rounded-md border border-[#001B08] px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#001B08] hover:text-white"
-          >
-            View Details
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => addToCart(product)}
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
-          >
-            <FaShoppingCart />
-            Add to Cart
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            addToCart(product);
+          }}
+          className="mt-auto inline-flex items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
+        >
+          <FaShoppingCart />
+          Add to Cart
+        </button>
       </div>
-    </div>
+    </Link>
   );
 };
 
