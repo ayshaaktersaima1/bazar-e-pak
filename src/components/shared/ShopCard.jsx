@@ -39,7 +39,7 @@ const ShopCard = ({ shop, variant = "default" }) => {
 
           <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 text-sm text-gray-500">
             <span>{shop.productIds.length} Products</span>
-            <span>{shop.totalReviews} Reviews</span>
+            <span>{shop.reviewIds.length} Reviews</span>
           </div>
 
           <Link
@@ -98,7 +98,7 @@ const ShopCard = ({ shop, variant = "default" }) => {
           </span>
 
           <span className="text-sm text-gray-500">
-            {shop.totalReviews} Reviews
+            {shop.reviewIds.length} Reviews
           </span>
         </div>
 

@@ -12,8 +12,8 @@ const shops = [
         phone: "+92 300 1234567",
         email: "purenature@example.com",
         rating: 4.8,
-        totalReviews: 124,
         productIds: [1, 2],
+        reviewIds: [1, 2, 3, 13, 14, 15],
     },
 
     {
@@ -29,8 +29,8 @@ const shops = [
         phone: "+92 301 7654321",
         email: "mehakfragrance@example.com",
         rating: 4.7,
-        totalReviews: 98,
         productIds: [3, 4, 5],
+        reviewIds: [4, 5, 6, 16, 17, 18],
     },
 
     {
@@ -46,8 +46,8 @@ const shops = [
         phone: "+92 302 9876543",
         email: "techzone@example.com",
         rating: 4.6,
-        totalReviews: 215,
         productIds: [6, 7, 8, 9, 10, 11, 12, 13],
+        reviewIds: [7, 8, 9, 19, 20, 21],
     },
 
     {
@@ -63,8 +63,8 @@ const shops = [
         phone: "+92 303 4567890",
         email: "comfortfurniture@example.com",
         rating: 4.5,
-        totalReviews: 87,
         productIds: [14, 15, 16, 17, 18],
+        reviewIds: [10, 11, 12, 22, 23],
     },
 ];
 
