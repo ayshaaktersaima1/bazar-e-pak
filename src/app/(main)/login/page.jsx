@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import {
     FaGoogle,
     FaMotorcycle,
@@ -17,17 +16,11 @@ import { authClient } from "@/lib/auth-client";
 const LoginPage = () => {
     const router = useRouter();
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        if (isSubmitting) return;
-
         const formData = new FormData(e.currentTarget);
         const user = Object.fromEntries(formData.entries());
-
-        setIsSubmitting(true);
 
         const { error } = await authClient.signIn.email({
             email: user?.email,
@@ -36,7 +29,6 @@ const LoginPage = () => {
 
         if (error) {
             alert(error.message);
-            setIsSubmitting(false);
             return;
         }
 
@@ -73,7 +65,7 @@ const LoginPage = () => {
 
                         <div className="mt-5 h-1 w-14 bg-[#E8BB44]" />
 
-                        <p className="mt-5 text-sm leading-6 text-gray-200 xl:text-base xl:leading-7 w-80">
+                        <p className="mt-5 w-80 text-sm leading-6 text-gray-200 xl:text-base xl:leading-7">
                             Login to continue shopping, manage your store or
                             handle deliveries from your account.
                         </p>
@@ -183,7 +175,7 @@ const LoginPage = () => {
                             <form onSubmit={onSubmit} className="mt-8">
                                 {/* Email */}
                                 <fieldset className="fieldset">
-                                    <legend className="fieldset-legend text-[#001B08]">
+                                    <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                                         Email Address
                                     </legend>
 
@@ -198,7 +190,7 @@ const LoginPage = () => {
 
                                 {/* Password */}
                                 <fieldset className="fieldset mt-4">
-                                    <legend className="fieldset-legend text-[#001B08]">
+                                    <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                                         Password
                                     </legend>
 
@@ -214,12 +206,9 @@ const LoginPage = () => {
                                 {/* Login Button */}
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting}
                                     className="btn mt-6 w-full border-none bg-[#001B08] text-white hover:bg-[#E8BB44] hover:text-[#001B08]"
                                 >
-                                    {isSubmitting
-                                        ? "Logging in..."
-                                        : "Login"}
+                                    Login
                                 </button>
 
                                 {/* Divider */}
@@ -253,11 +242,9 @@ const LoginPage = () => {
                                             <p className="font-semibold text-[#001B08]">
                                                 Customer
                                             </p>
-
                                             <p className="mt-1 text-sm text-gray-600">
                                                 customer@demo.com
                                             </p>
-
                                             <p className="text-sm text-gray-600">
                                                 Demo1234
                                             </p>
@@ -267,11 +254,9 @@ const LoginPage = () => {
                                             <p className="font-semibold text-[#001B08]">
                                                 Store Owner
                                             </p>
-
                                             <p className="mt-1 text-sm text-gray-600">
                                                 owner@demo.com
                                             </p>
-
                                             <p className="text-sm text-gray-600">
                                                 Demo1234
                                             </p>
@@ -281,11 +266,9 @@ const LoginPage = () => {
                                             <p className="font-semibold text-[#001B08]">
                                                 Rider
                                             </p>
-
                                             <p className="mt-1 text-sm text-gray-600">
                                                 rider@demo.com
                                             </p>
-
                                             <p className="text-sm text-gray-600">
                                                 Demo1234
                                             </p>
@@ -295,11 +278,9 @@ const LoginPage = () => {
                                             <p className="font-semibold text-[#001B08]">
                                                 Admin
                                             </p>
-
                                             <p className="mt-1 text-sm text-gray-600">
                                                 admin@demo.com
                                             </p>
-
                                             <p className="text-sm text-gray-600">
                                                 Demo1234
                                             </p>
