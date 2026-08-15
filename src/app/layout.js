@@ -26,7 +26,7 @@ export const metadata = {
     },
     {
       name: "Abdur Rahman Adil",
-      url: "https://github.com/SyntaxAdil?tab=repositories",
+      url: "https://github.com/SyntaxAdil",
     },
   ],
 };
