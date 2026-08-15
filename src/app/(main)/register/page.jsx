@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import {
     FaGoogle,
     FaMotorcycle,
@@ -18,12 +17,8 @@ import { authClient } from "@/lib/auth-client";
 const RegisterPage = () => {
     const router = useRouter();
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const onSubmit = async (e) => {
         e.preventDefault();
-
-        if (isSubmitting) return;
 
         const formData = new FormData(e.currentTarget);
         const user = Object.fromEntries(formData.entries());
@@ -40,8 +35,6 @@ const RegisterPage = () => {
             return;
         }
 
-        setIsSubmitting(true);
-
         const { error } = await authClient.signUp.email({
             email: user?.email,
             password: user?.password,
@@ -52,7 +45,6 @@ const RegisterPage = () => {
 
         if (error) {
             alert(error.message);
-            setIsSubmitting(false);
             return;
         }
 
@@ -283,7 +275,7 @@ const RegisterPage = () => {
                                 {/* Name + Email */}
                                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                                     <fieldset className="fieldset">
-                                        <legend className="fieldset-legend text-[#001B08]">
+                                        <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                                             Full Name
                                         </legend>
 
@@ -297,7 +289,7 @@ const RegisterPage = () => {
                                     </fieldset>
 
                                     <fieldset className="fieldset">
-                                        <legend className="fieldset-legend text-[#001B08]">
+                                        <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                                             Email Address
                                         </legend>
 
@@ -313,7 +305,7 @@ const RegisterPage = () => {
 
                                 {/* Phone */}
                                 <fieldset className="fieldset mt-3">
-                                    <legend className="fieldset-legend text-[#001B08]">
+                                    <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                                         Phone Number
                                     </legend>
 
@@ -331,7 +323,7 @@ const RegisterPage = () => {
 
                                 {/* Password */}
                                 <fieldset className="fieldset mt-3">
-                                    <legend className="fieldset-legend text-[#001B08]">
+                                    <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                                         Password
                                     </legend>
 
@@ -346,7 +338,7 @@ const RegisterPage = () => {
 
                                 {/* Confirm Password */}
                                 <fieldset className="fieldset mt-3">
-                                    <legend className="fieldset-legend text-[#001B08]">
+                                    <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                                         Confirm Password
                                     </legend>
 
@@ -362,12 +354,9 @@ const RegisterPage = () => {
                                 {/* Submit */}
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting}
                                     className="btn mt-6 w-full border-none bg-[#001B08] text-white hover:bg-[#E8BB44] hover:text-[#001B08]"
                                 >
-                                    {isSubmitting
-                                        ? "Creating Account..."
-                                        : "Create Account"}
+                                    Create Account
                                 </button>
 
                                 {/* Divider */}
