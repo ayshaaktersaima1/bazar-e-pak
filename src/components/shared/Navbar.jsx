@@ -9,7 +9,7 @@ import { FaBars, FaSearch, FaShoppingCart, FaWhatsapp } from "react-icons/fa";
 import CartButton from "./CartButton";
 import ProductSearch from "./ProductSearch";
 
-const Navbar = ({ needAuth = false }) => {
+const Navbar = ({ needAuth = true }) => {
   const pathname = usePathname();
   const navbarRef = useRef(null);
 
@@ -199,7 +199,7 @@ const Navbar = ({ needAuth = false }) => {
         {/* Right: Search + Icons */}
         <div className="flex shrink-0 items-center justify-end gap-0 sm:gap-1 md:gap-2">
           {/* Desktop Search */}
-          <div className="hidden w-full max-w-[280px] shrink-0 lg:block xl:max-w-[320px] 2xl:max-w-[350px]">
+          <div className="hidden w-full max-w-[150px] shrink-0 lg:block xl:max-w-[200px] 2xl:max-w-[230px]">
             <ProductSearch />
           </div>
           {/* WhatsApp */}
