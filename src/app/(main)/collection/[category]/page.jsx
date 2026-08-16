@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 
 import PageBanner from "@/components/PageBanner";
-import ProductCard from "@/components/shared/ProductCard";
+import CategoryProducts from "@/components/category/CategoryProducts";
 import categories from "@/data/categories";
-import products from "@/data/products";
 
 const CategoryPage = async ({ params }) => {
     const { category } = await params;
@@ -16,9 +15,6 @@ const CategoryPage = async ({ params }) => {
         notFound();
     }
 
-    const categoryProducts = products?.filter(
-        (product) => product?.category === category
-    );
 
     return (
         <main>
@@ -44,15 +40,7 @@ const CategoryPage = async ({ params }) => {
                         </div>
                     </div>
 
-                    <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-5 xl:gap-8">
-                        {categoryProducts?.map((product) => (
-                            <ProductCard
-                            variant="homepage"
-                                key={product?.id}
-                                product={product}
-                            />
-                        ))}
-                    </div>
+                    <CategoryProducts category={category} />
                 </div>
             </section>
         </main>

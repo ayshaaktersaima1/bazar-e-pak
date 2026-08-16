@@ -65,8 +65,8 @@ const ShopDetailsPage = async ({ params }) => {
             {/* Shop Image */}
             <div className="overflow-hidden rounded-2xl bg-[#F7F5EF]">
               <Image
-              width={300}
-              height={300}
+                width={300}
+                height={300}
                 src={shop.image}
                 alt={shop.name}
                 className="h-64 w-full object-cover md:h-80 lg:h-96"
@@ -206,7 +206,7 @@ const ShopDetailsPage = async ({ params }) => {
               <span className="h-px w-14 bg-[#001B08]" />
             </div>
 
-            
+
           </div>
 
           <div className="mt-10">
