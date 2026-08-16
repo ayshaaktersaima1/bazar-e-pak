@@ -1,12 +1,13 @@
 "use client";
 
-import products from "@/data/products";
+import { useProduct } from "@/hooks/use-product";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
 const ProductSearch = () => {
+  const { products } = useProduct();
   const [search, setSearch] = useState("");
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef(null);
@@ -14,10 +15,10 @@ const ProductSearch = () => {
   const searchResults =
     search.trim().length > 0
       ? products
-          .filter((product) =>
-            product.name.toLowerCase().includes(search.toLowerCase().trim()),
-          )
-          .slice(0, 5)
+        .filter((product) =>
+          product.name.toLowerCase().includes(search.toLowerCase().trim()),
+        )
+        .slice(0, 5)
       : [];
 
   useEffect(() => {
@@ -102,9 +103,9 @@ const ProductSearch = () => {
                     PKR{" "}
                     {product.discount
                       ? Math.round(
-                          product.price -
-                            (product.price * product.discount) / 100,
-                        )
+                        product.price -
+                        (product.price * product.discount) / 100,
+                      )
                       : product.price}
                   </div>
                 </Link>

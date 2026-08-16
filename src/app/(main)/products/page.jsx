@@ -4,13 +4,14 @@ import { useMemo, useState } from "react";
 import PageBanner from "@/components/PageBanner";
 import ProductCard from "@/components/shared/ProductCard";
 import SearchFilter from "@/components/shared/SearchFilter";
-import products from "@/data/products";
+import { useProduct } from "@/hooks/use-product";
 import categories from "@/data/categories";
 
 const AllProductsPage = () => {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("all");
     const [sort, setSort] = useState("default");
+    const { products } = useProduct();
 
     const filters = [
         {

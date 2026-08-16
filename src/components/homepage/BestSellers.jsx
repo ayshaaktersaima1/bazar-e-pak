@@ -8,10 +8,11 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 
-import products from "@/data/products";
+import { useProduct } from "@/hooks/use-product";
 import ProductCard from "../shared/ProductCard";
 
 const BestSellers = () => {
+  const { products } = useProduct();
   return (
     <section className="bg-[#F7F5EF] py-16">
       {/* Heading */}

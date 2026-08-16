@@ -3,19 +3,22 @@
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 
-import products from "@/data/products";
-import shops from "@/data/shops";
+import { useProduct } from "@/hooks/use-product";
+import { useShop } from "@/hooks/use-shop";
 import ShopInfo from "../../../../components/shared/ShopInfo";
 import ProductInfo from "../../../../components/shared/ProductInfo";
 
 const ProductDetailsPage = () => {
-  const { slug } = useParams();
+  const { id } = useParams();
   const router = useRouter();
 
-  const product = products.find((item) => item.slug === slug);
+  const { products, getProductById } = useProduct();
+  const { getShopById } = useShop();
+
+  const product = getProductById(id);
 
   const shop = product
-    ? shops.find((item) => item.id === product.shopId)
+    ? getShopById(product.shopId)
     : null;
 
   if (!product) {
@@ -42,7 +45,10 @@ const ProductDetailsPage = () => {
     <main className="bg-[#F7F5EF] py-10 md:py-14">
       <section className="mx-auto w-[90%]">
         {/* Shop Information */}
-        <ShopInfo shop={shop} productCount={productCount} />
+        <ShopInfo
+          shop={shop}
+          productCount={productCount}
+        />
 
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Product Image */}
@@ -58,7 +64,10 @@ const ProductDetailsPage = () => {
           </div>
 
           {/* Product Information */}
-          <ProductInfo product={product} onAdded={() => router.push("/cart")} />
+          <ProductInfo
+            product={product}
+            onAdded={() => router.push("/cart")}
+          />
         </div>
       </section>
     </main>
