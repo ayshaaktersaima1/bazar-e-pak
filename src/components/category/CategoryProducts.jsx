@@ -16,7 +16,7 @@ const CategoryProducts = ({ category }) => {
             {categoryProducts?.map((product) => (
                 <ProductCard
                     variant="homepage"
-                    key={product?.id}
+                    key={product?._id}
                     product={product}
                 />
             ))}

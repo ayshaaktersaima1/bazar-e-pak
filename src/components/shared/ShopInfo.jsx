@@ -23,7 +23,7 @@ const ShopInfo = ({ shop, productCount }) => {
                 <div className="flex min-w-0 items-center gap-4 md:gap-5">
                     <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-[#E8BB44] bg-[#F7F5EF] p-1.5 sm:h-24 sm:w-24">
                         <Image
-                            src={shop.image}
+                            src={shop.logo || "/images/placeholder.webp"}
                             alt={shop.name}
                             width={120}
                             height={120}

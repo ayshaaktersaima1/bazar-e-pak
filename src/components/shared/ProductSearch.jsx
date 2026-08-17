@@ -74,14 +74,17 @@ const ProductSearch = () => {
             <div className="max-h-80 overflow-y-auto">
               {searchResults.map((product) => (
                 <Link
-                  key={product.id}
-                  href={`/products/${product.id}`}
+                  key={product._id}
+                  href={`/products/${product._id}`}
                   onClick={handleProductClick}
                   className="flex items-center gap-3 border-b border-gray-100 p-3 transition last:border-b-0 hover:bg-[#F7F5EF]"
                 >
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-[#FAFAFA]">
                     <Image
-                      src={product.image}
+                      src={
+                        product.images?.[0] ||
+                        "/images/placeholder.webp"
+                      }
                       alt={product.name}
                       width={60}
                       height={60}
@@ -93,20 +96,10 @@ const ProductSearch = () => {
                     <p className="truncate text-sm font-semibold text-[#001B08]">
                       {product.name}
                     </p>
-
-                    <p className="mt-0.5 text-xs capitalize text-gray-500">
-                      {product.category}
-                    </p>
                   </div>
 
                   <div className="shrink-0 text-sm font-bold text-[#001B08]">
-                    PKR{" "}
-                    {product.discount
-                      ? Math.round(
-                        product.price -
-                        (product.price * product.discount) / 100,
-                      )
-                      : product.price}
+                    PKR {product.price}
                   </div>
                 </Link>
               ))}

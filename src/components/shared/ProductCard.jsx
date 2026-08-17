@@ -36,7 +36,7 @@ const ProductCard = ({ product, variant = "product" }) => {
         {/* Product Image */}
         <div className="group relative h-[210px] shrink-0 overflow-hidden rounded-lg bg-[#FAFAFA]">
           <Image
-            src={product.image}
+            src={product.images?.[0] || "/images/placeholder.webp"}
             alt={product.name}
             width={400}
             height={350}
@@ -48,7 +48,7 @@ const ProductCard = ({ product, variant = "product" }) => {
           {/* Hover Overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-[#001B08]/50 opacity-0 transition duration-300 group-hover:opacity-100">
             <Link
-              href={`/products/${product.id}`}
+              href={`/products/${product._id}`}
               className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
             >
               View Details
@@ -83,7 +83,7 @@ const ProductCard = ({ product, variant = "product" }) => {
         {/* Product Image */}
         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#FAFAFA]">
           <Image
-            src={product.image}
+            src={product.images?.[0] || "/images/placeholder.webp"}
             alt={product.name}
             width={100}
             height={100}
@@ -111,7 +111,7 @@ const ProductCard = ({ product, variant = "product" }) => {
         <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-[#F7F5EF] p-1">
           <button
             type="button"
-            onClick={() => decreaseQuantity(product.id)}
+            onClick={() => decreaseQuantity(product._id)}
             className="flex h-7 w-7 items-center justify-center rounded bg-white text-[#001B08] shadow-sm transition hover:bg-[#E8BB44]"
           >
             <FaMinus size={10} />
@@ -123,7 +123,7 @@ const ProductCard = ({ product, variant = "product" }) => {
 
           <button
             type="button"
-            onClick={() => increaseQuantity(product.id)}
+            onClick={() => increaseQuantity(product._id)}
             className="flex h-7 w-7 items-center justify-center rounded bg-white text-[#001B08] shadow-sm transition hover:bg-[#E8BB44]"
           >
             <FaPlus size={10} />
@@ -133,7 +133,7 @@ const ProductCard = ({ product, variant = "product" }) => {
         {/* Remove Button */}
         <button
           type="button"
-          onClick={() => removeFromCart(product.id)}
+          onClick={() => removeFromCart(product._id)}
           className="flex h-9 w-9 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-500"
         >
           <FaTrash size={14} />
@@ -144,13 +144,13 @@ const ProductCard = ({ product, variant = "product" }) => {
 
   return (
     <Link
-      href={`/products/${product.id}`}
+      href={`/products/${product._id}`}
       className="group flex h-full flex-col rounded-xl bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
     >
       {/* Product Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-[#FAFAFA]">
         <Image
-          src={product.image}
+          src={product.images?.[0] || "/images/placeholder.webp"}
           alt={product.name}
           width={500}
           height={500}

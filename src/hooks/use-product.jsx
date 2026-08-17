@@ -1,14 +1,44 @@
 "use client";
 
-import { createContext, useContext } from "react";
-import products from "@/data/products";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const res = await fetch(
+                `${baseUrl}/api/products`,
+                {
+                    cache: "no-store",
+                }
+            );
+
+            const data = await res.json();
+
+            if (data.success) {
+                setProducts(data.data || []);
+            }
+
+            setLoading(false);
+        };
+
+        fetchProducts();
+    }, [baseUrl]);
+
     const getProductById = (productId) => {
         return products.find(
-            (product) => product.id === Number(productId)
+            (product) => product._id === productId
         );
     };
 
@@ -16,6 +46,7 @@ export const ProductProvider = ({ children }) => {
         <ProductContext.Provider
             value={{
                 products,
+                loading,
                 getProductById,
             }}
         >

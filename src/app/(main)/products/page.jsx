@@ -7,10 +7,18 @@ import SearchFilter from "@/components/shared/SearchFilter";
 import { useProduct } from "@/hooks/use-product";
 import categories from "@/data/categories";
 
+const categoryIds = {
+    honey: "68a200000000000000000001",
+    mehak: "68a200000000000000000002",
+    mobile: "68a200000000000000000003",
+    furniture: "68a200000000000000000004",
+};
+
 const AllProductsPage = () => {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("all");
     const [sort, setSort] = useState("default");
+
     const { products } = useProduct();
 
     const filters = [
@@ -25,7 +33,7 @@ const AllProductsPage = () => {
                     label: "All Categories",
                 },
                 ...categories.map((item) => ({
-                    value: item.category,
+                    value: categoryIds[item.category],
                     label: item.title,
                 })),
             ],
@@ -59,7 +67,8 @@ const AllProductsPage = () => {
                 .includes(search.toLowerCase());
 
             const matchesCategory =
-                category === "all" || product.category === category;
+                category === "all" ||
+                product.categoryId === category;
 
             return matchesSearch && matchesCategory;
         });
@@ -83,7 +92,7 @@ const AllProductsPage = () => {
         }
 
         return result;
-    }, [search, category, sort]);
+    }, [products, search, category, sort]);
 
     const handleClear = () => {
         setSearch("");
@@ -132,7 +141,7 @@ const AllProductsPage = () => {
                         <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-5 xl:gap-8">
                             {filteredProducts.map((product) => (
                                 <ProductCard
-                                    key={product.id}
+                                    key={product._id}
                                     product={product}
                                 />
                             ))}

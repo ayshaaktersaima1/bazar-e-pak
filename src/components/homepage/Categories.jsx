@@ -1,15 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaArrowRight } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaChair,
+  FaHeadphones,
+  FaPumpSoap,
+} from "react-icons/fa";
+import { GiHoneyJar } from "react-icons/gi";
 
-import categories from "@/data/categories";
+const categoryIcons = {
+  honey: GiHoneyJar,
+  mehak: FaPumpSoap,
+  mobile: FaHeadphones,
+  furniture: FaChair,
+};
 
-const Categories = () => {
-  const categoryList = Object.values(categories);
+const Categories = async () => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SERVER_URL;
+
+  const res = await fetch(
+    `${baseUrl}/api/categories?status=active`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  const data = await res.json();
+
+  const categories = data.data || [];
 
   return (
     <section className="bg-[#F7F5EF] py-16">
       <div className="mx-auto w-[90%]">
+
         {/* Section Heading */}
         <div className="text-center">
           <p className="text-base font-semibold uppercase tracking-widest text-[#E8BB44]">
@@ -27,12 +51,13 @@ const Categories = () => {
 
         {/* Category Cards */}
         <div className="mt-12 grid gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-4 xl:gap-8">
-          {categoryList?.map((category) => {
-            const Icon = category?.icon;
+          {categories.map((category) => {
+            const Icon =
+              categoryIcons[category.slug];
 
             return (
               <div
-                key={category?.id}
+                key={category._id}
                 className="relative flex flex-col rounded-xl bg-white p-3 shadow-md transition duration-300 hover:-translate-y-2"
               >
                 {/* Category Icon */}
@@ -43,8 +68,11 @@ const Categories = () => {
                 {/* Category Image */}
                 <div className="overflow-hidden rounded-lg">
                   <Image
-                    src={category?.image}
-                    alt={category?.title}
+                    src={
+                      category.image ||
+                      "/images/placeholder.webp"
+                    }
+                    alt={category.name}
                     width={500}
                     height={400}
                     className="h-56 w-full object-cover transition duration-500 hover:scale-105 lg:h-44 xl:h-56"
@@ -54,16 +82,16 @@ const Categories = () => {
                 {/* Content */}
                 <div className="flex flex-1 flex-col px-3 pb-4 pt-5 text-center lg:px-1 lg:pt-4 xl:px-3 xl:pt-5">
                   <h3 className="text-xl font-bold text-[#001B08] lg:text-base xl:text-xl">
-                    {category?.title}
+                    {category.name}
                   </h3>
 
-                  <p className="mx-auto mt-3 max-w-60 text-base leading-6 text-gray-600 lg:text-sm lg:leading-5 xl:text-base xl:leading-6">
-                    {category?.cardDescription}
+                  <p className="mx-auto mt-3 max-w-60 text-base leading-6 text-gray-600 lg:text-sm lg:leading-5 xl:text-base xl:leading-6 line-clamp-2">
+                    {category.description}
                   </p>
 
                   <Link
-                    href={category?.href}
-                    className="text-center justify-center mt-5 inline-flex items-center gap-2 rounded-md bg-[#001B08] px-5 py-2.5 text-base font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08] lg:px-4 lg:py-2 lg:text-sm xl:px-5 xl:py-2.5 xl:text-base"
+                    href={`/collection/${category.slug}`}
+                    className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#001B08] px-5 py-2.5 text-base font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08] lg:px-4 lg:py-2 lg:text-sm xl:px-5 xl:py-2.5 xl:text-base"
                   >
                     Shop Now
                     <FaArrowRight className="text-sm" />

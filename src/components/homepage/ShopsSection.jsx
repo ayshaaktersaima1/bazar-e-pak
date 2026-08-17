@@ -1,11 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-
-import shops from "@/data/shops";
 import ShopCard from "../shared/ShopCard";
 
 const ShopsSection = () => {
+  const [shops, setShops] = useState([]);
+
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
+  useEffect(() => {
+    const fetchShops = async () => {
+      const res = await fetch(
+        `${baseUrl}/api/shops`,
+        {
+          cache: "no-store",
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        setShops(data.data || []);
+      }
+    };
+
+    fetchShops();
+  }, [baseUrl]);
+
   return (
     <section className="bg-[#F7F5EF] py-16">
       {/* Heading */}
@@ -28,7 +50,11 @@ const ShopsSection = () => {
       {/* Shop Cards */}
       <div className="mx-auto mt-10 grid w-[90%] grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
         {shops.map((shop) => (
-          <ShopCard key={shop.id} shop={shop} variant="homepage" />
+          <ShopCard
+            key={shop._id}
+            shop={shop}
+            variant="homepage"
+          />
         ))}
       </div>
 

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+
 import {
   FaArrowLeft,
   FaEnvelope,
@@ -8,21 +10,23 @@ import {
   FaStore,
 } from "react-icons/fa";
 
-import ShopReview from "../../../../components/shared/ShopReview";
-
-import shops from "@/data/shops";
-import products from "@/data/products";
 import ProductCard from "../../../../components/shared/ProductCard";
-import ShopCard from "../../../../components/shared/ShopCard";
-import Image from "next/image";
-import reviews from "../../../../data/review";
+import ShopReview from "@/components/shared/ShopReview";
 
 const ShopDetailsPage = async ({ params }) => {
   const { id } = await params;
 
-  const shop = shops.find((item) => item.id === Number(id));
-  const shopReviews = reviews.filter((review) => review.shopId === shop.id);
-  if (!shop) {
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
+  // Get this shop
+  const shopRes = await fetch(
+    `${baseUrl}/api/shops/${id}`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!shopRes.ok) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#F7F5EF] px-5">
         <div className="text-center">
@@ -46,13 +50,46 @@ const ShopDetailsPage = async ({ params }) => {
     );
   }
 
-  const shopProducts = products.filter((product) => product.shopId === shop.id);
+  const shopData = await shopRes.json();
+  const shop = shopData.data;
+
+  // Get products of this shop
+  const productRes = await fetch(
+    `${baseUrl}/api/products?shopId=${shop._id}`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  const productData = await productRes.json();
+  const shopProducts = productData.data || [];
+
+  // Get reviews of this shop
+  const reviewRes = await fetch(
+    `${baseUrl}/api/reviews?reviewType=shop&shopId=${shop._id}`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  const reviewData = await reviewRes.json();
+  const shopReviews = reviewData.data || [];
+
+  const averageRating =
+    shopReviews.length > 0
+      ? shopReviews.reduce(
+        (total, review) => total + review.rating,
+        0
+      ) / shopReviews.length
+      : 0;
 
   return (
     <main className="min-h-screen bg-[#F7F5EF]">
+
       {/* Shop Hero */}
       <section className="bg-[#001B08] py-12 md:py-16">
         <div className="mx-auto w-[90%]">
+
           <Link
             href="/shops"
             className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-white transition duration-300 hover:text-[#E8BB44]"
@@ -62,12 +99,17 @@ const ShopDetailsPage = async ({ params }) => {
           </Link>
 
           <div className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+
             {/* Shop Image */}
             <div className="overflow-hidden rounded-2xl bg-[#F7F5EF]">
               <Image
-                width={300}
-                height={300}
-                src={shop.image}
+                width={800}
+                height={500}
+                src={
+                  shop.banner ||
+                  shop.logo ||
+                  "/images/placeholder.webp"
+                }
                 alt={shop.name}
                 className="h-64 w-full object-cover md:h-80 lg:h-96"
               />
@@ -75,9 +117,10 @@ const ShopDetailsPage = async ({ params }) => {
 
             {/* Shop Information */}
             <div className="text-white">
+
               <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-[#E8BB44]">
                 <FaStore />
-                {shop.category}
+                {shop.status}
               </div>
 
               <h1 className="mt-3 text-4xl font-bold md:text-5xl">
@@ -85,13 +128,17 @@ const ShopDetailsPage = async ({ params }) => {
               </h1>
 
               <div className="mt-5 flex flex-wrap items-center gap-4">
+
                 <div className="flex items-center gap-2 rounded-full bg-[#E8BB44] px-3 py-1.5 text-sm font-bold text-[#001B08]">
                   <FaStar />
-                  {shop.rating}
+
+                  {shopReviews.length > 0
+                    ? averageRating.toFixed(1)
+                    : "0.0"}
                 </div>
 
                 <span className="text-sm text-gray-300">
-                  {shop.totalReviews} Reviews
+                  {shopReviews.length} Reviews
                 </span>
 
                 <span className="text-sm text-gray-300">
@@ -104,37 +151,67 @@ const ShopDetailsPage = async ({ params }) => {
               </p>
 
               <div className="mt-7 grid gap-4 text-sm text-gray-300 sm:grid-cols-2">
+
+                {/* Seller */}
                 <div className="flex items-start gap-3">
                   <FaStore className="mt-1 shrink-0 text-[#E8BB44]" />
+
                   <div>
-                    <p className="font-semibold text-white">Owner</p>
-                    <p className="mt-1">{shop.owner}</p>
+                    <p className="font-semibold text-white">
+                      Seller
+                    </p>
+
+                    <p className="mt-1 break-all">
+                      {shop.sellerId}
+                    </p>
                   </div>
                 </div>
 
+                {/* Location */}
                 <div className="flex items-start gap-3">
                   <FaMapMarkerAlt className="mt-1 shrink-0 text-[#E8BB44]" />
+
                   <div>
-                    <p className="font-semibold text-white">Location</p>
-                    <p className="mt-1">{shop.address}</p>
+                    <p className="font-semibold text-white">
+                      Location
+                    </p>
+
+                    <p className="mt-1">
+                      {shop.address || "Not provided"}
+                    </p>
                   </div>
                 </div>
 
+                {/* Phone */}
                 <div className="flex items-start gap-3">
                   <FaPhone className="mt-1 shrink-0 text-[#E8BB44]" />
+
                   <div>
-                    <p className="font-semibold text-white">Phone</p>
-                    <p className="mt-1">{shop.phone}</p>
+                    <p className="font-semibold text-white">
+                      Phone
+                    </p>
+
+                    <p className="mt-1">
+                      {shop.phone || "Not provided"}
+                    </p>
                   </div>
                 </div>
 
+                {/* Email */}
                 <div className="flex items-start gap-3">
                   <FaEnvelope className="mt-1 shrink-0 text-[#E8BB44]" />
+
                   <div>
-                    <p className="font-semibold text-white">Email</p>
-                    <p className="mt-1 break-all">{shop.email}</p>
+                    <p className="font-semibold text-white">
+                      Email
+                    </p>
+
+                    <p className="mt-1 break-all">
+                      {shop.email || "Not provided"}
+                    </p>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -144,8 +221,9 @@ const ShopDetailsPage = async ({ params }) => {
       {/* Products */}
       <section className="py-16">
         <div className="mx-auto w-[90%]">
-          {/* Section Heading */}
+
           <div className="text-center">
+
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#E8BB44]">
               Shop Collection
             </p>
@@ -156,13 +234,17 @@ const ShopDetailsPage = async ({ params }) => {
 
             <div className="mt-5 flex items-center justify-center gap-3">
               <span className="h-px w-14 bg-[#001B08]" />
-              <span className="text-[#E8BB44]">★</span>
+
+              <span className="text-[#E8BB44]">
+                ★
+              </span>
+
               <span className="h-px w-14 bg-[#001B08]" />
             </div>
 
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-gray-500">
-              Explore the complete collection of products available from{" "}
-              {shop.name}.
+              Explore the complete collection of products
+              available from {shop.name}.
             </p>
           </div>
 
@@ -170,11 +252,15 @@ const ShopDetailsPage = async ({ params }) => {
           {shopProducts.length > 0 ? (
             <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {shopProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                />
               ))}
             </div>
           ) : (
             <div className="mt-10 rounded-xl bg-white p-10 text-center shadow-sm">
+
               <FaStore className="mx-auto text-3xl text-[#E8BB44]" />
 
               <h3 className="mt-4 text-xl font-bold text-[#001B08]">
@@ -186,12 +272,16 @@ const ShopDetailsPage = async ({ params }) => {
               </p>
             </div>
           )}
+
         </div>
       </section>
+
       {/* Reviews */}
       <section className="bg-white py-16">
         <div className="mx-auto w-[90%]">
+
           <div className="text-center">
+
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#E8BB44]">
               Customer Reviews
             </p>
@@ -202,18 +292,23 @@ const ShopDetailsPage = async ({ params }) => {
 
             <div className="mt-5 flex items-center justify-center gap-3">
               <span className="h-px w-14 bg-[#001B08]" />
-              <span className="text-[#E8BB44]">★</span>
+
+              <span className="text-[#E8BB44]">
+                ★
+              </span>
+
               <span className="h-px w-14 bg-[#001B08]" />
             </div>
-
-
           </div>
 
-          <div className="mt-10">
-            <ShopReview reviews={shopReviews} />
-          </div>
+          <ShopReview
+            shopId={shop._id}
+            initialReviews={shopReviews}
+          />
+
         </div>
       </section>
+
     </main>
   );
 };
