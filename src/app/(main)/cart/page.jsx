@@ -1,11 +1,23 @@
 "use client";
 
 import { useCart } from "@/hooks/use-cart";
+
 import { CartList, CartSummary, EmptyCart } from "../../../components/cart";
 
-
 const CartPage = () => {
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartItems, cartTotal, clearCart, loading, actionLoading } = useCart();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F7F5EF] py-12">
+        <div className="mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4">
+          <p className="text-sm font-medium text-gray-500">
+            Loading your cart...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F5EF] py-12">
@@ -14,21 +26,32 @@ const CartPage = () => {
           <p className="text-xs font-semibold uppercase tracking-widest text-[#E8BB44]">
             Review Your Order
           </p>
+
           <h1 className="mt-2 font-serif text-3xl font-bold text-[#001B08] sm:text-4xl">
             Shopping Cart
           </h1>
-          <div className="mx-auto mt-3 h-0.5 w-16 bg-[#E8BB44]"></div>
+
+          <div className="mx-auto mt-3 h-0.5 w-16 bg-[#E8BB44]" />
         </div>
 
         {cartItems.length === 0 ? (
           <EmptyCart />
         ) : (
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div
+            className={`grid grid-cols-1 gap-8 lg:grid-cols-3 ${
+              actionLoading ? "pointer-events-none opacity-70" : ""
+            }`}
+          >
             <div className="lg:col-span-2">
               <CartList cartItems={cartItems} />
             </div>
+
             <div>
-              <CartSummary cartTotal={cartTotal} clearCart={clearCart} />
+              <CartSummary
+                cartTotal={cartTotal}
+                clearCart={clearCart}
+                actionLoading={actionLoading}
+              />
             </div>
           </div>
         )}
