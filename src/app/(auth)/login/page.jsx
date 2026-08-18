@@ -122,6 +122,7 @@ const LoginPage = () => {
   return (
     <main className="relative min-h-screen bg-[#F7F5EF]">
       {/* Left Background */}
+
       <div className="absolute bottom-0 left-0 top-0 hidden overflow-hidden lg:block lg:w-[42%] xl:w-[48%]">
         <Image
           src="/images/test.png"
@@ -133,8 +134,10 @@ const LoginPage = () => {
       </div>
 
       {/* Website Content */}
+
       <div className="relative mx-auto grid min-h-screen w-[90%] items-start gap-4 py-10 lg:grid-cols-[38%_1fr] xl:grid-cols-[42%_1fr] xl:gap-8">
         {/* Left Content */}
+
         <div className="relative z-10 hidden lg:block">
           <div className="max-w-[300px] xl:max-w-md">
             <h1 className="text-3xl font-bold leading-tight text-white xl:text-4xl">
@@ -150,6 +153,7 @@ const LoginPage = () => {
             </p>
 
             {/* Benefits */}
+
             <div className="mt-8 space-y-5">
               <div className="flex items-start gap-3 xl:gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44]">
@@ -217,21 +221,35 @@ const LoginPage = () => {
         </div>
 
         {/* Right Side */}
+
         <div className="min-w-0 w-full">
           <div className="mx-auto w-full max-w-xl">
-            {/* Register Link */}
-            <div className="mb-5 flex items-center justify-end gap-3 text-sm">
-              <span className="text-gray-600">Don&apos;t have an account?</span>
+            {/* Back to Home + Register Link */}
 
+            <div className="mb-5 flex items-center justify-between gap-3 text-sm">
               <Link
-                href="/register"
-                className="rounded-md border border-[#001B08] px-4 py-2 font-semibold text-[#001B08] transition hover:bg-[#001B08] hover:text-white"
+                href="/"
+                className="font-semibold text-[#001B08] transition hover:text-[#E8BB44]"
               >
-                Register
+                ← Back to Home
               </Link>
+
+              <div className="flex items-center gap-3">
+                <span className="text-gray-600">
+                  Don&apos;t have an account?
+                </span>
+
+                <Link
+                  href="/register"
+                  className="rounded-md border border-[#001B08] px-4 py-2 font-semibold text-[#001B08] transition hover:bg-[#001B08] hover:text-white"
+                >
+                  Register
+                </Link>
+              </div>
             </div>
 
             {/* Login Form */}
+
             <div className="rounded-2xl bg-white p-6 shadow-md sm:p-8">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-[#001B08] sm:text-3xl">
@@ -249,12 +267,14 @@ const LoginPage = () => {
                 noValidate
               >
                 {/* Roles */}
+
                 <p className="mb-3 text-sm font-semibold text-[#001B08]">
                   Login as Demo Role
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {/* Customer */}
+
                   <label className="cursor-pointer">
                     <input
                       type="radio"
@@ -273,6 +293,7 @@ const LoginPage = () => {
                   </label>
 
                   {/* Store Owner */}
+
                   <label className="cursor-pointer">
                     <input
                       type="radio"
@@ -291,6 +312,7 @@ const LoginPage = () => {
                   </label>
 
                   {/* Rider */}
+
                   <label className="cursor-pointer">
                     <input
                       type="radio"
@@ -309,6 +331,7 @@ const LoginPage = () => {
                   </label>
 
                   {/* Admin */}
+
                   <label className="cursor-pointer">
                     <input
                       type="radio"
@@ -328,6 +351,7 @@ const LoginPage = () => {
                 </div>
 
                 {/* Email */}
+
                 <fieldset className="fieldset mt-5">
                   <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                     Email Address
@@ -359,6 +383,7 @@ const LoginPage = () => {
                 </fieldset>
 
                 {/* Password */}
+
                 <fieldset className="fieldset mt-4">
                   <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                     Password
@@ -384,6 +409,7 @@ const LoginPage = () => {
                     />
 
                     {/* Password Toggle */}
+
                     <button
                       type="button"
                       disabled={isLoading}
@@ -405,6 +431,7 @@ const LoginPage = () => {
                 </fieldset>
 
                 {/* Login Button */}
+
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -414,6 +441,7 @@ const LoginPage = () => {
                 </button>
 
                 {/* Divider */}
+
                 <div className="my-5 flex items-center gap-3">
                   <span className="h-px flex-1 bg-gray-200" />
 
@@ -425,6 +453,7 @@ const LoginPage = () => {
                 </div>
 
                 {/* Google */}
+
                 <button
                   type="button"
                   disabled={isLoading}
@@ -435,6 +464,7 @@ const LoginPage = () => {
                 </button>
 
                 {/* Mobile Register */}
+
                 <p className="mt-6 text-center text-sm text-gray-600 lg:hidden">
                   Don&apos;t have an account?{" "}
                   <Link

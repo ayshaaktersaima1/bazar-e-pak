@@ -124,7 +124,6 @@ const RegisterPage = () => {
 
       toast.error(
         error?.message || "Something went wrong while creating your account.",
-
         {
           duration: 5000,
         },
@@ -237,18 +236,29 @@ const RegisterPage = () => {
         {/* Right Side */}
 
         <div className="min-w-0 w-full">
-          <div className="mx-auto w-full ">
-            {/* Login */}
+          <div className="mx-auto w-full">
+            {/* Back to Home + Login */}
 
-            <div className="mb-5 flex items-center justify-end gap-3 text-sm">
-              <span className="text-gray-600">Already have an account?</span>
-
+            <div className="mb-5 flex items-center justify-between gap-3 text-sm">
               <Link
-                href="/login"
-                className="rounded-md border border-[#001B08] px-4 py-2 font-semibold text-[#001B08] transition hover:bg-[#001B08] hover:text-white"
+                href="/"
+                className="font-semibold text-[#001B08] transition hover:text-[#E8BB44]"
               >
-                Login
+                ← Back to Home
               </Link>
+
+              <div className="flex items-center gap-3">
+                <span className="text-gray-600">
+                  Already have an account?
+                </span>
+
+                <Link
+                  href="/login"
+                  className="rounded-md border border-[#001B08] px-4 py-2 font-semibold text-[#001B08] transition hover:bg-[#001B08] hover:text-white"
+                >
+                  Login
+                </Link>
+              </div>
             </div>
 
             {/* Form */}
@@ -598,4 +608,5 @@ const RegisterPage = () => {
     </main>
   );
 };
+
 export default RegisterPage;
