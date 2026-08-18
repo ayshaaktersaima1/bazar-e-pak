@@ -598,3 +598,4 @@ const RegisterPage = () => {
     </main>
   );
 };
+export default RegisterPage;
