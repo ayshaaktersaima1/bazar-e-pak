@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import {
@@ -14,6 +14,7 @@ import {
   FaShieldAlt,
   FaShoppingBag,
   FaStore,
+  FaUser,
 } from "react-icons/fa";
 
 import { authClient } from "@/lib/auth-client";
@@ -28,13 +29,35 @@ const LoginPage = () => {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      role: "customer",
+      email: "customer@bep.com",
+      password: "customer@BEP",
     },
   });
+
+  const role = watch("role");
+
+  // Auto-fill login details when role changes
+  useEffect(() => {
+    if (role === "customer") {
+      setValue("email", "customer@bep.com");
+      setValue("password", "customer@BEP");
+    } else if (role === "store-owner") {
+      setValue("email", "seller@bep.com");
+      setValue("password", "seller@BEP");
+    } else if (role === "rider") {
+      setValue("email", "rider@bep.com");
+      setValue("password", "rider@BEP");
+    } else if (role === "admin") {
+      setValue("email", "admin@bep.com");
+      setValue("password", "admin@BEP");
+    }
+  }, [role, setValue]);
 
   const loginUser = async (email, password) => {
     try {
@@ -92,30 +115,6 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     await loginUser(data.email, data.password);
-  };
-
-  const handleDemoLogin = async (role) => {
-    const demoAccounts = {
-      customer: "customer@demo.com",
-      owner: "owner@demo.com",
-      rider: "rider@demo.com",
-      admin: "admin@demo.com",
-    };
-
-    const email = demoAccounts[role];
-
-    if (!email) {
-      toast.error("Invalid demo account.");
-      return;
-    }
-
-    setIsDemoLogin(true);
-
-    try {
-      await loginUser(email, "Demo1234");
-    } finally {
-      setIsDemoLogin(false);
-    }
   };
 
   const isLoading = isSubmitting || isDemoLogin;
@@ -240,17 +239,96 @@ const LoginPage = () => {
                 </h2>
 
                 <p className="mt-2 text-sm text-gray-600">
-                  Enter your details to continue
+                  Select a role to autofill demo credentials
                 </p>
               </div>
 
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="mt-8"
+                className="mt-6"
                 noValidate
               >
+                {/* Roles */}
+                <p className="mb-3 text-sm font-semibold text-[#001B08]">
+                  Login as Demo Role
+                </p>
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {/* Customer */}
+                  <label className="cursor-pointer">
+                    <input
+                      type="radio"
+                      value="customer"
+                      className="peer hidden"
+                      {...register("role")}
+                    />
+
+                    <div className="rounded-xl border-2 border-gray-200 p-3 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
+                      <FaUser className="mx-auto text-2xl text-[#001B08]" />
+
+                      <h3 className="mt-2 text-xs font-semibold text-[#001B08]">
+                        Customer
+                      </h3>
+                    </div>
+                  </label>
+
+                  {/* Store Owner */}
+                  <label className="cursor-pointer">
+                    <input
+                      type="radio"
+                      value="store-owner"
+                      className="peer hidden"
+                      {...register("role")}
+                    />
+
+                    <div className="rounded-xl border-2 border-gray-200 p-3 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
+                      <FaStore className="mx-auto text-2xl text-[#E8BB44]" />
+
+                      <h3 className="mt-2 text-xs font-semibold text-[#001B08]">
+                        Store Owner
+                      </h3>
+                    </div>
+                  </label>
+
+                  {/* Rider */}
+                  <label className="cursor-pointer">
+                    <input
+                      type="radio"
+                      value="rider"
+                      className="peer hidden"
+                      {...register("role")}
+                    />
+
+                    <div className="rounded-xl border-2 border-gray-200 p-3 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
+                      <FaMotorcycle className="mx-auto text-2xl text-[#001B08]" />
+
+                      <h3 className="mt-2 text-xs font-semibold text-[#001B08]">
+                        Rider
+                      </h3>
+                    </div>
+                  </label>
+
+                  {/* Admin */}
+                  <label className="cursor-pointer">
+                    <input
+                      type="radio"
+                      value="admin"
+                      className="peer hidden"
+                      {...register("role")}
+                    />
+
+                    <div className="rounded-xl border-2 border-gray-200 p-3 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
+                      <FaShieldAlt className="mx-auto text-2xl text-[#001B08]" />
+
+                      <h3 className="mt-2 text-xs font-semibold text-[#001B08]">
+                        Admin
+                      </h3>
+                    </div>
+                  </label>
+                </div>
+
                 {/* Email */}
-                <fieldset className="fieldset">
+                <fieldset className="fieldset mt-5">
                   <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                     Email Address
                   </legend>
@@ -299,8 +377,8 @@ const LoginPage = () => {
                       {...register("password", {
                         required: "Password is required.",
                         minLength: {
-                          value: 8,
-                          message: "Password must be at least 8 characters.",
+                          value: 6,
+                          message: "Password must be at least 6 characters.",
                         },
                       })}
                     />
@@ -355,73 +433,6 @@ const LoginPage = () => {
                   <FaGoogle />
                   Continue with Google
                 </button>
-
-                {/* Demo Credentials */}
-                <div className="mt-6 rounded-xl border border-[#E8BB44]/40 bg-[#F7F5EF] p-4">
-                  <h3 className="text-center font-semibold text-[#001B08]">
-                    Demo Login
-                  </h3>
-
-                  <p className="mt-1 text-center text-sm text-gray-600">
-                    Select an account to continue
-                  </p>
-
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <button
-                      type="button"
-                      disabled={isLoading}
-                      onClick={() => handleDemoLogin("customer")}
-                      className="rounded-lg border border-gray-200 bg-white p-3 text-left transition hover:border-[#E8BB44] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <p className="font-semibold text-[#001B08]">Customer</p>
-
-                      <p className="mt-1 text-sm text-gray-500">
-                        Login as Customer
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={isLoading}
-                      onClick={() => handleDemoLogin("owner")}
-                      className="rounded-lg border border-gray-200 bg-white p-3 text-left transition hover:border-[#E8BB44] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <p className="font-semibold text-[#001B08]">
-                        Store Owner
-                      </p>
-
-                      <p className="mt-1 text-sm text-gray-500">
-                        Login as Store Owner
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={isLoading}
-                      onClick={() => handleDemoLogin("rider")}
-                      className="rounded-lg border border-gray-200 bg-white p-3 text-left transition hover:border-[#E8BB44] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <p className="font-semibold text-[#001B08]">Rider</p>
-
-                      <p className="mt-1 text-sm text-gray-500">
-                        Login as Rider
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={isLoading}
-                      onClick={() => handleDemoLogin("admin")}
-                      className="rounded-lg border border-gray-200 bg-white p-3 text-left transition hover:border-[#E8BB44] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <p className="font-semibold text-[#001B08]">Admin</p>
-
-                      <p className="mt-1 text-sm text-gray-500">
-                        Login as Admin
-                      </p>
-                    </button>
-                  </div>
-                </div>
 
                 {/* Mobile Register */}
                 <p className="mt-6 text-center text-sm text-gray-600 lg:hidden">
