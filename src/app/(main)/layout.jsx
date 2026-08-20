@@ -8,7 +8,9 @@ const layout = ({ children }) => {
     <div>
       <Navbar></Navbar>
       {/* lenis provider off for devlopment purpose only */}
-      <LenisProvider>{children}</LenisProvider>
+      {/* <LenisProvider> */}
+      {children}
+      {/* </LenisProvider> */}
       <Footer></Footer>
     </div>
   );
