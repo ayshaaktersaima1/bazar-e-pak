@@ -48,7 +48,7 @@ const LoginPage = () => {
       setValue("email", "customer@bep.com");
       setValue("password", "customer@BEP");
     } else if (role === "seller") {
-      setValue("email", "store-owner-seller@bep.com");
+      setValue("email", "seller-shop@bep.com");
       setValue("password", "seller@BEP");
     } else if (role === "rider") {
       setValue("email", "rider@bep.com");
