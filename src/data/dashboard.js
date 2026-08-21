@@ -13,17 +13,15 @@ import {
     ShieldCheck,
     Boxes,
     Settings,
-    Truck,
-    MapPin,
     History,
-    Bike,
     Image,
     Tags,
     UserCheck,
     AlertTriangle,
+    Bike,
 } from "lucide-react";
 
-// One nav config per role. Keep hrefs absolute and grouped by section.
+// One nav config per role.
 export const dashboardNav = {
     customer: [
         {
@@ -31,17 +29,17 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Dashboard",
-                    href: "/dashboard",
+                    href: "/dashboard/customer",
                     icon: LayoutDashboard,
                 },
                 {
                     label: "My Orders",
-                    href: "/dashboard/orders",
+                    href: "/dashboard/customer/orders",
                     icon: ShoppingBag,
                 },
                 {
                     label: "Wishlist",
-                    href: "/dashboard/wishlist",
+                    href: "/dashboard/customer/wishlist",
                     icon: Heart,
                 },
             ],
@@ -51,12 +49,12 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Wallet",
-                    href: "/dashboard/wallet",
+                    href: "/dashboard/customer/wallet",
                     icon: Wallet,
                 },
                 {
                     label: "Profile",
-                    href: "/dashboard/profile",
+                    href: "/dashboard/customer/profile",
                     icon: User,
                 },
             ],
@@ -69,12 +67,12 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Dashboard",
-                    href: "/dashboard",
+                    href: "/dashboard/seller",
                     icon: LayoutDashboard,
                 },
                 {
                     label: "My Shop",
-                    href: "/dashboard/shop",
+                    href: "/dashboard/seller/shop",
                     icon: Store,
                 },
             ],
@@ -84,12 +82,12 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Shop CMS",
-                    href: "/dashboard/shop/cms",
+                    href: "/dashboard/seller/shop/cms",
                     icon: Image,
                 },
                 {
                     label: "Shop Information",
-                    href: "/dashboard/shop/settings",
+                    href: "/dashboard/seller/shop/settings",
                     icon: Settings,
                 },
             ],
@@ -99,17 +97,17 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Products",
-                    href: "/dashboard/products",
+                    href: "/dashboard/seller/products",
                     icon: Boxes,
                 },
                 {
                     label: "Add Product",
-                    href: "/dashboard/products/new",
+                    href: "/dashboard/seller/products/new",
                     icon: PackagePlus,
                 },
                 {
                     label: "Categories",
-                    href: "/dashboard/categories",
+                    href: "/dashboard/seller/categories",
                     icon: Tags,
                 },
             ],
@@ -119,12 +117,12 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Orders",
-                    href: "/dashboard/orders",
+                    href: "/dashboard/seller/orders",
                     icon: ClipboardList,
                 },
                 {
                     label: "Order History",
-                    href: "/dashboard/orders/history",
+                    href: "/dashboard/seller/orders/history",
                     icon: History,
                 },
             ],
@@ -134,12 +132,12 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Analytics",
-                    href: "/dashboard/analytics",
+                    href: "/dashboard/seller/analytics",
                     icon: BarChart3,
                 },
                 {
                     label: "Reviews",
-                    href: "/dashboard/reviews",
+                    href: "/dashboard/seller/reviews",
                     icon: Star,
                 },
             ],
@@ -152,7 +150,7 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Dashboard",
-                    href: "/dashboard",
+                    href: "/dashboard/admin",
                     icon: LayoutDashboard,
                 },
             ],
@@ -162,27 +160,27 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Users",
-                    href: "/dashboard/users",
+                    href: "/dashboard/admin/users",
                     icon: Users,
                 },
                 {
                     label: "Shops",
-                    href: "/dashboard/shops",
+                    href: "/dashboard/admin/shops",
                     icon: Store,
                 },
                 {
                     label: "Riders",
-                    href: "/dashboard/riders",
+                    href: "/dashboard/admin/riders",
                     icon: Bike,
                 },
                 {
                     label: "Orders",
-                    href: "/dashboard/orders",
+                    href: "/dashboard/admin/orders",
                     icon: ClipboardList,
                 },
                 {
                     label: "Products",
-                    href: "/dashboard/products",
+                    href: "/dashboard/admin/products",
                     icon: Boxes,
                 },
             ],
@@ -192,12 +190,12 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Shop Verification",
-                    href: "/dashboard/verification/shops",
+                    href: "/dashboard/admin/verification/shops",
                     icon: ShieldCheck,
                 },
                 {
                     label: "Seller Verification",
-                    href: "/dashboard/verification/sellers",
+                    href: "/dashboard/admin/verification/sellers",
                     icon: UserCheck,
                 },
             ],
@@ -207,80 +205,44 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Categories",
-                    href: "/dashboard/categories",
+                    href: "/dashboard/admin/categories",
                     icon: Tags,
                 },
                 {
                     label: "Reports",
-                    href: "/dashboard/reports",
+                    href: "/dashboard/admin/reports",
                     icon: BarChart3,
                 },
                 {
                     label: "Complaints",
-                    href: "/dashboard/complaints",
+                    href: "/dashboard/admin/complaints",
                     icon: AlertTriangle,
                 },
             ],
         },
     ],
-
-    // rider: [
-    //     {
-    //         section: "Overview",
-    //         items: [
-    //             {
-    //                 label: "Dashboard",
-    //                 href: "/dashboard",
-    //                 icon: LayoutDashboard,
-    //             },
-    //         ],
-    //     },
-    //     {
-    //         section: "Deliveries",
-    //         items: [
-    //             {
-    //                 label: "Active Delivery",
-    //                 href: "/dashboard/active",
-    //                 icon: Truck,
-    //             },
-    //             {
-    //                 label: "Nearby Zone",
-    //                 href: "/dashboard/zone",
-    //                 icon: MapPin,
-    //             },
-    //             {
-    //                 label: "Delivery History",
-    //                 href: "/dashboard/history",
-    //                 icon: History,
-    //             },
-    //         ],
-    //     },
-    //     {
-    //         section: "Account",
-    //         items: [
-    //             {
-    //                 label: "Earnings",
-    //                 href: "/dashboard/earnings",
-    //                 icon: Wallet,
-    //             },
-    //             {
-    //                 label: "Profile",
-    //                 href: "/dashboard/profile",
-    //                 icon: User,
-    //             },
-    //         ],
-    //     },
-    // ],
 };
 
-// Shown at the bottom for every role
-export const dashboardFooterNav = [
-    {
+// Settings path for each role.
+export const dashboardSettings = {
+    customer: {
         label: "Settings",
-        href: "/dashboard/settings",
+        href: "/dashboard/customer/settings",
         icon: Settings,
     },
-];
 
-// Fallback if role is missing or unrecognized
+    seller: {
+        label: "Settings",
+        href: "/dashboard/seller/settings",
+        icon: Settings,
+    },
+
+    admin: {
+        label: "Settings",
+        href: "/dashboard/admin/settings",
+        icon: Settings,
+    },
+};
+
+// Fallback if role is missing or unrecognized.
 export const defaultRole = "customer";

@@ -47,8 +47,8 @@ const LoginPage = () => {
     if (role === "customer") {
       setValue("email", "customer@bep.com");
       setValue("password", "customer@BEP");
-    } else if (role === "store-owner") {
-      setValue("email", "seller@bep.com");
+    } else if (role === "seller") {
+      setValue("email", "store-owner-seller@bep.com");
       setValue("password", "seller@BEP");
     } else if (role === "rider") {
       setValue("email", "rider@bep.com");
@@ -297,7 +297,7 @@ const LoginPage = () => {
                   <label className="cursor-pointer">
                     <input
                       type="radio"
-                      value="store-owner"
+                      value="seller"
                       className="peer hidden"
                       {...register("role")}
                     />

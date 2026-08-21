@@ -10,7 +10,9 @@ import { useSession } from "../../../lib/auth-client";
 
 export default function DashboardLayout({ children }) {
   const { data: session, status } = useSession();
-  const role = session?.user?.role ?? defaultRole;
+  console.log("SESSION USER:", session?.user);
+  console.log("ROLE:", session?.user?.role);
+  const role = session?.user?.role ;
 
   if (status === "loading") {
     return (
@@ -24,8 +26,10 @@ export default function DashboardLayout({ children }) {
     <SidebarProvider>
       <div className="flex min-h-svh bg-zinc-50">
         <DashboardSidebar role={role} />
+
         <div className="flex min-h-svh flex-1 flex-col">
           <DashboardHeader />
+
           <main className="flex-1 p-4 md:p-6">{children}</main>
         </div>
       </div>
