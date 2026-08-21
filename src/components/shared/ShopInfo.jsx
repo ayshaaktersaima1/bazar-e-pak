@@ -72,7 +72,7 @@ const ShopInfo = ({ shop, productCount }) => {
 
                 {/* Visit Shop */}
                 <Link
-                    href={`/shops/${shop.id}`}
+                    href={`/shops/${shop._id}`}
                     className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#E8BB44] px-5 py-3 text-sm font-bold text-[#001B08] transition duration-300 hover:bg-white"
                 >
                     Visit Shop
