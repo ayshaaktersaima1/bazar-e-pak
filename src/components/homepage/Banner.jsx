@@ -101,7 +101,7 @@ const Banner = () => {
                 <div className="relative h-80 translate-y-6 md:h-96 lg:h-80 lg:translate-x-9 lg:translate-y-10 xl:h-96 xl:translate-x-14 xl:translate-y-20">
                     {products.map((product, index) => (
                         <div
-                            key={product.id}
+                            key={product._id}
                             className={`absolute inset-0 flex items-end justify-center transition-all duration-700 ease-in-out ${currentProduct === index
                                 ? "translate-x-0 opacity-100"
                                 : "translate-x-full opacity-0"

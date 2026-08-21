@@ -1,56 +1,41 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import shops from "@/data/shops";
+import { useState } from "react";
+
+import { useShop } from "@/hooks/use-shop";
 import ShopCard from "@/components/shared/ShopCard";
 import SearchFilter from "@/components/shared/SearchFilter";
 
 const ShopsPage = () => {
+    const { shops } = useShop();
+
     const [search, setSearch] = useState("");
-    const [category, setCategory] = useState("all");
 
-    const categories = useMemo(
-        () => [...new Set(shops.map((shop) => shop.category))],
-        [],
+    const searchValue =
+        search.toLowerCase().trim();
+
+    const filteredShops = shops.filter(
+        (shop) => {
+            if (!searchValue) {
+                return true;
+            }
+
+            return (
+                shop.name
+                    ?.toLowerCase()
+                    .includes(searchValue) ||
+                shop.description
+                    ?.toLowerCase()
+                    .includes(searchValue) ||
+                shop.address
+                    ?.toLowerCase()
+                    .includes(searchValue)
+            );
+        }
     );
-
-    const filters = [
-        {
-            name: "category",
-            label: "Category",
-            value: category,
-            onChange: setCategory,
-            options: [
-                {
-                    value: "all",
-                    label: "All Categories",
-                },
-                ...categories.map((item) => ({
-                    value: item,
-                    label: item,
-                })),
-            ],
-        },
-    ];
-
-    const filteredShops = shops.filter((shop) => {
-        const searchValue = search.toLowerCase().trim();
-
-        const matchesSearch =
-            !searchValue ||
-            shop.name.toLowerCase().includes(searchValue) ||
-            shop.owner.toLowerCase().includes(searchValue) ||
-            shop.category.toLowerCase().includes(searchValue);
-
-        const matchesCategory =
-            category === "all" || shop.category === category;
-
-        return matchesSearch && matchesCategory;
-    });
 
     const handleClear = () => {
         setSearch("");
-        setCategory("all");
     };
 
     return (
@@ -67,18 +52,20 @@ const ShopsPage = () => {
 
                 <div className="mt-5 flex items-center justify-center gap-3">
                     <span className="h-px w-14 bg-[#001B08]" />
-                    <span className="text-[#E8BB44]">★</span>
+                    <span className="text-[#E8BB44]">
+                        ★
+                    </span>
                     <span className="h-px w-14 bg-[#001B08]" />
                 </div>
             </section>
 
-            {/* Search & Filter */}
+            {/* Search */}
             <section className="mx-auto mt-10 w-[90%]">
                 <SearchFilter
                     searchValue={search}
                     onSearchChange={setSearch}
                     searchPlaceholder="Search shops..."
-                    filters={filters}
+                    filters={[]}
                     onClear={handleClear}
                 />
             </section>
@@ -87,13 +74,15 @@ const ShopsPage = () => {
             <section className="mx-auto mt-10 w-[90%]">
                 {filteredShops.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {filteredShops.map((shop) => (
-                            <ShopCard
-                                key={shop.id}
-                                shop={shop}
-                                variant="homepage"
-                            />
-                        ))}
+                        {filteredShops.map(
+                            (shop) => (
+                                <ShopCard
+                                    key={shop._id}
+                                    shop={shop}
+                                    variant="homepage"
+                                />
+                            )
+                        )}
                     </div>
                 ) : (
                     <div className="rounded-xl bg-white px-6 py-12 text-center shadow-sm">
@@ -102,7 +91,7 @@ const ShopsPage = () => {
                         </h3>
 
                         <p className="mt-2 text-sm text-gray-500">
-                            Try searching with a different shop name or category.
+                            Try searching with a different shop name.
                         </p>
 
                         <button
@@ -110,7 +99,7 @@ const ShopsPage = () => {
                             onClick={handleClear}
                             className="mt-5 rounded-md bg-[#001B08] px-5 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
                         >
-                            Clear Filters
+                            Clear Search
                         </button>
                     </div>
                 )}

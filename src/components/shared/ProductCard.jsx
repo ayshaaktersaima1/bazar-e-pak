@@ -4,12 +4,12 @@ import DiscountPrice from "../../utils/discount-price";
 
 import Image from "next/image";
 import Link from "next/link";
+
 import {
   FaShoppingCart,
   FaTrash,
   FaPlus,
   FaMinus,
-  FaEye,
 } from "react-icons/fa";
 
 import { useCart } from "@/hooks/use-cart";
@@ -26,29 +26,71 @@ const DiscountBadge = ({ discount }) => {
   );
 };
 
-const ProductCard = ({ product, variant = "product" }) => {
-  const { addToCart, increaseQuantity, decreaseQuantity, removeFromCart } =
-    useCart();
+const ProductImage = ({
+  src,
+  alt,
+  className = "",
+  sizes,
+}) => {
+  return (
+    <div
+      className={`relative overflow-hidden rounded-lg bg-[#FAFAFA] ${className}`}
+    >
+      <Image
+        src={src || "/images/placeholder.webp"}
+        alt={alt || "Product"}
+        fill
+        sizes={sizes || "100vw"}
+        className="object-cover"
+      />
+    </div>
+  );
+};
+
+const ProductCard = ({
+  product,
+  variant = "product",
+}) => {
+  const {
+    addToCart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+  } = useCart();
+
+  const image =
+    product?.productImage ||
+    product?.images?.[0] ||
+    "/images/placeholder.webp";
+
+  const productId =
+    product?.product?._id ||
+    product?.product ||
+    product?._id;
+
+  const productName =
+    product?.productName ||
+    product?.product?.name ||
+    product?.name ||
+    "Product";
 
   if (variant === "homepage") {
     return (
       <div className="flex h-[410px] w-full flex-col rounded-xl bg-white p-3 shadow-sm">
-        {/* Product Image */}
         <div className="group relative h-[210px] shrink-0 overflow-hidden rounded-lg bg-[#FAFAFA]">
           <Image
-            src={product.image}
-            alt={product.name}
-            width={400}
-            height={350}
-            className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+            src={image}
+            alt={productName}
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-cover transition duration-500 group-hover:scale-105"
           />
 
           <DiscountBadge discount={product.discount} />
 
-          {/* Hover Overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-[#001B08]/50 opacity-0 transition duration-300 group-hover:opacity-100">
             <Link
-              href={`/products/${product.id}`}
+              href={`/products/${productId}`}
               className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
             >
               View Details
@@ -56,10 +98,9 @@ const ProductCard = ({ product, variant = "product" }) => {
           </div>
         </div>
 
-        {/* Product Information */}
         <div className="flex flex-1 flex-col px-2 pb-2 pt-4 text-center">
           <h3 className="text-xl font-bold text-[#001B08] lg:text-lg xl:text-xl">
-            {product.name}
+            {productName}
           </h3>
 
           <DiscountPrice product={product} />
@@ -67,7 +108,7 @@ const ProductCard = ({ product, variant = "product" }) => {
           <button
             type="button"
             onClick={() => addToCart(product)}
-            className=" mt-auto inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
+            className="mt-auto inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
           >
             <FaShoppingCart />
             Add to Cart
@@ -80,38 +121,27 @@ const ProductCard = ({ product, variant = "product" }) => {
   if (variant === "cart") {
     return (
       <div className="flex w-full items-center gap-4 rounded-xl bg-white p-4 shadow-sm">
-        {/* Product Image */}
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#FAFAFA]">
-          <Image
-            src={product.image}
-            alt={product.name}
-            width={100}
-            height={100}
-            className="h-full w-full object-contain p-2"
-          />
-        </div>
+        <ProductImage
+          src={image}
+          alt={productName}
+          className="h-20 w-20 shrink-0"
+          sizes="80px"
+        />
 
-        {/* Product Information */}
-        <div className="flex flex-1 flex-col">
-          <h3 className="font-serif text-lg font-bold text-[#001B08]">
-            {product.name}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <h3 className="truncate font-serif text-lg font-bold text-[#001B08]">
+            {productName}
           </h3>
 
           <div className="mt-1">
-            <div className="flex gap-2">
-              <DiscountPrice product={product} variant="cart" />
-              {product.discount && <span className="rounded-full bg-[#E8BB44] px-2.5 py-1 text-xs font-bold text-[#001B08] shadow-sm w-fit">
-                -{product.discount}%
-              </span>}
-            </div>
+            <DiscountPrice product={product} variant="cart" />
           </div>
         </div>
 
-        {/* Quantity Controls */}
-        <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-[#F7F5EF] p-1">
+        <div className="flex shrink-0 items-center gap-2 rounded-md border border-gray-200 bg-[#F7F5EF] p-1">
           <button
             type="button"
-            onClick={() => decreaseQuantity(product.id)}
+            onClick={() => decreaseQuantity(productId)}
             className="flex h-7 w-7 items-center justify-center rounded bg-white text-[#001B08] shadow-sm transition hover:bg-[#E8BB44]"
           >
             <FaMinus size={10} />
@@ -123,18 +153,17 @@ const ProductCard = ({ product, variant = "product" }) => {
 
           <button
             type="button"
-            onClick={() => increaseQuantity(product.id)}
+            onClick={() => increaseQuantity(productId)}
             className="flex h-7 w-7 items-center justify-center rounded bg-white text-[#001B08] shadow-sm transition hover:bg-[#E8BB44]"
           >
             <FaPlus size={10} />
           </button>
         </div>
 
-        {/* Remove Button */}
         <button
           type="button"
-          onClick={() => removeFromCart(product.id)}
-          className="flex h-9 w-9 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-500"
+          onClick={() => removeFromCart(productId)}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-500"
         >
           <FaTrash size={14} />
         </button>
@@ -144,29 +173,27 @@ const ProductCard = ({ product, variant = "product" }) => {
 
   return (
     <Link
-      href={`/products/${product.id}`}
+      href={`/products/${productId}`}
       className="group flex h-full flex-col rounded-xl bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
     >
-      {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-[#FAFAFA]">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-[#FAFAFA]">
         <Image
-          src={product.image}
-          alt={product.name}
-          width={500}
-          height={500}
-          className="h-full w-full object-contain p-3 transition duration-500 group-hover:scale-105"
+          src={image}
+          alt={productName}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover p-0 transition duration-500 group-hover:scale-105"
         />
 
         <DiscountBadge discount={product.discount} />
       </div>
 
-      {/* Product Information */}
       <div className="flex flex-1 flex-col px-2 pb-2 pt-5 text-center">
         <h3 className="text-xl font-bold text-[#001B08] lg:text-lg xl:text-xl">
-          {product.name}
+          {productName}
         </h3>
 
-        <div className="flex min-h-[32px] mb-2 items-center justify-center ">
+        <div className="mb-2 flex min-h-[32px] items-center justify-center">
           <DiscountPrice product={product} />
         </div>
 
