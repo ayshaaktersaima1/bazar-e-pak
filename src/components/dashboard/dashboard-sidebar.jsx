@@ -35,7 +35,7 @@ export function SidebarProvider({ children }) {
   useEffect(() => {
     if (!isMobile) {
       setTimeout(() => {
-        setMobileOpen(false)
+        setMobileOpen(false);
       }, 0);
     }
   }, [isMobile]);
@@ -58,7 +58,9 @@ export function SidebarProvider({ children }) {
   };
 
   return (
-    <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>
+    <SidebarContext.Provider value={value}>
+      {children}
+    </SidebarContext.Provider>
   );
 }
 
@@ -139,7 +141,9 @@ function SidebarTopBar({ collapsed, toggleSidebar }) {
   return (
     <div
       className={`group relative flex h-20 items-center border-b border-[#D9A928]/20 ${
-        collapsed ? "justify-center" : "cursor-pointer justify-between px-3"
+        collapsed
+          ? "justify-center"
+          : "cursor-pointer justify-between px-3"
       }`}
     >
       {!collapsed ? (
@@ -313,14 +317,23 @@ function SignOutButton({ collapsed }) {
   );
 }
 
-function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
+function SidebarBody({
+  collapsed,
+  toggleSidebar,
+  role,
+  pathname,
+  onNavigate,
+}) {
   const sections = dashboardNav[role] ?? dashboardNav[defaultRole];
 
   const settingsHref = `/dashboard/${role}/settings`;
 
   return (
     <div className="flex h-full flex-col bg-[#002B12]">
-      <SidebarTopBar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+      <SidebarTopBar
+        collapsed={collapsed}
+        toggleSidebar={toggleSidebar}
+      />
 
       <div className="border-b border-[#D9A928]/20">
         <AccountHeader collapsed={collapsed} />
@@ -344,10 +357,7 @@ function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
                   key={item.href}
                   item={item}
                   collapsed={collapsed}
-                  active={
-                    pathname === item.href ||
-                    pathname.startsWith(item.href + "/")
-                  }
+                  active={pathname === item.href}
                 />
               ))}
             </ul>
@@ -364,10 +374,7 @@ function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
               icon: Settings,
             }}
             collapsed={collapsed}
-            active={
-              pathname === settingsHref ||
-              pathname.startsWith(settingsHref + "/")
-            }
+            active={pathname === settingsHref}
           />
 
           <SignOutButton collapsed={collapsed} />
@@ -377,11 +384,14 @@ function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
   );
 }
 
-
-
 export function DashboardSidebar({ role = defaultRole }) {
-  const { collapsed, toggleSidebar, isMobile, mobileOpen, setMobileOpen } =
-    useSidebar();
+  const {
+    collapsed,
+    toggleSidebar,
+    isMobile,
+    mobileOpen,
+    setMobileOpen,
+  } = useSidebar();
 
   const pathname = usePathname();
 
