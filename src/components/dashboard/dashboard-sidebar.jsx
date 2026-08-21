@@ -4,40 +4,48 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-
-import { PanelLeft, LogOut } from "lucide-react";
-import {
-  dashboardNav,
-  dashboardFooterNav,
-  defaultRole,
-} from "@/data/dashboard";
+import { PanelLeft, LogOut, Settings } from "lucide-react";
+import { dashboardNav, defaultRole } from "@/data/dashboard";
 import { useSession, authClient } from "../../lib/auth-client";
 import Image from "next/image";
 
 const SidebarContext = createContext(null);
 
-// Read/expose collapse + mobile state to sidebar, trigger, header
 export function SidebarProvider({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Track viewport, force sidebar closed when switching to desktop
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 767px)");
-    const onChange = () => setIsMobile(mql.matches);
+
+    const onChange = () => {
+      setIsMobile(mql.matches);
+    };
+
     onChange();
+
     mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
+
+    return () => {
+      mql.removeEventListener("change", onChange);
+    };
   }, []);
 
   useEffect(() => {
-    if (!isMobile) setTimeout(() => setMobileOpen(false), 0);
+    if (!isMobile) {
+      setTimeout(() => {
+        setMobileOpen(false)
+      }, 0);
+    }
   }, [isMobile]);
 
   const toggleSidebar = () => {
-    if (isMobile) setMobileOpen((v) => !v);
-    else setCollapsed((v) => !v);
+    if (isMobile) {
+      setMobileOpen((value) => !value);
+    } else {
+      setCollapsed((value) => !value);
+    }
   };
 
   const value = {
@@ -55,21 +63,21 @@ export function SidebarProvider({ children }) {
 }
 
 export function useSidebar() {
-  const ctx = useContext(SidebarContext);
+  const context = useContext(SidebarContext);
 
-  if (!ctx) {
+  if (!context) {
     throw new Error("useSidebar must be used inside SidebarProvider");
   }
 
-  return ctx;
+  return context;
 }
 
-// Single button that opens sidebar on mobile, collapses it on desktop
 export function SidebarTrigger({ className = "" }) {
   const { toggleSidebar } = useSidebar();
 
   return (
     <button
+      type="button"
       onClick={toggleSidebar}
       className={`inline-flex h-8 w-8 items-center justify-center rounded-md text-[#D9A928] transition-all hover:bg-[#D9A928]/10 hover:text-[#D9A928] ${className}`}
       aria-label="Toggle sidebar"
@@ -79,7 +87,6 @@ export function SidebarTrigger({ className = "" }) {
   );
 }
 
-// Small hover tooltip, only rendered when sidebar is collapsed
 function NavTooltip({ label, targetRef, show }) {
   const [position, setPosition] = useState(null);
 
@@ -128,34 +135,34 @@ function NavTooltip({ label, targetRef, show }) {
   );
 }
 
-// Top bar: brand + icon-only sidebar toggle, same spot on every state
 function SidebarTopBar({ collapsed, toggleSidebar }) {
   return (
     <div
       className={`group relative flex h-20 items-center border-b border-[#D9A928]/20 ${
-        collapsed ? "justify-center" : "justify-between px-3 cursor-pointer"
+        collapsed ? "justify-center" : "cursor-pointer justify-between px-3"
       }`}
     >
       {!collapsed ? (
         <>
           <Link
             href="/"
-            className="flex items-center gap-2 text-base font-semibold text-[#F0B92E] transition-opacity hover:opacity-90 cursor-pointer"
+            className="flex cursor-pointer items-center gap-2 text-base font-semibold text-[#F0B92E] transition-opacity hover:opacity-90"
           >
             <Image
               src="/images/logo.webp"
               width={150}
               height={150}
-              alt="bazar-e-pak"
-              className="h-14 w-14 object-contain cursor-pointer"
+              alt="Bazar-e-Pak"
+              className="h-14 w-14 cursor-pointer object-contain"
             />
 
             <span className="whitespace-nowrap">Bazar-e-Pak</span>
           </Link>
 
           <button
+            type="button"
             onClick={toggleSidebar}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#D9A928]/30 bg-[#003817] text-[#D9A928] transition-all duration-200 hover:border-[#D9A928] hover:bg-[#D9A928] hover:text-[#002B12] cursor-pointer"
+            className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#D9A928]/30 bg-[#003817] text-[#D9A928] transition-all duration-200 hover:border-[#D9A928] hover:bg-[#D9A928] hover:text-[#002B12]"
             aria-label="Collapse sidebar"
           >
             <PanelLeft className="h-4 w-4" />
@@ -166,21 +173,22 @@ function SidebarTopBar({ collapsed, toggleSidebar }) {
           <Link
             href="/"
             aria-label="Go to home"
-            className="absolute inset-0 z-10 flex h-14 w-14 items-center justify-center rounded-full opacity-100 transition-opacity duration-200 group-hover:opacity-0 cursor-pointer"
+            className="absolute inset-0 z-10 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full opacity-100 transition-opacity duration-200 group-hover:opacity-0"
           >
             <Image
               src="/images/logo.webp"
               width={150}
               height={150}
-              alt="bazar-e-pak"
-              className="h-14 w-14 object-contain cursor-pointer"
+              alt="Bazar-e-Pak"
+              className="h-14 w-14 cursor-pointer object-contain"
             />
           </Link>
 
           <button
+            type="button"
             onClick={toggleSidebar}
             aria-label="Expand sidebar"
-            className="absolute inset-0 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-[#002B12] text-[#D9A928] opacity-0 transition-opacity duration-200 group-hover:opacity-100 cursor-pointer"
+            className="absolute inset-0 z-20 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-[#002B12] text-[#D9A928] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           >
             <PanelLeft className="h-6 w-6" />
           </button>
@@ -222,7 +230,6 @@ function NavLink({ item, collapsed, active }) {
   );
 }
 
-// Account row, plain display only — toggle now lives in the top bar
 function AccountHeader({ collapsed }) {
   const { data: session } = useSession();
   const user = session?.user;
@@ -230,7 +237,7 @@ function AccountHeader({ collapsed }) {
   const initials = user?.name
     ? user.name
         .split(" ")
-        .map((n) => n[0])
+        .map((name) => name[0])
         .slice(0, 2)
         .join("")
         .toUpperCase()
@@ -270,7 +277,6 @@ function AccountHeader({ collapsed }) {
   );
 }
 
-// Signs out via better-auth client, then sends user to login
 function SignOutButton({ collapsed }) {
   const router = useRouter();
   const buttonRef = useRef(null);
@@ -284,6 +290,7 @@ function SignOutButton({ collapsed }) {
   return (
     <li className="group relative list-none">
       <button
+        type="button"
         ref={buttonRef}
         onClick={handleSignOut}
         onMouseEnter={() => setTooltipVisible(true)}
@@ -306,9 +313,10 @@ function SignOutButton({ collapsed }) {
   );
 }
 
-// Sidebar body shared by desktop rail and mobile overlay
 function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
   const sections = dashboardNav[role] ?? dashboardNav[defaultRole];
+
+  const settingsHref = `/dashboard/${role}/settings`;
 
   return (
     <div className="flex h-full flex-col bg-[#002B12]">
@@ -349,14 +357,18 @@ function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
 
       <div className="border-t border-[#D9A928]/20 px-2 py-3">
         <ul className="space-y-1">
-          {dashboardFooterNav.map((item) => (
-            <NavLink
-              key={item.href}
-              item={item}
-              collapsed={collapsed}
-              active={pathname === item.href}
-            />
-          ))}
+          <NavLink
+            item={{
+              label: "Settings",
+              href: settingsHref,
+              icon: Settings,
+            }}
+            collapsed={collapsed}
+            active={
+              pathname === settingsHref ||
+              pathname.startsWith(settingsHref + "/")
+            }
+          />
 
           <SignOutButton collapsed={collapsed} />
         </ul>
@@ -365,7 +377,8 @@ function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
   );
 }
 
-// role: "customer" | "seller" | "admin" | "rider"
+
+
 export function DashboardSidebar({ role = defaultRole }) {
   const { collapsed, toggleSidebar, isMobile, mobileOpen, setMobileOpen } =
     useSidebar();

@@ -316,7 +316,7 @@ const RegisterPage = () => {
                   <label className="cursor-pointer">
                     <input
                       type="radio"
-                      value="store-owner"
+                      value="seller"
                       className="peer hidden"
                       {...register("role", {
                         required: "Please select a role.",

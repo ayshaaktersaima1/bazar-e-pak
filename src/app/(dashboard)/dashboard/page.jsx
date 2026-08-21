@@ -1,38 +1,29 @@
-
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "../../../lib/auth-client";
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
-  const name = session?.user?.name ?? "there";
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    const role = session?.user?.role ?? "customer";
+
+    if (role === "seller" || role === "admin" || role === "customer") {
+      router.replace(`/dashboard/${role}`);
+      return;
+    }
+
+    router.replace("/dashboard/customer");
+  }, [session, status, router]);
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg border border-zinc-200 bg-white p-5">
-        <h2 className="text-lg font-semibold text-zinc-900">
-          Welcome back, {name}
-        </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          This is your dashboard overview. Replace this block with real widgets
-          per role.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="rounded-lg border border-zinc-200 bg-white p-5"
-          >
-            <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
-              Stat {i}
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-zinc-900">—</p>
-          </div>
-        ))}
-      </div>
+    <div className="flex min-h-[300px] items-center justify-center">
+      <p className="text-sm text-zinc-500">Loading dashboard...</p>
     </div>
   );
 }
-
