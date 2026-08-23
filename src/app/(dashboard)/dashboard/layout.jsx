@@ -10,9 +10,7 @@ import { useSession } from "../../../lib/auth-client";
 
 export default function DashboardLayout({ children }) {
   const { data: session, status } = useSession();
-  console.log("SESSION USER:", session?.user);
-  console.log("ROLE:", session?.user?.role);
-  const role = session?.user?.role ;
+  const role = session?.user?.role;
 
   if (status === "loading") {
     return (

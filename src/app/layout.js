@@ -4,6 +4,7 @@ import { CartProvider } from "../hooks/use-cart";
 import { Toaster } from "react-hot-toast";
 import { ShopProvider } from "../hooks/use-shop";
 import { ProductProvider } from "@/hooks/use-product";
+import { CategoryProvider } from "@/hooks/use-categories";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,13 +41,15 @@ export default function RootLayout({ children }) {
     >
       <body className="flex min-h-full flex-col">
         <main className="flex-1">
-          <ShopProvider>
-            <CartProvider>
-              <ProductProvider>
-                {children}
-              </ProductProvider>
-            </CartProvider>
-          </ShopProvider>
+          <CategoryProvider>
+            <ShopProvider>
+              <CartProvider>
+                <ProductProvider>
+                  {children}
+                </ProductProvider>
+              </CartProvider>
+            </ShopProvider>
+          </CategoryProvider>
 
           <Toaster position="top-center" />
         </main>

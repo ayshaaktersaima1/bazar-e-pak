@@ -1,6 +1,6 @@
 "use client";
 
-import categories from "@/data/categories";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,10 +10,12 @@ import CartButton from "./CartButton";
 import ProductSearch from "./ProductSearch";
 import AvatarDropdown from "./AvatarDropdown";
 import { useSession } from "../../lib/auth-client";
+import { useCategory } from "@/hooks/use-categories";
 
 const Navbar = ({ needAuth = true }) => {
   const { data: session } = useSession();
   const user = session?.user;
+  const { categories } = useCategory();
 
   const pathname = usePathname();
   const navbarRef = useRef(null);
@@ -99,17 +101,17 @@ const Navbar = ({ needAuth = true }) => {
             }
           >
             {categories?.map((category) => (
-              <li key={category?.id}>
+              <li key={category?._id}>
                 <Link
-                  href={category?.href}
+                  href={`/collection/${category?.slug}`}
                   onClick={closeDropdowns}
                   className={
-                    pathname === category?.href
+                    pathname === `/collection/${category?.slug}`
                       ? "rounded-md bg-[#E8BB44] text-[#001B08]"
                       : "rounded-md text-white"
                   }
                 >
-                  {category?.title}
+                  {category?.name}
                 </Link>
               </li>
             ))}
