@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Loading() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F7F5EF] px-5">
@@ -7,7 +9,12 @@ export default function Loading() {
           <div className="absolute h-20 w-20 animate-spin rounded-full border-4 border-gray-200 border-t-[#001B08]" />
 
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#001B08]">
-            <span className="text-lg font-bold text-[#E8BB44]">BEP</span>
+            <Image
+              src={"/images/logo.webp"}
+              alt="Bazar-e-Pak"
+              width={100}
+              height={100}
+            />
           </div>
         </div>
 
