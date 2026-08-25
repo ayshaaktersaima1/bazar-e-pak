@@ -19,9 +19,7 @@ const SellerProductsPage = async () => {
   const sellerId = session.user.id;
 
   const shopResponse = await serverApi.get(
-    `/api/shops?sellerId=${encodeURIComponent(
-      sellerId,
-    )}&page=1&limit=1`,
+    `/api/shops?sellerId=${encodeURIComponent(sellerId)}&page=1&limit=1`,
     {},
     {
       auth: true,
@@ -45,8 +43,7 @@ const SellerProductsPage = async () => {
             </h2>
 
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-              You need an active shop before you can create and manage
-              products.
+              You need an active shop before you can create and manage products.
             </p>
 
             <Link
@@ -62,20 +59,48 @@ const SellerProductsPage = async () => {
     );
   }
 
-  const productResponse = await serverApi.get(
-    `/api/products?shopId=${encodeURIComponent(
-      shop._id,
-    )}&page=1&limit=20`,
-    {},
-    {
-      auth: true,
-      includeMeta: true,
-    },
-  );
+  const [productResponse, categoryResponse] = await Promise.all([
+    serverApi.get(
+      `/api/products?shopId=${encodeURIComponent(shop._id)}&page=1&limit=20`,
+      {},
+      {
+        auth: true,
+        includeMeta: true,
+      },
+    ),
+
+    serverApi.get(
+      "/api/categories?status=active&page=1&limit=100",
+      {},
+      {
+        auth: false,
+        includeMeta: true,
+      },
+    ),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#002B12]">Products</h1>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            Manage your shop products and inventory.
+          </p>
+        </div>
+
+        <Link
+          href="/dashboard/seller/products/new"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#D9A928] px-5 text-sm font-semibold text-[#001B08] transition-all hover:bg-[#E8BB44]"
+        >
+          <Plus className="h-4 w-4" />
+          Add Product
+        </Link>
+      </div>
+
       <ProductManagement
+        shop={shop}
         initialProducts={productResponse?.data ?? []}
         initialPagination={
           productResponse?.pagination ?? {
@@ -85,7 +110,7 @@ const SellerProductsPage = async () => {
             totalPages: 1,
           }
         }
-        shopId={String(shop._id)}
+        categories={categoryResponse?.data ?? []}
       />
     </div>
   );

@@ -1,44 +1,43 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 import DataTable from "@/components/table/data-table";
 import ConfirmationModal from "@/components/shared/confirmation-modal";
 import ProductColumns from "@/components/dashboard/seller/product-columns";
-import ProductForm from "@/components/dashboard/seller/product-form";
 import useApi from "../../../hooks/use-api";
 
 const LIMIT = 20;
 
 const ProductManagement = ({
+    shopId,
     initialProducts = [],
     initialPagination = {},
     categories = [],
-    shops = [],
 }) => {
+    const router = useRouter();
     const api = useApi();
 
-    const [products, setProducts] = useState(initialProducts);
+    const [products, setProducts] =
+        useState(initialProducts);
 
     const [pagination, setPagination] = useState({
         page: initialPagination.page ?? 1,
         limit: initialPagination.limit ?? LIMIT,
         total: initialPagination.total ?? 0,
-        totalPages: initialPagination.totalPages ?? 1,
+        totalPages:
+            initialPagination.totalPages ?? 1,
     });
 
     const [search, setSearch] = useState("");
+
     const [filters, setFilters] = useState({
         status: "",
         categoryId: "",
-        isFeatured: "",
     });
-
-    const [formOpen, setFormOpen] = useState(false);
-    const [editingProduct, setEditingProduct] =
-        useState(null);
 
     const [confirmProduct, setConfirmProduct] =
         useState(null);
@@ -46,63 +45,89 @@ const ProductManagement = ({
     const [confirmAction, setConfirmAction] =
         useState(null);
 
-    const fetchProducts = useCallback(
-        async ({
-            page = pagination.page,
-            searchValue = search,
-            filterValues = filters,
-        } = {}) => {
-            try {
-                const params = new URLSearchParams({
-                    page: String(page),
-                    limit: String(LIMIT),
-                });
+    const fetchProducts = async ({
+        page = 1,
+        searchValue = search,
+        filterValues = filters,
+    } = {}) => {
+        if (!shopId) {
+            return;
+        }
 
-                if (searchValue.trim()) {
-                    params.set(
-                        "search",
-                        searchValue.trim(),
-                    );
-                }
+        try {
+            const params = new URLSearchParams();
 
-                Object.entries(filterValues).forEach(
-                    ([key, value]) => {
-                        if (value !== "") {
-                            params.set(key, value);
-                        }
-                    },
-                );
+            params.set("page", String(page));
+            params.set("limit", String(LIMIT));
+            params.set("shopId", String(shopId));
 
-                const result = await api.get(
-                    `/api/products?${params.toString()}`,
-                );
-
-                setProducts(result.data || []);
-
-                setPagination({
-                    page: result.pagination?.page ?? page,
-                    limit:
-                        result.pagination?.limit ?? LIMIT,
-                    total:
-                        result.pagination?.total ??
-                        result.meta?.total ??
-                        0,
-                    totalPages:
-                        result.pagination?.totalPages ??
-                        result.meta?.totalPages ??
-                        1,
-                });
-            } catch (error) {
-                toast.error(
-                    error.message ||
-                        "Failed to load products",
+            if (searchValue.trim()) {
+                params.set(
+                    "search",
+                    searchValue.trim(),
                 );
             }
-        },
-        [api, pagination.page, search, filters],
-    );
+
+            if (filterValues.status) {
+                params.set(
+                    "status",
+                    filterValues.status,
+                );
+            }
+
+            if (filterValues.categoryId) {
+                params.set(
+                    "categoryId",
+                    filterValues.categoryId,
+                );
+            }
+
+            const result = await api.get(
+                `/api/products?${params.toString()}`,
+            );
+
+            const productData = Array.isArray(
+                result?.data,
+            )
+                ? result.data
+                : Array.isArray(result)
+                  ? result
+                  : [];
+
+            setProducts(productData);
+
+            setPagination({
+                page:
+                    result?.pagination?.page ??
+                    page,
+                limit:
+                    result?.pagination?.limit ??
+                    LIMIT,
+                total:
+                    result?.pagination?.total ??
+                    productData.length,
+                totalPages:
+                    result?.pagination?.totalPages ??
+                    1,
+            });
+        } catch (error) {
+            console.error(
+                "Fetch products error:",
+                error,
+            );
+
+            toast.error(
+                error?.message ||
+                    "Failed to load products",
+            );
+        }
+    };
 
     useEffect(() => {
+        if (!shopId) {
+            return;
+        }
+
         const timer = setTimeout(() => {
             fetchProducts({
                 page: 1,
@@ -112,60 +137,54 @@ const ProductManagement = ({
         }, 350);
 
         return () => clearTimeout(timer);
-    }, [search, filters]);
+    }, [
+        shopId,
+        search,
+        filters.status,
+        filters.categoryId,
+    ]);
 
-    const handleFilterChange = (key, value) => {
+    const handleFilterChange = (
+        key,
+        value,
+    ) => {
         setFilters((current) => ({
             ...current,
             [key]: value,
         }));
     };
 
-    const openCreate = () => {
-        setEditingProduct(null);
-        setFormOpen(true);
+    const handleCreate = () => {
+        router.push(
+            "/dashboard/seller/products/new",
+        );
     };
 
-    const openEdit = (product) => {
-        setEditingProduct(product);
-        setFormOpen(true);
-    };
-
-    const handleSubmit = async (values) => {
-        try {
-            if (editingProduct) {
-                await api.patch(
-                    `/api/products/${editingProduct._id}`,
-                    values,
-                );
-
-                toast.success(
-                    "Product updated successfully",
-                );
-            } else {
-                await api.post("/api/products", values);
-
-                toast.success(
-                    "Product created successfully",
-                );
-            }
-
-            setFormOpen(false);
-            setEditingProduct(null);
-
-            await fetchProducts({
-                page: pagination.page,
-            });
-        } catch (error) {
-            toast.error(
-                error.message ||
-                    "Failed to save product",
-            );
+    const handleEdit = (product) => {
+        if (!product?._id) {
+            toast.error("Invalid product.");
+            return;
         }
+
+        router.push(
+            `/dashboard/seller/products/${product._id}/edit`,
+        );
+    };
+
+    const openDelete = (product) => {
+        if (!product?._id) {
+            toast.error("Invalid product.");
+            return;
+        }
+
+        setConfirmProduct(product);
+        setConfirmAction("delete");
     };
 
     const handleDelete = async () => {
-        if (!confirmProduct) return;
+        if (!confirmProduct?._id) {
+            return;
+        }
 
         try {
             await api.remove(
@@ -173,72 +192,89 @@ const ProductManagement = ({
             );
 
             toast.success(
-                "Product deleted successfully",
+                "Product deleted successfully.",
             );
 
-            setConfirmProduct(null);
-
-            await fetchProducts({
-                page:
-                    products.length === 1 &&
-                    pagination.page > 1
-                        ? pagination.page - 1
-                        : pagination.page,
-            });
-        } catch (error) {
-            toast.error(
-                error.message ||
-                    "Failed to delete product",
-            );
-        }
-    };
-
-    const handleFeatured = (product) => {
-        setConfirmProduct(product);
-        setConfirmAction("featured");
-    };
-
-    const handleFeaturedConfirm = async () => {
-        if (!confirmProduct) return;
-
-        try {
-            await api.patch(
-                `/api/products/${confirmProduct._id}/featured`,
-                {
-                    isFeatured: !confirmProduct.isFeatured,
-                },
-            );
-
-            toast.success(
-                confirmProduct.isFeatured
-                    ? "Removed from featured"
-                    : "Added to featured",
-            );
+            const nextPage =
+                products.length === 1 &&
+                pagination.page > 1
+                    ? pagination.page - 1
+                    : pagination.page;
 
             setConfirmProduct(null);
             setConfirmAction(null);
 
             await fetchProducts({
-                page: pagination.page,
+                page: nextPage,
             });
         } catch (error) {
+            console.error(
+                "Delete product error:",
+                error,
+            );
+
             toast.error(
-                error.message ||
-                    "Failed to update featured status",
+                error?.message ||
+                    "Failed to delete product",
             );
         }
     };
 
-    const columns = useMemo(
-        () =>
-            ProductColumns({
-                onEdit: openEdit,
-                onDelete: (product) =>
-                    setConfirmProduct(product),
-                onFeatured: handleFeatured,
-            }),
-        [],
-    );
+    const openFeatured = (product) => {
+        if (!product?._id) {
+            toast.error("Invalid product.");
+            return;
+        }
+
+        setConfirmProduct(product);
+        setConfirmAction("featured");
+    };
+
+    const handleFeaturedConfirm =
+        async () => {
+            if (!confirmProduct?._id) {
+                return;
+            }
+
+            try {
+                await api.patch(
+                    `/api/products/${confirmProduct._id}/featured`,
+                    {
+                        isFeatured:
+                            !confirmProduct.isFeatured,
+                    },
+                );
+
+                toast.success(
+                    confirmProduct.isFeatured
+                        ? "Removed from featured."
+                        : "Added to featured.",
+                );
+
+                setConfirmProduct(null);
+                setConfirmAction(null);
+
+                await fetchProducts({
+                    page: pagination.page,
+                });
+            } catch (error) {
+                console.error(
+                    "Featured update error:",
+                    error,
+                );
+
+                toast.error(
+                    error?.message ||
+                        "Failed to update featured status",
+                );
+            }
+        };
+
+    const columns = ProductColumns({
+        onEdit: handleEdit,
+        onDelete: openDelete,
+        onFeatured: openFeatured,
+    });
 
     const filterConfig = [
         {
@@ -258,117 +294,99 @@ const ProductManagement = ({
         {
             key: "categoryId",
             label: "Category",
-            options: categories.map((category) => ({
-                value: category._id,
-                label: category.name,
-            })),
-        },
-        {
-            key: "isFeatured",
-            label: "Featured",
-            options: [
-                {
-                    value: "true",
-                    label: "Featured",
-                },
-                {
-                    value: "false",
-                    label: "Not Featured",
-                },
-            ],
+            options: categories.map(
+                (category) => ({
+                    value: String(
+                        category._id,
+                    ),
+                    label: category.name,
+                }),
+            ),
         },
     ];
 
-    if (formOpen) {
+    if (!shopId) {
         return (
-            <div className="rounded-2xl bg-white p-5 shadow-sm md:p-7">
-                <div className="mb-6">
-                    <h2 className="text-xl font-bold text-[#001B08]">
-                        {editingProduct
-                            ? "Edit Product"
-                            : "Add Product"}
-                    </h2>
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-10 text-center">
+                <h2 className="text-xl font-bold text-[#002B12]">
+                    No Shop Found
+                </h2>
 
-                    <p className="mt-1 text-sm text-[#6B7280]">
-                        {editingProduct
-                            ? "Update your product information."
-                            : "Create a new product for your shop."}
-                    </p>
-                </div>
-
-                <ProductForm
-                    product={editingProduct}
-                    categories={categories}
-                    shops={shops}
-                    loading={api.loading}
-                    onSubmit={handleSubmit}
-                    onCancel={() => {
-                        setFormOpen(false);
-                        setEditingProduct(null);
-                    }}
-                />
+                <p className="mt-2 text-sm text-[#6B7280]">
+                    Create your shop before
+                    managing products.
+                </p>
             </div>
         );
     }
 
     return (
         <>
-            <div className="mb-5 flex items-center justify-between">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 className="text-xl font-bold text-[#001B08]">
+                    <h2 className="text-xl font-bold text-[#002B12]">
                         Products
                     </h2>
 
                     <p className="mt-1 text-sm text-[#6B7280]">
-                        Manage products, inventory and
-                        featured status.
+                        Manage your products,
+                        inventory and featured
+                        status.
                     </p>
                 </div>
 
                 <button
                     type="button"
-                    onClick={openCreate}
-                    className="btn bg-[#D9A928] text-[#001B08] hover:bg-[#E8BB44]"
+                    onClick={handleCreate}
+                    className="btn border-0 bg-[#D9A928] text-[#001B08] shadow-sm hover:bg-[#E8BB44]"
                 >
                     <Plus size={17} />
                     Add Product
                 </button>
             </div>
 
-            <DataTable
-                columns={columns}
-                data={products}
-                loading={api.loading}
-                search={search}
-                onSearch={setSearch}
-                searchPlaceholder="Search products..."
-                filters={filterConfig}
-                filterValues={filters}
-                onFilterChange={handleFilterChange}
-                page={pagination.page}
-                totalPages={pagination.totalPages}
-                total={pagination.total}
-                limit={pagination.limit}
-                onPageChange={(nextPage) =>
-                    fetchProducts({
-                        page: nextPage,
-                    })
-                }
-                emptyMessage="No products found."
-            />
+            <div className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
+                <DataTable
+                    columns={columns}
+                    data={products}
+                    loading={api.loading}
+                    search={search}
+                    onSearch={setSearch}
+                    searchPlaceholder="Search your products..."
+                    filters={filterConfig}
+                    filterValues={filters}
+                    onFilterChange={
+                        handleFilterChange
+                    }
+                    page={pagination.page}
+                    totalPages={
+                        pagination.totalPages
+                    }
+                    total={pagination.total}
+                    limit={pagination.limit}
+                    onPageChange={(nextPage) =>
+                        fetchProducts({
+                            page: nextPage,
+                        })
+                    }
+                    emptyMessage="No products found in your shop."
+                />
+            </div>
 
             <ConfirmationModal
                 open={
                     Boolean(confirmProduct) &&
-                    confirmAction === null
+                    confirmAction === "delete"
                 }
                 title="Delete Product?"
                 description={`Are you sure you want to delete "${confirmProduct?.name}"? The product will be soft deleted.`}
                 confirmText="Delete Product"
+                cancelText="Cancel"
                 loading={api.loading}
-                onCancel={() =>
-                    setConfirmProduct(null)
-                }
+                onCancel={() => {
+                    setConfirmProduct(null);
+                    setConfirmAction(null);
+                }}
                 onConfirm={handleDelete}
             />
 
@@ -392,13 +410,15 @@ const ProductManagement = ({
                         ? "Remove"
                         : "Set Featured"
                 }
-                danger={false}
+                cancelText="Cancel"
                 loading={api.loading}
                 onCancel={() => {
                     setConfirmProduct(null);
                     setConfirmAction(null);
                 }}
-                onConfirm={handleFeaturedConfirm}
+                onConfirm={
+                    handleFeaturedConfirm
+                }
             />
         </>
     );

@@ -14,6 +14,7 @@ export const ShopProvider = ({ children }) => {
     const api = useApi();
 
     const [shops, setShops] = useState([]);
+    const [myShop, setMyShop] = useState(null);
     const [loading, setLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
 
@@ -35,7 +36,7 @@ export const ShopProvider = ({ children }) => {
 
             const queryString = query.toString();
 
-            const data = await api.get(
+            const response = await api.get(
                 `/api/shops${queryString ? `?${queryString}` : ""}`,
                 {},
                 {
@@ -44,9 +45,11 @@ export const ShopProvider = ({ children }) => {
                 },
             );
 
-            const shopList = Array.isArray(data)
-                ? data
-                : data?.data || [];
+            const shopList = Array.isArray(response)
+                ? response
+                : Array.isArray(response?.data)
+                  ? response.data
+                  : [];
 
             setShops(shopList);
 
@@ -60,11 +63,63 @@ export const ShopProvider = ({ children }) => {
         }
     };
 
+    const fetchMyShop = async () => {
+        try {
+            setLoading(true);
+
+            const response = await api.get(
+                "/api/shops/my-shop",
+                {},
+                {
+                    auth: true,
+                    showError: false,
+                },
+            );
+
+            const shop =
+                response?.data?.shop ||
+                response?.data ||
+                response?.shop ||
+                null;
+
+            setMyShop(shop);
+
+            if (shop) {
+                setShops((prev) => {
+                    const exists = prev.some(
+                        (item) =>
+                            String(item._id) ===
+                            String(shop._id),
+                    );
+
+                    if (exists) {
+                        return prev.map((item) =>
+                            String(item._id) ===
+                            String(shop._id)
+                                ? shop
+                                : item,
+                        );
+                    }
+
+                    return [shop, ...prev];
+                });
+            }
+
+            return shop;
+        } catch (error) {
+            console.error("Fetch my shop error:", error);
+            setMyShop(null);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchShopById = async (shopId) => {
         if (!shopId) return null;
 
         try {
-            const data = await api.get(
+            const response = await api.get(
                 `/api/shops/${shopId}`,
                 {},
                 {
@@ -73,7 +128,7 @@ export const ShopProvider = ({ children }) => {
                 },
             );
 
-            return data?.data || data || null;
+            return response?.data || response || null;
         } catch (error) {
             console.error("Fetch shop error:", error);
             return null;
@@ -84,7 +139,7 @@ export const ShopProvider = ({ children }) => {
         if (!slug) return null;
 
         try {
-            const data = await api.get(
+            const response = await api.get(
                 `/api/shops/slug/${encodeURIComponent(slug)}`,
                 {},
                 {
@@ -93,30 +148,40 @@ export const ShopProvider = ({ children }) => {
                 },
             );
 
-            return data?.data || data || null;
+            return response?.data || response || null;
         } catch (error) {
-            console.error("Fetch shop by slug error:", error);
+            console.error(
+                "Fetch shop by slug error:",
+                error,
+            );
+
             return null;
         }
     };
 
     const getShopById = (shopId) => {
+        if (!shopId) return null;
+
         return shops.find(
             (shop) =>
                 String(shop._id) === String(shopId),
-        );
+        ) || null;
     };
 
     const getShopBySlug = (slug) => {
+        if (!slug) return null;
+
         return shops.find(
             (shop) => shop.slug === slug,
-        );
+        ) || null;
     };
 
     const getShopProducts = (
         shopId,
         products = [],
     ) => {
+        if (!shopId) return [];
+
         return products.filter(
             (product) =>
                 String(product.shopId) ===
@@ -128,7 +193,7 @@ export const ShopProvider = ({ children }) => {
         try {
             setActionLoading(true);
 
-            const data = await api.post(
+            const response = await api.post(
                 "/api/shops",
                 shopData,
                 {},
@@ -140,18 +205,29 @@ export const ShopProvider = ({ children }) => {
                 },
             );
 
-            const newShop = data?.data || data;
+            const newShop =
+                response?.data || response;
 
             if (newShop) {
+                setMyShop(newShop);
+
                 setShops((prev) => [
                     newShop,
-                    ...prev,
+                    ...prev.filter(
+                        (shop) =>
+                            String(shop._id) !==
+                            String(newShop._id),
+                    ),
                 ]);
             }
 
             return newShop || null;
         } catch (error) {
-            console.error("Create shop error:", error);
+            console.error(
+                "Create shop error:",
+                error,
+            );
+
             return null;
         } finally {
             setActionLoading(false);
@@ -167,7 +243,7 @@ export const ShopProvider = ({ children }) => {
         try {
             setActionLoading(true);
 
-            const data = await api.patch(
+            const response = await api.patch(
                 `/api/shops/${shopId}`,
                 shopData,
                 {},
@@ -180,14 +256,28 @@ export const ShopProvider = ({ children }) => {
             );
 
             const updatedShop =
-                data?.data || data;
+                response?.data || response;
 
             if (updatedShop) {
+                setMyShop((prev) =>
+                    prev &&
+                    String(prev._id) ===
+                        String(shopId)
+                        ? {
+                              ...prev,
+                              ...updatedShop,
+                          }
+                        : updatedShop,
+                );
+
                 setShops((prev) =>
                     prev.map((shop) =>
                         String(shop._id) ===
                         String(shopId)
-                            ? updatedShop
+                            ? {
+                                  ...shop,
+                                  ...updatedShop,
+                              }
                             : shop,
                     ),
                 );
@@ -195,7 +285,11 @@ export const ShopProvider = ({ children }) => {
 
             return updatedShop || null;
         } catch (error) {
-            console.error("Update shop error:", error);
+            console.error(
+                "Update shop error:",
+                error,
+            );
+
             return null;
         } finally {
             setActionLoading(false);
@@ -227,9 +321,21 @@ export const ShopProvider = ({ children }) => {
                 ),
             );
 
+            setMyShop((prev) =>
+                prev &&
+                String(prev._id) ===
+                    String(shopId)
+                    ? null
+                    : prev,
+            );
+
             return true;
         } catch (error) {
-            console.error("Delete shop error:", error);
+            console.error(
+                "Delete shop error:",
+                error,
+            );
+
             return false;
         } finally {
             setActionLoading(false);
@@ -245,7 +351,7 @@ export const ShopProvider = ({ children }) => {
         try {
             setActionLoading(true);
 
-            const data = await api.patch(
+            const response = await api.patch(
                 `/api/shops/${shopId}/status`,
                 { status },
                 {},
@@ -258,9 +364,20 @@ export const ShopProvider = ({ children }) => {
             );
 
             const updatedShop =
-                data?.data || data;
+                response?.data || response;
 
             if (updatedShop) {
+                setMyShop((prev) =>
+                    prev &&
+                    String(prev._id) ===
+                        String(shopId)
+                        ? {
+                              ...prev,
+                              ...updatedShop,
+                          }
+                        : prev,
+                );
+
                 setShops((prev) =>
                     prev.map((shop) =>
                         String(shop._id) ===
@@ -293,15 +410,23 @@ export const ShopProvider = ({ children }) => {
         return fetchShops(params);
     };
 
+    const refreshMyShop = async () => {
+        return fetchMyShop();
+    };
+
     return (
         <ShopContext.Provider
             value={{
                 shops,
+                myShop,
                 loading,
                 actionLoading,
 
                 fetchShops,
                 refreshShops,
+
+                fetchMyShop,
+                refreshMyShop,
 
                 fetchShopById,
                 fetchShopBySlug,
