@@ -1,408 +1,336 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useState,
+} from "react";
 import toast from "react-hot-toast";
-import { authClient } from "../lib/auth-client";
+import useApi from "./use-api";
 
-const ShopContext = createContext();
+const ShopContext = createContext(null);
 
 export const ShopProvider = ({ children }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+    const api = useApi();
 
-  const [shops, setShops] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
+    const [shops, setShops] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
 
-  const getAuthHeaders = async () => {
-    try {
-      const { data: tokenData } = await authClient.token();
+    const fetchShops = async (params = {}) => {
+        try {
+            setLoading(true);
 
-      if (!tokenData?.token) {
-        return null;
-      }
+            const query = new URLSearchParams();
 
-      return {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${tokenData.token}`,
-      };
-    } catch {
-      return null;
-    }
-  };
+            Object.entries(params).forEach(([key, value]) => {
+                if (
+                    value !== undefined &&
+                    value !== null &&
+                    value !== ""
+                ) {
+                    query.set(key, String(value));
+                }
+            });
 
-  const getResponseData = async (response, fallbackMessage) => {
-    const data = await response.json().catch(() => ({}));
+            const queryString = query.toString();
 
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || fallbackMessage);
-    }
+            const data = await api.get(
+                `/api/shops${queryString ? `?${queryString}` : ""}`,
+                {},
+                {
+                    auth: true,
+                    showError: false,
+                },
+            );
 
-    return data;
-  };
+            const shopList = Array.isArray(data)
+                ? data
+                : data?.data || [];
 
-  const fetchShops = async (params = {}) => {
-    if (!baseUrl) {
-      setLoading(false);
-      setShops([]);
-      return [];
-    }
+            setShops(shopList);
 
-    try {
-      setLoading(true);
-
-      const query = new URLSearchParams();
-
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          query.set(key, String(value));
+            return shopList;
+        } catch (error) {
+            console.error("Fetch shops error:", error);
+            setShops([]);
+            return [];
+        } finally {
+            setLoading(false);
         }
-      });
-
-      const queryString = query.toString();
-
-      const response = await fetch(
-        `${baseUrl}/api/shops${queryString ? `?${queryString}` : ""}`,
-        {
-          method: "GET",
-          cache: "no-store",
-        },
-      );
-
-      const data = await getResponseData(response, "Failed to fetch shops");
-
-      const shopList = data.data || [];
-
-      setShops(shopList);
-
-      return shopList;
-    } catch (error) {
-      console.error("Fetch shops error:", error);
-      setShops([]);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!baseUrl) {
-      setTimeout(() => setLoading(false));
-      return;
-    }
-
-    let cancelled = false;
-
-    const loadShops = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/api/shops`, {
-          method: "GET",
-          cache: "no-store",
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!cancelled && response.ok && data.success) {
-          setShops(data.data || []);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Fetch shops error:", error);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
     };
 
-    loadShops();
+    const fetchShopById = async (shopId) => {
+        if (!shopId) return null;
 
-    return () => {
-      cancelled = true;
+        try {
+            const data = await api.get(
+                `/api/shops/${shopId}`,
+                {},
+                {
+                    auth: true,
+                    showError: false,
+                },
+            );
+
+            return data?.data || data || null;
+        } catch (error) {
+            console.error("Fetch shop error:", error);
+            return null;
+        }
     };
-  }, [baseUrl]);
 
-  const fetchShopById = async (shopId) => {
-    if (!shopId || !baseUrl) {
-      return null;
-    }
+    const fetchShopBySlug = async (slug) => {
+        if (!slug) return null;
 
-    try {
-      const response = await fetch(`${baseUrl}/api/shops/${shopId}`, {
-        method: "GET",
-        cache: "no-store",
-      });
+        try {
+            const data = await api.get(
+                `/api/shops/slug/${encodeURIComponent(slug)}`,
+                {},
+                {
+                    auth: false,
+                    showError: false,
+                },
+            );
 
-      const data = await getResponseData(response, "Failed to fetch shop");
+            return data?.data || data || null;
+        } catch (error) {
+            console.error("Fetch shop by slug error:", error);
+            return null;
+        }
+    };
 
-      return data.data || null;
-    } catch (error) {
-      console.error("Fetch shop by ID error:", error);
+    const getShopById = (shopId) => {
+        return shops.find(
+            (shop) =>
+                String(shop._id) === String(shopId),
+        );
+    };
 
-      return null;
-    }
-  };
+    const getShopBySlug = (slug) => {
+        return shops.find(
+            (shop) => shop.slug === slug,
+        );
+    };
 
-  const fetchShopBySlug = async (slug) => {
-    if (!slug || !baseUrl) {
-      return null;
-    }
+    const getShopProducts = (
+        shopId,
+        products = [],
+    ) => {
+        return products.filter(
+            (product) =>
+                String(product.shopId) ===
+                String(shopId),
+        );
+    };
 
-    try {
-      const response = await fetch(`${baseUrl}/api/shops/slug/${slug}`, {
-        method: "GET",
-        cache: "no-store",
-      });
+    const createShop = async (shopData) => {
+        try {
+            setActionLoading(true);
 
-      const data = await getResponseData(response, "Failed to fetch shop");
+            const data = await api.post(
+                "/api/shops",
+                shopData,
+                {},
+                {
+                    auth: true,
+                    showSuccess: true,
+                    successMessage:
+                        "Shop created successfully.",
+                },
+            );
 
-      return data.data || null;
-    } catch (error) {
-      console.error("Fetch shop by slug error:", error);
+            const newShop = data?.data || data;
 
-      return null;
-    }
-  };
+            if (newShop) {
+                setShops((prev) => [
+                    newShop,
+                    ...prev,
+                ]);
+            }
 
-  const getShopById = (shopId) => {
-    return shops.find((shop) => String(shop._id) === String(shopId));
-  };
+            return newShop || null;
+        } catch (error) {
+            console.error("Create shop error:", error);
+            return null;
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
-  const getShopBySlug = (slug) => {
-    return shops.find((shop) => shop.slug === slug);
-  };
+    const updateShop = async (
+        shopId,
+        shopData,
+    ) => {
+        if (!shopId) return null;
 
-  const getShopProducts = (shopId, products = []) => {
-    return products.filter(
-      (product) => String(product.shopId) === String(shopId),
+        try {
+            setActionLoading(true);
+
+            const data = await api.patch(
+                `/api/shops/${shopId}`,
+                shopData,
+                {},
+                {
+                    auth: true,
+                    showSuccess: true,
+                    successMessage:
+                        "Shop updated successfully.",
+                },
+            );
+
+            const updatedShop =
+                data?.data || data;
+
+            if (updatedShop) {
+                setShops((prev) =>
+                    prev.map((shop) =>
+                        String(shop._id) ===
+                        String(shopId)
+                            ? updatedShop
+                            : shop,
+                    ),
+                );
+            }
+
+            return updatedShop || null;
+        } catch (error) {
+            console.error("Update shop error:", error);
+            return null;
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const deleteShop = async (shopId) => {
+        if (!shopId) return false;
+
+        try {
+            setActionLoading(true);
+
+            await api.delete(
+                `/api/shops/${shopId}`,
+                {},
+                {
+                    auth: true,
+                    showSuccess: true,
+                    successMessage:
+                        "Shop deleted successfully.",
+                },
+            );
+
+            setShops((prev) =>
+                prev.filter(
+                    (shop) =>
+                        String(shop._id) !==
+                        String(shopId),
+                ),
+            );
+
+            return true;
+        } catch (error) {
+            console.error("Delete shop error:", error);
+            return false;
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const updateShopStatus = async (
+        shopId,
+        status,
+    ) => {
+        if (!shopId || !status) return null;
+
+        try {
+            setActionLoading(true);
+
+            const data = await api.patch(
+                `/api/shops/${shopId}/status`,
+                { status },
+                {},
+                {
+                    auth: true,
+                    showSuccess: true,
+                    successMessage:
+                        "Shop status updated successfully.",
+                },
+            );
+
+            const updatedShop =
+                data?.data || data;
+
+            if (updatedShop) {
+                setShops((prev) =>
+                    prev.map((shop) =>
+                        String(shop._id) ===
+                        String(shopId)
+                            ? {
+                                  ...shop,
+                                  ...updatedShop,
+                              }
+                            : shop,
+                    ),
+                );
+            }
+
+            return updatedShop || null;
+        } catch (error) {
+            console.error(
+                "Update shop status error:",
+                error,
+            );
+
+            return null;
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const refreshShops = async (
+        params = {},
+    ) => {
+        return fetchShops(params);
+    };
+
+    return (
+        <ShopContext.Provider
+            value={{
+                shops,
+                loading,
+                actionLoading,
+
+                fetchShops,
+                refreshShops,
+
+                fetchShopById,
+                fetchShopBySlug,
+
+                getShopById,
+                getShopBySlug,
+                getShopProducts,
+
+                createShop,
+                updateShop,
+                deleteShop,
+                updateShopStatus,
+            }}
+        >
+            {children}
+        </ShopContext.Provider>
     );
-  };
-
-  const createShop = async (shopData) => {
-    if (!baseUrl) {
-      return false;
-    }
-
-    try {
-      setActionLoading(true);
-
-      const headers = await getAuthHeaders();
-
-      if (!headers) {
-        toast.error("Please log in to create a shop.");
-
-        return false;
-      }
-
-      const response = await fetch(`${baseUrl}/api/shops`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(shopData),
-      });
-
-      const data = await getResponseData(response, "Failed to create shop");
-
-      const newShop = data.data;
-
-      setShops((prev) => [newShop, ...prev]);
-
-      toast.success("Shop created successfully.");
-
-      return newShop;
-    } catch (error) {
-      console.error("Create shop error:", error);
-
-      toast.error(error.message || "Failed to create shop.");
-
-      return false;
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const updateShop = async (shopId, shopData) => {
-    if (!shopId || !baseUrl) {
-      return false;
-    }
-
-    try {
-      setActionLoading(true);
-
-      const headers = await getAuthHeaders();
-
-      if (!headers) {
-        toast.error("Please log in to update the shop.");
-
-        return false;
-      }
-
-      const response = await fetch(`${baseUrl}/api/shops/${shopId}`, {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify(shopData),
-      });
-
-      const data = await getResponseData(response, "Failed to update shop");
-
-      const updatedShop = data.data;
-
-      setShops((prev) =>
-        prev.map((shop) =>
-          String(shop._id) === String(shopId) ? updatedShop : shop,
-        ),
-      );
-
-      toast.success("Shop updated successfully.");
-
-      return updatedShop;
-    } catch (error) {
-      console.error("Update shop error:", error);
-
-      toast.error(error.message || "Failed to update shop.");
-
-      return false;
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const deleteShop = async (shopId) => {
-    if (!shopId || !baseUrl) {
-      return false;
-    }
-
-    try {
-      setActionLoading(true);
-
-      const headers = await getAuthHeaders();
-
-      if (!headers) {
-        toast.error("Please log in to delete the shop.");
-
-        return false;
-      }
-
-      const response = await fetch(`${baseUrl}/api/shops/${shopId}`, {
-        method: "DELETE",
-        headers,
-      });
-
-      await getResponseData(response, "Failed to delete shop");
-
-      setShops((prev) =>
-        prev.filter((shop) => String(shop._id) !== String(shopId)),
-      );
-
-      toast.success("Shop deleted successfully.");
-
-      return true;
-    } catch (error) {
-      console.error("Delete shop error:", error);
-
-      toast.error(error.message || "Failed to delete shop.");
-
-      return false;
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const updateShopStatus = async (shopId, status) => {
-    if (!shopId || !status || !baseUrl) {
-      return false;
-    }
-
-    try {
-      setActionLoading(true);
-
-      const headers = await getAuthHeaders();
-
-      if (!headers) {
-        toast.error("Please log in to update shop status.");
-
-        return false;
-      }
-
-      const response = await fetch(`${baseUrl}/api/shops/${shopId}/status`, {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify({
-          status,
-        }),
-      });
-
-      const data = await getResponseData(
-        response,
-        "Failed to update shop status",
-      );
-
-      const updatedShop = data.data;
-
-      setShops((prev) =>
-        prev.map((shop) =>
-          String(shop._id) === String(shopId)
-            ? {
-                ...shop,
-                ...updatedShop,
-              }
-            : shop,
-        ),
-      );
-
-      toast.success("Shop status updated successfully.");
-
-      return updatedShop;
-    } catch (error) {
-      console.error("Update shop status error:", error);
-
-      toast.error(error.message || "Failed to update shop status.");
-
-      return false;
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const refreshShops = async (params = {}) => {
-    return fetchShops(params);
-  };
-
-  return (
-    <ShopContext.Provider
-      value={{
-        shops,
-        loading,
-        actionLoading,
-
-        fetchShops,
-        refreshShops,
-
-        fetchShopById,
-        fetchShopBySlug,
-
-        getShopById,
-        getShopBySlug,
-        getShopProducts,
-
-        createShop,
-        updateShop,
-        deleteShop,
-        updateShopStatus,
-      }}
-    >
-      {children}
-    </ShopContext.Provider>
-  );
 };
 
 export const useShop = () => {
-  const context = useContext(ShopContext);
+    const context = useContext(ShopContext);
 
-  if (!context) {
-    throw new Error("useShop must be used inside ShopProvider");
-  }
+    if (!context) {
+        throw new Error(
+            "useShop must be used inside ShopProvider",
+        );
+    }
 
-  return context;
+    return context;
 };
 
 export default ShopContext;
