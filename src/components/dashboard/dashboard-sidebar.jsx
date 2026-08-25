@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { PanelLeft, LogOut, Settings } from "lucide-react";
+import { PanelLeft, LogOut, Settings, ChevronDown } from "lucide-react";
 import { dashboardNav, defaultRole } from "@/data/dashboard";
 import { useSession, authClient } from "../../lib/auth-client";
 import Image from "next/image";
@@ -24,7 +24,6 @@ export function SidebarProvider({ children }) {
     };
 
     onChange();
-
     mql.addEventListener("change", onChange);
 
     return () => {
@@ -48,17 +47,17 @@ export function SidebarProvider({ children }) {
     }
   };
 
-  const value = {
-    collapsed,
-    setCollapsed,
-    mobileOpen,
-    setMobileOpen,
-    isMobile,
-    toggleSidebar,
-  };
-
   return (
-    <SidebarContext.Provider value={value}>
+    <SidebarContext.Provider
+      value={{
+        collapsed,
+        setCollapsed,
+        mobileOpen,
+        setMobileOpen,
+        isMobile,
+        toggleSidebar,
+      }}
+    >
       {children}
     </SidebarContext.Provider>
   );
@@ -81,7 +80,7 @@ export function SidebarTrigger({ className = "" }) {
     <button
       type="button"
       onClick={toggleSidebar}
-      className={`inline-flex h-8 w-8 items-center justify-center rounded-md text-[#D9A928] transition-all hover:bg-[#D9A928]/10 hover:text-[#D9A928] ${className}`}
+      className={`inline-flex h-8 w-8 items-center justify-center rounded-md text-[#D9A928] transition-all hover:bg-[#D9A928]/10 ${className}`}
       aria-label="Toggle sidebar"
     >
       <PanelLeft className="h-4 w-4" />
@@ -112,10 +111,12 @@ function NavTooltip({ label, targetRef, show }) {
     updatePosition();
 
     window.addEventListener("resize", updatePosition);
+
     window.addEventListener("scroll", updatePosition, true);
 
     return () => {
       window.removeEventListener("resize", updatePosition);
+
       window.removeEventListener("scroll", updatePosition, true);
     };
   }, [show, targetRef]);
@@ -141,32 +142,30 @@ function SidebarTopBar({ collapsed, toggleSidebar }) {
   return (
     <div
       className={`group relative flex h-20 items-center border-b border-[#D9A928]/20 ${
-        collapsed
-          ? "justify-center"
-          : "cursor-pointer justify-between px-3"
+        collapsed ? "justify-center" : "justify-between px-3"
       }`}
     >
       {!collapsed ? (
         <>
           <Link
             href="/"
-            className="flex cursor-pointer items-center gap-2 text-base font-semibold text-[#F0B92E] transition-opacity hover:opacity-90"
+            className="flex items-center gap-2 text-base font-semibold text-[#F0B92E]"
           >
             <Image
               src="/images/logo.webp"
               width={150}
               height={150}
               alt="Bazar-e-Pak"
-              className="h-14 w-14 cursor-pointer object-contain"
+              className="h-14 w-14 object-contain"
             />
 
-            <span className="whitespace-nowrap">Bazar-e-Pak</span>
+            <span>Bazar-e-Pak</span>
           </Link>
 
           <button
             type="button"
             onClick={toggleSidebar}
-            className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#D9A928]/30 bg-[#003817] text-[#D9A928] transition-all duration-200 hover:border-[#D9A928] hover:bg-[#D9A928] hover:text-[#002B12]"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#D9A928]/30 bg-[#003817] text-[#D9A928] transition-all hover:border-[#D9A928] hover:bg-[#D9A928] hover:text-[#002B12]"
             aria-label="Collapse sidebar"
           >
             <PanelLeft className="h-4 w-4" />
@@ -176,15 +175,14 @@ function SidebarTopBar({ collapsed, toggleSidebar }) {
         <div className="relative h-14 w-14 shrink-0">
           <Link
             href="/"
-            aria-label="Go to home"
-            className="absolute inset-0 z-10 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full opacity-100 transition-opacity duration-200 group-hover:opacity-0"
+            className="absolute inset-0 z-10 flex h-14 w-14 items-center justify-center rounded-full transition-opacity group-hover:opacity-0"
           >
             <Image
               src="/images/logo.webp"
               width={150}
               height={150}
               alt="Bazar-e-Pak"
-              className="h-14 w-14 cursor-pointer object-contain"
+              className="h-14 w-14 object-contain"
             />
           </Link>
 
@@ -192,45 +190,13 @@ function SidebarTopBar({ collapsed, toggleSidebar }) {
             type="button"
             onClick={toggleSidebar}
             aria-label="Expand sidebar"
-            className="absolute inset-0 z-20 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-[#002B12] text-[#D9A928] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            className="absolute inset-0 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-[#002B12] text-[#D9A928] opacity-0 transition-opacity group-hover:opacity-100"
           >
             <PanelLeft className="h-6 w-6" />
           </button>
         </div>
       )}
     </div>
-  );
-}
-
-function NavLink({ item, collapsed, active }) {
-  const Icon = item.icon;
-  const linkRef = useRef(null);
-  const [tooltipVisible, setTooltipVisible] = useState(false);
-
-  return (
-    <li className="group relative">
-      <Link
-        ref={linkRef}
-        href={item.href}
-        onMouseEnter={() => setTooltipVisible(true)}
-        onMouseLeave={() => setTooltipVisible(false)}
-        className={`flex items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-all duration-200 ${
-          active
-            ? "bg-[#D9A928] text-[#002B12] shadow-sm"
-            : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
-        } ${collapsed ? "justify-center" : ""}`}
-      >
-        <Icon className="h-[18px] w-[18px] shrink-0" />
-
-        {!collapsed && <span className="truncate">{item.label}</span>}
-      </Link>
-
-      <NavTooltip
-        label={item.label}
-        targetRef={linkRef}
-        show={collapsed && tooltipVisible}
-      />
-    </li>
   );
 }
 
@@ -255,7 +221,6 @@ function AccountHeader({ collapsed }) {
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#D9A928] bg-[#D9A928] text-xs font-semibold text-[#002B12]">
         {user?.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={user.image}
             alt={user?.name ?? "Account"}
@@ -281,9 +246,163 @@ function AccountHeader({ collapsed }) {
   );
 }
 
+function NavItem({ item, collapsed, active, pathname }) {
+  const Icon = item.icon;
+  const linkRef = useRef(null);
+
+  const hasChildren = item.children?.length > 0;
+
+  const childActive = hasChildren
+    ? item.children.some(
+        (child) =>
+          pathname === child.href || pathname.startsWith(`${child.href}/`),
+      )
+    : false;
+
+  const [open, setOpen] = useState(childActive);
+
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
+  useEffect(() => {
+    if (childActive) {
+      setTimeout(() => setOpen(true), 0);
+    }
+  }, [childActive]);
+
+  if (hasChildren && !collapsed) {
+    return (
+      <li className="list-none">
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-all ${
+            childActive
+              ? "bg-[#D9A928]/10 text-[#F0B92E]"
+              : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+          }`}
+        >
+          <Icon className="h-[18px] w-[18px] shrink-0" />
+
+          <span className="flex-1 truncate text-left">{item.label}</span>
+
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        <div
+          className={`grid transition-[grid-template-rows] duration-200 ${
+            open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <ul className="ml-5 mt-1 space-y-1 border-l border-[#D9A928]/20 pl-2">
+              {item.children.map((child) => (
+                <li key={child.href}>
+                  <Link
+                    href={child.href}
+                    className={`flex items-center rounded-md px-3 py-2 text-sm transition-all ${
+                      pathname === child.href
+                        ? "bg-[#D9A928] font-medium text-[#002B12]"
+                        : "text-[#B7C4BC] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+                    }`}
+                  >
+                    {child.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </li>
+    );
+  }
+
+  if (hasChildren && collapsed) {
+    return (
+      <li className="group relative list-none">
+        <button
+          ref={linkRef}
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          onMouseEnter={() => setTooltipVisible(true)}
+          onMouseLeave={() => setTooltipVisible(false)}
+          className={`flex w-full items-center justify-center rounded-md px-2.5 py-2.5 transition-all ${
+            childActive
+              ? "bg-[#D9A928] text-[#002B12]"
+              : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+          }`}
+        >
+          <Icon className="h-[18px] w-[18px]" />
+        </button>
+
+        <NavTooltip
+          label={item.label}
+          targetRef={linkRef}
+          show={tooltipVisible}
+        />
+
+        {open && (
+          <div className="absolute left-[calc(100%+8px)] top-0 z-[999] min-w-48 rounded-lg border border-[#D9A928]/20 bg-[#002B12] p-2 shadow-xl">
+            <p className="px-2 py-1.5 text-xs font-semibold text-[#D9A928]">
+              {item.label}
+            </p>
+
+            <ul className="space-y-1">
+              {item.children.map((child) => (
+                <li key={child.href}>
+                  <Link
+                    href={child.href}
+                    className={`block rounded-md px-3 py-2 text-sm ${
+                      pathname === child.href
+                        ? "bg-[#D9A928] text-[#002B12]"
+                        : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+                    }`}
+                  >
+                    {child.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </li>
+    );
+  }
+
+  return (
+    <li className="group relative list-none">
+      <Link
+        ref={linkRef}
+        href={item.href}
+        onMouseEnter={() => setTooltipVisible(true)}
+        onMouseLeave={() => setTooltipVisible(false)}
+        className={`flex items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-all ${
+          active
+            ? "bg-[#D9A928] text-[#002B12] shadow-sm"
+            : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+        } ${collapsed ? "justify-center" : ""}`}
+      >
+        <Icon className="h-[18px] w-[18px] shrink-0" />
+
+        {!collapsed && <span className="truncate">{item.label}</span>}
+      </Link>
+
+      <NavTooltip
+        label={item.label}
+        targetRef={linkRef}
+        show={collapsed && tooltipVisible}
+      />
+    </li>
+  );
+}
+
 function SignOutButton({ collapsed }) {
   const router = useRouter();
   const buttonRef = useRef(null);
+
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const handleSignOut = async () => {
@@ -299,7 +418,7 @@ function SignOutButton({ collapsed }) {
         onClick={handleSignOut}
         onMouseEnter={() => setTooltipVisible(true)}
         onMouseLeave={() => setTooltipVisible(false)}
-        className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium text-[#E8E8E8] transition-all duration-200 hover:bg-red-500/10 hover:text-red-400 ${
+        className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium text-[#E8E8E8] transition-all hover:bg-red-500/10 hover:text-red-400 ${
           collapsed ? "justify-center" : ""
         }`}
       >
@@ -317,23 +436,14 @@ function SignOutButton({ collapsed }) {
   );
 }
 
-function SidebarBody({
-  collapsed,
-  toggleSidebar,
-  role,
-  pathname,
-  onNavigate,
-}) {
+function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
   const sections = dashboardNav[role] ?? dashboardNav[defaultRole];
 
   const settingsHref = `/dashboard/${role}/settings`;
 
   return (
     <div className="flex h-full flex-col bg-[#002B12]">
-      <SidebarTopBar
-        collapsed={collapsed}
-        toggleSidebar={toggleSidebar}
-      />
+      <SidebarTopBar collapsed={collapsed} toggleSidebar={toggleSidebar} />
 
       <div className="border-b border-[#D9A928]/20">
         <AccountHeader collapsed={collapsed} />
@@ -353,10 +463,11 @@ function SidebarBody({
 
             <ul className="space-y-1">
               {section.items.map((item) => (
-                <NavLink
-                  key={item.href}
+                <NavItem
+                  key={item.href ?? item.label}
                   item={item}
                   collapsed={collapsed}
+                  pathname={pathname}
                   active={pathname === item.href}
                 />
               ))}
@@ -367,7 +478,7 @@ function SidebarBody({
 
       <div className="border-t border-[#D9A928]/20 px-2 py-3">
         <ul className="space-y-1">
-          <NavLink
+          <NavItem
             item={{
               label: "Settings",
               href: settingsHref,
@@ -375,6 +486,7 @@ function SidebarBody({
             }}
             collapsed={collapsed}
             active={pathname === settingsHref}
+            pathname={pathname}
           />
 
           <SignOutButton collapsed={collapsed} />
@@ -385,13 +497,8 @@ function SidebarBody({
 }
 
 export function DashboardSidebar({ role = defaultRole }) {
-  const {
-    collapsed,
-    toggleSidebar,
-    isMobile,
-    mobileOpen,
-    setMobileOpen,
-  } = useSidebar();
+  const { collapsed, toggleSidebar, isMobile, mobileOpen, setMobileOpen } =
+    useSidebar();
 
   const pathname = usePathname();
 
