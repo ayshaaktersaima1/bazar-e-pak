@@ -1,18 +1,75 @@
 import {
     LayoutDashboard,
+    ShoppingBag,
+    Heart,
+    Wallet,
+    User,
     Store,
-    Image,
-    Settings,
-    Boxes,
     PackagePlus,
-    Tags,
     ClipboardList,
-    History,
     BarChart3,
     Star,
+    Users,
+    ShieldCheck,
+    Boxes,
+    Settings,
+    History,
+    Image,
+    Tags,
+    UserCheck,
+    AlertTriangle,
+    Bike,
 } from "lucide-react";
 
 export const dashboardNav = {
+    customer: [
+        {
+            section: "Overview",
+            items: [
+                {
+                    label: "Dashboard",
+                    href: "/dashboard/customer",
+                    icon: LayoutDashboard,
+                },
+                {
+                    label: "Orders",
+                    icon: ShoppingBag,
+                    children: [
+                        {
+                            label: "My Orders",
+                            href: "/dashboard/customer/orders",
+                        },
+                        {
+                            label: "Order History",
+                            href: "/dashboard/customer/orders/history",
+                        },
+                    ],
+                },
+                {
+                    label: "Wishlist",
+                    href: "/dashboard/customer/wishlist",
+                    icon: Heart,
+                },
+            ],
+        },
+
+        {
+            section: "Account",
+            items: [
+                {
+                    label: "Wallet",
+                    href: "/dashboard/customer/wallet",
+                    icon: Wallet,
+                },
+                {
+                    label: "Profile",
+                    href: "/dashboard/customer/profile",
+                    icon: User,
+                },
+            ],
+        },
+    ],
+
     seller: [
         {
             section: "Overview",
@@ -66,17 +123,6 @@ export const dashboardNav = {
                         },
                     ],
                 },
-
-                {
-                    label: "Categories",
-                    icon: Tags,
-                    children: [
-                        {
-                            label: "All Categories",
-                            href: "/dashboard/seller/categories",
-                        },
-                    ],
-                },
             ],
         },
 
@@ -116,12 +162,147 @@ export const dashboardNav = {
             ],
         },
     ],
+
+    admin: [
+        {
+            section: "Overview",
+            items: [
+                {
+                    label: "Dashboard",
+                    href: "/dashboard/admin",
+                    icon: LayoutDashboard,
+                },
+            ],
+        },
+
+        {
+            section: "Management",
+            items: [
+                {
+                    label: "Users",
+                    icon: Users,
+                    children: [
+                        {
+                            label: "All Users",
+                            href: "/dashboard/admin/users",
+                        },
+                    ],
+                },
+
+                {
+                    label: "Shops",
+                    icon: Store,
+                    children: [
+                        {
+                            label: "All Shops",
+                            href: "/dashboard/admin/shops",
+                        },
+                    ],
+                },
+
+                {
+                    label: "Riders",
+                    icon: Bike,
+                    children: [
+                        {
+                            label: "All Riders",
+                            href: "/dashboard/admin/riders",
+                        },
+                    ],
+                },
+
+                {
+                    label: "Orders",
+                    icon: ClipboardList,
+                    children: [
+                        {
+                            label: "All Orders",
+                            href: "/dashboard/admin/orders",
+                        },
+                    ],
+                },
+
+                {
+                    label: "Products",
+                    icon: Boxes,
+                    children: [
+                        {
+                            label: "All Products",
+                            href: "/dashboard/admin/products",
+                        },
+                    ],
+                },
+            ],
+        },
+
+        {
+            section: "Verification",
+            items: [
+                {
+                    label: "Verification",
+                    icon: ShieldCheck,
+                    children: [
+                        {
+                            label: "Shop Verification",
+                            href: "/dashboard/admin/verification/shops",
+                        },
+                        {
+                            label: "Seller Verification",
+                            href: "/dashboard/admin/verification/sellers",
+                        },
+                    ],
+                },
+            ],
+        },
+
+        {
+            section: "Platform",
+            items: [
+                {
+                    label: "Categories",
+                    icon: Tags,
+                    children: [
+                        {
+                            label: "All Categories",
+                            href: "/dashboard/admin/categories",
+                        },
+                    ],
+                },
+
+                {
+                    label: "Reports",
+                    href: "/dashboard/admin/reports",
+                    icon: BarChart3,
+                },
+
+                {
+                    label: "Complaints",
+                    href: "/dashboard/admin/complaints",
+                    icon: AlertTriangle,
+                },
+            ],
+        },
+    ],
 };
 
 export const dashboardSettings = {
-    label: "Settings",
-    href: "/dashboard/seller/settings",
-    icon: Settings,
+    customer: {
+        label: "Settings",
+        href: "/dashboard/customer/settings",
+        icon: Settings,
+    },
+
+    seller: {
+        label: "Settings",
+        href: "/dashboard/seller/settings",
+        icon: Settings,
+    },
+
+    admin: {
+        label: "Settings",
+        href: "/dashboard/admin/settings",
+        icon: Settings,
+    },
 };
 
-export const defaultRole = "seller";
+export const defaultRole = "customer";
