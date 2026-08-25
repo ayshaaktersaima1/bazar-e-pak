@@ -25,29 +25,28 @@ const ProductColumns = ({
                                 product.images[0]
                             }
                             alt={
-                                product.name
+                                product.name ||
+                                "Product"
                             }
                             fill
                             sizes="44px"
                             className="object-cover"
                         />
                     ) : (
-                        <div className="flex h-full items-center justify-center text-xs text-[#98A2B3]">
+                        <span className="flex h-full items-center justify-center text-xs text-[#98A2B3]">
                             N/A
-                        </div>
+                        </span>
                     )}
                 </div>
 
                 <div className="min-w-0">
                     <p className="truncate font-semibold text-[#001B08]">
-                        {
-                            product.name
-                        }
+                        {product.name}
                     </p>
 
                     <p className="text-xs text-[#667085]">
                         {product.categoryId
-                            ?.name ??
+                            ?.name ||
                             "Uncategorized"}
                     </p>
                 </div>
@@ -61,42 +60,26 @@ const ProductColumns = ({
 
         render: (product) => {
             const price =
-                Number(
-                    product.price,
-                ) || 0;
+                Number(product.price) || 0;
 
             const discount =
-                Number(
-                    product.discount,
-                ) || 0;
+                Number(product.discount) || 0;
 
             const finalPrice =
                 price -
-                (price *
-                    discount) /
-                    100;
+                (price * discount) / 100;
 
             return (
                 <div>
-                    {discount >
-                    0 ? (
-                        <>
-                            <p className="font-semibold text-[#001B08]">
-                                ৳
-                                {finalPrice.toFixed(
-                                    2,
-                                )}
-                            </p>
+                    <p className="font-semibold text-[#001B08]">
+                        ৳
+                        {finalPrice.toFixed(
+                            2,
+                        )}
+                    </p>
 
-                            <p className="text-xs text-[#98A2B3] line-through">
-                                ৳
-                                {price.toFixed(
-                                    2,
-                                )}
-                            </p>
-                        </>
-                    ) : (
-                        <p className="font-semibold text-[#001B08]">
+                    {discount > 0 && (
+                        <p className="text-xs text-[#98A2B3] line-through">
                             ৳
                             {price.toFixed(
                                 2,
@@ -115,16 +98,12 @@ const ProductColumns = ({
         render: (product) => (
             <span
                 className={
-                    product.stock >
-                    0
+                    Number(product.stock) > 0
                         ? "font-semibold text-[#166534]"
                         : "font-semibold text-[#DC2626]"
                 }
             >
-                {
-                    product.stock ??
-                    0
-                }
+                {product.stock ?? 0}
             </span>
         ),
     },
@@ -142,9 +121,7 @@ const ProductColumns = ({
                         : "bg-[#F3F4F6] text-[#667085]"
                 }`}
             >
-                {
-                    product.status
-                }
+                {product.status}
             </span>
         ),
     },
@@ -196,12 +173,9 @@ const ProductColumns = ({
                             product,
                         )
                     }
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[#475467] transition hover:bg-[#F2F4F7] hover:text-[#001B08]"
-                    title="Edit product"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[#475467] hover:bg-[#F2F4F7] hover:text-[#001B08]"
                 >
-                    <Edit3
-                        size={16}
-                    />
+                    <Edit3 size={16} />
                 </button>
 
                 <button
@@ -211,12 +185,9 @@ const ProductColumns = ({
                             product,
                         )
                     }
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[#DC2626] transition hover:bg-[#FEF2F2]"
-                    title="Delete product"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[#DC2626] hover:bg-[#FEF2F2]"
                 >
-                    <Trash2
-                        size={16}
-                    />
+                    <Trash2 size={16} />
                 </button>
             </div>
         ),

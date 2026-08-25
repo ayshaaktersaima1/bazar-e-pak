@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
-const BASE_URL =
-    process.env.NEXT_PUBLIC_SERVER_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 const useApi = () => {
+    const [loading, setLoading] = useState(false);
+
     const request = useCallback(
         async (
             endpoint,
@@ -17,10 +18,11 @@ const useApi = () => {
             const {
                 auth = true,
                 showSuccess = false,
-                successMessage =
-                    "Operation successful",
+                successMessage = "Operation successful",
                 showError = true,
             } = config;
+
+            setLoading(true);
 
             try {
                 let token = null;
@@ -32,44 +34,64 @@ const useApi = () => {
                     token = data?.token;
                 }
 
-                const response =
-                    await fetch(
-                        `${BASE_URL}${endpoint}`,
-                        {
-                            ...options,
+                const response = await fetch(
+                    `${BASE_URL}${endpoint}`,
+                    {
+                        ...options,
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type":
+                                "application/json",
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json",
+                            ...(token && {
+                                Authorization:
+                                    `Bearer ${token}`,
+                            }),
 
-                                ...(token && {
-                                    Authorization:
-                                        `Bearer ${token}`,
-                                }),
-
-                                ...options.headers,
-                            },
+                            ...options.headers,
                         },
-                    );
+                    },
+                );
 
-                let result;
+                const contentType =
+                    response.headers.get(
+                        "content-type",
+                    ) || "";
 
-                try {
-                    result =
-                        await response.json();
-                } catch {
+                let result = null;
+
+                if (
+                    contentType.includes(
+                        "application/json",
+                    )
+                ) {
+                    result = await response.json();
+                } else {
+                    const text =
+                        await response.text();
+
+                    result = {
+                        success: false,
+                        message:
+                            text ||
+                            "Invalid server response.",
+                    };
+                }
+
+                if (!response.ok) {
                     throw new Error(
-                        "Invalid server response",
+                        result?.message ||
+                            `Request failed with status ${response.status}`,
                     );
                 }
 
                 if (
-                    !response.ok ||
-                    !result.success
+                    result &&
+                    result.success === false
                 ) {
                     throw new Error(
                         result.message ||
-                            "API request failed",
+                            "API request failed.",
                     );
                 }
 
@@ -80,35 +102,41 @@ const useApi = () => {
                 }
 
                 return {
-                    data: result.data,
+                    data: result?.data ?? null,
                     pagination:
-                        result.pagination ??
-                        null,
+                        result?.pagination ?? null,
+                    success:
+                        result?.success ?? true,
+                    error: null,
                 };
             } catch (error) {
+                console.error(
+                    "API Error:",
+                    error,
+                );
+
                 if (showError) {
                     toast.error(
                         error?.message ||
-                            "Something went wrong",
+                            "Something went wrong.",
                     );
                 }
 
                 return {
                     data: null,
                     pagination: null,
+                    success: false,
                     error,
                 };
+            } finally {
+                setLoading(false);
             }
         },
         [],
     );
 
     const get = useCallback(
-        (
-            endpoint,
-            options = {},
-            config = {},
-        ) =>
+        (endpoint, options = {}, config = {}) =>
             request(
                 endpoint,
                 {
@@ -123,7 +151,7 @@ const useApi = () => {
     const post = useCallback(
         (
             endpoint,
-            body,
+            body = {},
             options = {},
             config = {},
         ) =>
@@ -132,9 +160,7 @@ const useApi = () => {
                 {
                     ...options,
                     method: "POST",
-                    body: JSON.stringify(
-                        body,
-                    ),
+                    body: JSON.stringify(body),
                 },
                 config,
             ),
@@ -144,7 +170,7 @@ const useApi = () => {
     const put = useCallback(
         (
             endpoint,
-            body,
+            body = {},
             options = {},
             config = {},
         ) =>
@@ -153,9 +179,7 @@ const useApi = () => {
                 {
                     ...options,
                     method: "PUT",
-                    body: JSON.stringify(
-                        body,
-                    ),
+                    body: JSON.stringify(body),
                 },
                 config,
             ),
@@ -165,7 +189,7 @@ const useApi = () => {
     const patch = useCallback(
         (
             endpoint,
-            body,
+            body = {},
             options = {},
             config = {},
         ) =>
@@ -174,9 +198,7 @@ const useApi = () => {
                 {
                     ...options,
                     method: "PATCH",
-                    body: JSON.stringify(
-                        body,
-                    ),
+                    body: JSON.stringify(body),
                 },
                 config,
             ),
@@ -206,6 +228,8 @@ const useApi = () => {
         put,
         patch,
         delete: remove,
+        remove,
+        loading,
     };
 };
 

@@ -6,10 +6,10 @@ import toast from "react-hot-toast";
 import ProductForm from "@/components/dashboard/seller/product/product-form";
 import useApi from "@/hooks/use-api";
 
-const NewProductClient = ({
-    shopId,
-    shopName,
+const EditProductClient = ({
+    product,
     categories = [],
+    shopId,
 }) => {
     const router = useRouter();
     const api = useApi();
@@ -17,8 +17,8 @@ const NewProductClient = ({
     const handleSubmit = async (
         values,
     ) => {
-        const result = await api.post(
-            "/api/products",
+        const result = await api.put(
+            `/api/products/${product._id}`,
             {
                 name: values.name.trim(),
                 description:
@@ -47,7 +47,7 @@ const NewProductClient = ({
         if (result.error) return;
 
         toast.success(
-            "Product created successfully.",
+            "Product updated successfully.",
         );
 
         router.push(
@@ -61,19 +61,17 @@ const NewProductClient = ({
         <div className="rounded-2xl border border-[#E5E2D8] bg-white p-5 shadow-sm md:p-7">
             <div className="mb-6">
                 <h1 className="text-xl font-bold text-[#002B12]">
-                    Create Product
+                    Edit Product
                 </h1>
 
                 <p className="mt-1 text-sm text-zinc-500">
-                    Add a new product to{" "}
-                    <span className="font-semibold text-[#002B12]">
-                        {shopName}
-                    </span>
-                    .
+                    Update your product
+                    information.
                 </p>
             </div>
 
             <ProductForm
+                product={product}
                 shopId={shopId}
                 categories={categories}
                 loading={api.loading}
@@ -88,4 +86,4 @@ const NewProductClient = ({
     );
 };
 
-export default NewProductClient;
+export default EditProductClient;

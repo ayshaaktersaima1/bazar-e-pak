@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { serverApi } from "@/lib/server";
 
-import NewProductClient from "./new-product-client";
+import EditProductClient from "./edit-product-client";
 
-const NewProductPage = async () => {
+const EditProductPage = async ({
+    params,
+}) => {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
@@ -15,51 +17,56 @@ const NewProductPage = async () => {
         redirect("/login");
     }
 
-    const shopResponse =
-        await serverApi.get(
-            `/api/shops?sellerId=${encodeURIComponent(
-                session.user.id,
-            )}&page=1&limit=1`,
+    const { id } = await params;
+
+    const [
+        productResponse,
+        categoryResponse,
+    ] = await Promise.all([
+        serverApi.get(
+            `/api/products/${id}`,
             {},
             {
                 auth: true,
                 includeMeta: true,
             },
-        );
+        ),
 
-    const shop =
-        shopResponse?.data?.[0] ?? null;
-
-    if (!shop?._id) {
-        redirect(
-            "/dashboard/seller/products",
-        );
-    }
-
-    const categoryResponse =
-        await serverApi.get(
+        serverApi.get(
             "/api/categories?status=active&page=1&limit=100",
             {},
             {
                 auth: false,
                 includeMeta: true,
             },
+        ),
+    ]);
+
+    const product =
+        productResponse?.data ?? null;
+
+    if (!product?._id) {
+        redirect(
+            "/dashboard/seller/products",
         );
+    }
 
     return (
         <div className="mx-auto w-full max-w-5xl">
-            <NewProductClient
-                shopId={String(shop._id)}
-                shopName={
-                    shop.name ?? ""
-                }
+            <EditProductClient
+                product={product}
                 categories={
                     categoryResponse?.data ??
                     []
                 }
+                shopId={String(
+                    product.shopId?._id ??
+                        product.shopId ??
+                        "",
+                )}
             />
         </div>
     );
 };
 
-export default NewProductPage;
+export default EditProductPage;
