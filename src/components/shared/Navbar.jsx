@@ -1,20 +1,24 @@
 "use client";
 
-
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { FaBars, FaWhatsapp } from "react-icons/fa";
+
 import CartButton from "./CartButton";
 import ProductSearch from "./ProductSearch";
 import AvatarDropdown from "./AvatarDropdown";
+
 import { useSession } from "../../lib/auth-client";
 import { useCategory } from "@/hooks/use-categories";
+
+import { navLinks, authNavLinks } from "@/data/navbar";
 
 const Navbar = ({ needAuth = true }) => {
   const { data: session } = useSession();
   const user = session?.user;
+
   const { categories } = useCategory();
 
   const pathname = usePathname();
@@ -58,16 +62,25 @@ const Navbar = ({ needAuth = true }) => {
     };
   }, []);
 
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/products", label: "All Products" },
-    { href: "/shops", label: "Shops" },
-    { href: "/about", label: "About Us" },
-  ];
+  const visibleNavLinks = navLinks.filter((link) => {
+    if (link.auth === "authenticated") return !!user;
+    if (link.auth === "guest") return !user;
+
+    return true;
+  });
+
+  const visibleAuthLinks = needAuth
+    ? authNavLinks.filter((link) => {
+        if (link.auth === "guest") return !user;
+        if (link.auth === "authenticated") return !!user;
+
+        return true;
+      })
+    : [];
 
   const renderNavItems = (isMobile = false) => (
     <>
-      {navLinks.slice(0, 3).map((link) => (
+      {visibleNavLinks.map((link) => (
         <li key={link.href}>
           <Link
             href={link.href}
@@ -85,6 +98,7 @@ const Navbar = ({ needAuth = true }) => {
         </li>
       ))}
 
+      {/* Categories */}
       <li>
         <details>
           <summary
@@ -119,48 +133,25 @@ const Navbar = ({ needAuth = true }) => {
         </details>
       </li>
 
-      <li>
-        <Link
-          href={navLinks[3].href}
-          onClick={closeDropdowns}
-          className={getLinkClass(navLinks[3].href)}
-        >
-          {navLinks[3].label}
-        </Link>
-      </li>
-
-      {needAuth && !user && (
-        <>
-          <li>
-            <Link
-              href="/login"
-              onClick={closeDropdowns}
-              className={getLinkClass("/login")}
-            >
-              Login
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              href="/register"
-              onClick={closeDropdowns}
-              className={getLinkClass("/register")}
-            >
-              Register
-            </Link>
-          </li>
-        </>
-      )}
+      {/* Auth Links */}
+      {visibleAuthLinks.map((link) => (
+        <li key={link.href}>
+          <Link
+            href={link.href}
+            onClick={closeDropdowns}
+            className={getLinkClass(link.href)}
+          >
+            {link.label}
+          </Link>
+        </li>
+      ))}
     </>
   );
 
   return (
-    <nav
-      ref={navbarRef}
-      className="sticky top-0 z-50 bg-[#001B08] text-white"
-    >
+    <nav ref={navbarRef} className="sticky top-0 z-50 bg-[#001B08] text-white">
       <div className="mx-auto flex min-h-20 w-[92%] max-w-[1600px] items-center justify-between gap-2 py-1.5 sm:gap-3 lg:gap-4">
+        {/* Logo + Mobile Menu */}
         <div className="flex min-w-0 shrink-0 items-center">
           <div className="dropdown lg:hidden">
             <div
@@ -195,17 +186,21 @@ const Navbar = ({ needAuth = true }) => {
           </Link>
         </div>
 
+        {/* Desktop Navigation */}
         <div className="hidden min-w-0 flex-1 justify-center lg:flex">
           <ul className="menu menu-horizontal flex-nowrap items-center gap-2 whitespace-nowrap px-0 text-sm font-medium xl:gap-4 xl:text-base 2xl:gap-5 2xl:text-lg">
             {renderNavItems(false)}
           </ul>
         </div>
 
+        {/* Right Actions */}
         <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
+          {/* Search */}
           <div className="hidden w-[180px] shrink-0 lg:block xl:w-[220px] 2xl:w-[250px]">
             <ProductSearch />
           </div>
 
+          {/* WhatsApp */}
           <Link
             href="https://wa.me/923260882255"
             target="_blank"
@@ -216,10 +211,12 @@ const Navbar = ({ needAuth = true }) => {
             <FaWhatsapp className="text-xl sm:text-2xl" />
           </Link>
 
+          {/* Cart */}
           <div className="flex h-10 w-10 shrink-0 items-center justify-center sm:h-11 sm:w-11">
             <CartButton />
           </div>
 
+          {/* User */}
           {user && <AvatarDropdown user={user} />}
         </div>
       </div>
