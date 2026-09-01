@@ -9,6 +9,8 @@ import Image from "next/image";
 import ShopsSection from "../../components/homepage/ShopsSection";
 import BannerDiscount from "@/components/homepage/BannerDiscount";
 import MissionVission from "../../components/homepage/MissionVission";
+import WhatsAppFloat from "../../components/shared/WhatsAppFloat";
+import BackToTop from "../../components/shared/BackToTop";
 
 export default function Home() {
   return (
@@ -37,6 +39,9 @@ export default function Home() {
       <FadeUp>
         <BestSellers />
       </FadeUp>
+
+      <WhatsAppFloat />
+      <BackToTop />
     </div>
   );
 }
