@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import useApi from "../../../../../../hooks/use-api";
+import ProductForm from "../../../../../../features/dashboard/seller/product/product-form";
 
-import ProductForm from "@/components/dashboard/seller/product/product-form";
-import useApi from "@/hooks/use-api";
 
 const NewProductClient = ({
     shopId,

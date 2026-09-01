@@ -1,8 +1,8 @@
 
-import AllShopsTable from "@/components/admin/AllShopsTable";
 import { getData } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import AllShopsTable from "../../../../../features/dashboard/admin/shops/all-shops-table";
 
 
 const AllShops = async () => {

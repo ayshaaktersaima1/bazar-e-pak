@@ -1,10 +1,10 @@
 "use client";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { DashboardHeader } from "@/features/dashboard/common/layout/dashboard-header";
 import {
   DashboardSidebar,
   SidebarProvider,
-} from "@/components/dashboard/dashboard-sidebar";
+} from "@/features/dashboard/common/layout/dashboard-sidebar";
 import { defaultRole } from "@/data/dashboard";
 import { useSession } from "@/lib/auth-client";
 

@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import ShopPage from "../../../../../features/dashboard/seller/shop/shop-page";
 
-import ShopPage from "@/components/dashboard/seller/shop/shop-page";
 
 export default async function SellerShopPage() {
     const session = await auth.api.getSession({

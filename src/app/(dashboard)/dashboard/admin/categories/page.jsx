@@ -1,7 +1,7 @@
-import AllCategoriesTable from "@/components/admin/AllCategoriesTable";
 import { auth } from "@/lib/auth";
 import { getData } from "@/lib/api";
 import { headers } from "next/headers";
+import AllCategoriesTable from "../../../../../features/dashboard/admin/categories/all-categories-table";
 
 const AllCategories = async () => {
     const { token } = await auth.api.getToken({
@@ -32,6 +32,7 @@ const AllCategories = async () => {
             </div>
 
             <AllCategoriesTable categories={categories} />
+
         </div>
     );
 };
