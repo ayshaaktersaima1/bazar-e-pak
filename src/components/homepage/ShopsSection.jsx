@@ -2,6 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/navigation";
+
 import ShopCard from "../shared/ShopCard";
 
 const ShopsSection = () => {
@@ -11,17 +19,18 @@ const ShopsSection = () => {
 
   useEffect(() => {
     const fetchShops = async () => {
-      const res = await fetch(
-        `${baseUrl}/api/shops`,
-        {
+      try {
+        const res = await fetch(`${baseUrl}/api/shops`, {
           cache: "no-store",
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          setShops(data.data || []);
         }
-      );
-
-      const data = await res.json();
-
-      if (data.success) {
-        setShops(data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch shops:", error);
       }
     };
 
@@ -47,15 +56,59 @@ const ShopsSection = () => {
         </div>
       </div>
 
-      {/* Shop Cards */}
-      <div className="mx-auto mt-10 grid w-[90%] grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-        {shops.map((shop) => (
-          <ShopCard
-            key={shop._id}
-            shop={shop}
-            variant="homepage"
-          />
-        ))}
+      {/* Slider */}
+      <div className="relative mt-10">
+        {/* Left Arrow */}
+        <button
+          type="button"
+          aria-label="Previous shops"
+          className="shops-prev absolute left-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-[#E8BB44] text-[#001B08] shadow-md transition duration-300 hover:bg-[#001B08] hover:text-white md:left-4 lg:left-3 lg:h-10 lg:w-10 xl:left-5"
+        >
+          <FaChevronLeft />
+        </button>
+
+        {/* Shop Cards */}
+        <div className="mx-auto w-[90%]">
+          <Swiper
+            modules={[Navigation]}
+            navigation={{
+              prevEl: ".shops-prev",
+              nextEl: ".shops-next",
+            }}
+            loop={shops.length > 4}
+            spaceBetween={16}
+            slidesPerView={1}
+            breakpoints={{
+              768: {
+                slidesPerView: 2,
+              },
+              1024: {
+                slidesPerView: 4,
+              },
+              1280: {
+                slidesPerView: 4,
+              },
+            }}
+          >
+            {shops.map((shop) => (
+              <SwiperSlide key={shop._id} className="h-auto">
+                <ShopCard
+                  shop={shop}
+                  variant="homepage"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+
+        {/* Right Arrow */}
+        <button
+          type="button"
+          aria-label="Next shops"
+          className="shops-next absolute right-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-[#E8BB44] text-[#001B08] shadow-md transition duration-300 hover:bg-[#001B08] hover:text-white md:right-4 lg:right-3 lg:h-10 lg:w-10 xl:right-5"
+        >
+          <FaChevronRight />
+        </button>
       </div>
 
       {/* View All Shops */}

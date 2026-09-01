@@ -8,12 +8,17 @@ import FadeUp from "@/components/shared/FadeUp";
 import Image from "next/image";
 import ShopsSection from "../../components/homepage/ShopsSection";
 import BannerDiscount from "@/components/homepage/BannerDiscount";
+import MissionVission from "../../components/homepage/MissionVission";
 
 export default function Home() {
   return (
     <div>
       {/* <Banner></Banner> */}
       <BannerDiscount></BannerDiscount>
+
+      <FadeUp>
+        <MissionVission></MissionVission>
+      </FadeUp>
       <FadeUp>
         <Features />
       </FadeUp>
@@ -33,6 +38,5 @@ export default function Home() {
         <BestSellers />
       </FadeUp>
     </div>
-
   );
 }
