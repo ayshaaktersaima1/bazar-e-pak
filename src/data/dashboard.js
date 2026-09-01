@@ -5,7 +5,6 @@ import {
     Wallet,
     User,
     Store,
-    PackagePlus,
     ClipboardList,
     BarChart3,
     Star,
@@ -13,63 +12,12 @@ import {
     ShieldCheck,
     Boxes,
     Settings,
-    History,
-    Image,
     Tags,
-    UserCheck,
     AlertTriangle,
     Bike,
 } from "lucide-react";
 
 export const dashboardNav = {
-    customer: [
-        {
-            section: "Overview",
-            items: [
-                {
-                    label: "Dashboard",
-                    href: "/dashboard/customer",
-                    icon: LayoutDashboard,
-                },
-                {
-                    label: "Orders",
-                    icon: ShoppingBag,
-                    children: [
-                        {
-                            label: "My Orders",
-                            href: "/dashboard/customer/orders",
-                        },
-                        {
-                            label: "Order History",
-                            href: "/dashboard/customer/orders/history",
-                        },
-                    ],
-                },
-                {
-                    label: "Wishlist",
-                    href: "/dashboard/customer/wishlist",
-                    icon: Heart,
-                },
-            ],
-        },
-
-        {
-            section: "Account",
-            items: [
-                {
-                    label: "Wallet",
-                    href: "/dashboard/customer/wallet",
-                    icon: Wallet,
-                },
-                {
-                    label: "Profile",
-                    href: "/dashboard/customer/profile",
-                    icon: User,
-                },
-            ],
-        },
-    ],
-
     seller: [
         {
             section: "Overview",
@@ -286,12 +234,6 @@ export const dashboardNav = {
 };
 
 export const dashboardSettings = {
-    customer: {
-        label: "Settings",
-        href: "/dashboard/customer/settings",
-        icon: Settings,
-    },
-
     seller: {
         label: "Settings",
         href: "/dashboard/seller/settings",
@@ -305,4 +247,4 @@ export const dashboardSettings = {
     },
 };
 
-export const defaultRole = "customer";
+export const defaultRole = "seller";

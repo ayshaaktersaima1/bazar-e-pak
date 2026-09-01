@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import { authClient } from "../../lib/auth-client";
 import { LuLayoutDashboard } from "react-icons/lu";
 
-// Two visual flavors: "default" (original) and "dashboard" (site theme colors)
+// Two visual flavors: "default" and "dashboard"
 const THEMES = {
   default: {
     ring: "bg-[#E8BB44]",
@@ -25,6 +25,7 @@ const THEMES = {
     panelBorder: "",
     itemIconBg: "bg-[#F7F5EF] text-[#001B08] group-hover:bg-[#E8BB44]",
   },
+
   dashboard: {
     ring: "bg-[#D9A928]",
     avatarBg: "bg-[#002B12]",
@@ -38,8 +39,11 @@ const THEMES = {
   },
 };
 
+const DASHBOARD_ROLES = ["seller", "admin", "superadmin"];
+
 const AvatarDropdown = ({ user, variant = "default" }) => {
   const router = useRouter();
+
   const theme = THEMES[variant] ?? THEMES.default;
   const isDashboard = variant === "dashboard";
 
@@ -47,13 +51,19 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
 
   const name = user?.name || "User";
   const email = user?.email || "";
-  const role = user?.role || "User";
+
+  const role = String(user?.role ?? "")
+    .trim()
+    .toLowerCase();
+
   const initial = name.trim().charAt(0).toUpperCase();
 
-  // dashboard variant links to home page, default variant links to /dashboard
-  const primaryLink = isDashboard
-    ? { href: "/", label: "Home", desc: "Go to homepage" }
-    : { href: "/dashboard", label: "Dashboard", desc: "Manage your account" };
+  // Only seller/admin/superadmin have dashboard access
+  const hasDashboard = DASHBOARD_ROLES.includes(role);
+
+  const dashboardHref = hasDashboard ? `/dashboard/${role}` : null;
+  const profileHref = hasDashboard ? `/dashboard/${role}/profile` : null;
+  const settingsHref = hasDashboard ? `/dashboard/${role}/settings` : null;
 
   const handleSignOut = async () => {
     try {
@@ -65,6 +75,7 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
       }
 
       toast.success("Signed out successfully");
+
       router.push("/");
       router.refresh();
     } catch (error) {
@@ -75,11 +86,12 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
 
   return (
     <div className="dropdown dropdown-end">
+      {/* Avatar */}
       <button
         type="button"
         tabIndex={0}
         aria-label="Open user menu"
-        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ${theme.ring} p-[2px] transition-transform duration-200 hover:scale-105 focus:outline-none sm:h-11 sm:w-11 cursor-pointer`}
+        className={`flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full ${theme.ring} p-[2px] transition-transform duration-200 hover:scale-105 focus:outline-none sm:h-11 sm:w-11`}
       >
         <div
           className={`flex h-full w-full items-center justify-center overflow-hidden rounded-full ${theme.avatarBg}`}
@@ -100,10 +112,12 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
         </div>
       </button>
 
+      {/* Dropdown */}
       <div
         tabIndex={0}
         className={`dropdown-content z-[100] mt-3 w-[280px] overflow-hidden rounded-2xl bg-white shadow-[0_12px_35px_rgba(0,0,0,0.14)] ${theme.panelBorder}`}
       >
+        {/* Header */}
         <div className={`${theme.panelHeaderBg} px-4 py-4`}>
           <div className="flex items-center gap-3">
             <div
@@ -138,40 +152,45 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
               <span
                 className={`mt-1.5 inline-block rounded-full text-[10px] font-medium uppercase tracking-wide ${theme.roleText} ${theme.roleBadge}`}
               >
-                {role}
+                {role || "User"}
               </span>
             </div>
           </div>
         </div>
 
         <div className="p-2">
-          <Link
-            href={primaryLink.href}
-            onClick={() => document.activeElement?.blur()}
-            className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#F7F5EF]"
-          >
-            <span
-              className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${theme.itemIconBg}`}
+          {/* Dashboard / Home */}
+          {hasDashboard && (
+            <Link
+              href={isDashboard ? "/" : dashboardHref}
+              onClick={() => document.activeElement?.blur()}
+              className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#F7F5EF]"
             >
-              <LuLayoutDashboard />
-            </span>
-
-            <span className="flex-1">
-              <span className="block text-sm font-medium text-[#001B08]">
-                {primaryLink.label}
+              <span
+                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${theme.itemIconBg}`}
+              >
+                {isDashboard ? <FaUserCircle /> : <LuLayoutDashboard />}
               </span>
-              <span className="block text-[11px] text-gray-400">
-                {primaryLink.desc}
+
+              <span className="flex-1">
+                <span className="block text-sm font-medium text-[#001B08]">
+                  {isDashboard ? "Home" : "Dashboard"}
+                </span>
+
+                <span className="block text-[11px] text-gray-400">
+                  {isDashboard ? "Go to homepage" : "Manage your dashboard"}
+                </span>
               </span>
-            </span>
 
-            <FaChevronRight className="text-[10px] text-gray-300 transition-transform group-hover:translate-x-1" />
-          </Link>
+              <FaChevronRight className="text-[10px] text-gray-300 transition-transform group-hover:translate-x-1" />
+            </Link>
+          )}
 
-          {isDashboard && (
+          {/* Profile + Settings — dashboard roles only */}
+          {hasDashboard && isDashboard && (
             <>
               <Link
-                href="/dashboard/profile"
+                href={profileHref}
                 onClick={() => document.activeElement?.blur()}
                 className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#F7F5EF]"
               >
@@ -185,6 +204,7 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
                   <span className="block text-sm font-medium text-[#001B08]">
                     Profile
                   </span>
+
                   <span className="block text-[11px] text-gray-400">
                     View and edit your profile
                   </span>
@@ -194,7 +214,7 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
               </Link>
 
               <Link
-                href="/dashboard/settings"
+                href={settingsHref}
                 onClick={() => document.activeElement?.blur()}
                 className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#F7F5EF]"
               >
@@ -208,6 +228,7 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
                   <span className="block text-sm font-medium text-[#001B08]">
                     Settings
                   </span>
+
                   <span className="block text-[11px] text-gray-400">
                     Preferences and security
                   </span>
@@ -220,6 +241,7 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
             </>
           )}
 
+          {/* Sign Out */}
           <button
             type="button"
             onClick={handleSignOut}
@@ -233,6 +255,7 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
               <span className="block text-sm font-medium text-gray-700">
                 Sign Out
               </span>
+
               <span className="block text-[11px] text-gray-400">
                 Sign out from your account
               </span>

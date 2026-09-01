@@ -15,6 +15,8 @@ import { useCategory } from "@/hooks/use-categories";
 
 import { navLinks, authNavLinks } from "@/data/navbar";
 
+const DASHBOARD_ROLES = ["seller", "admin", "superadmin"];
+
 const Navbar = ({ needAuth = true }) => {
   const { data: session } = useSession();
   const user = session?.user;
@@ -35,6 +37,13 @@ const Navbar = ({ needAuth = true }) => {
 
   const isCollectionActive = pathname?.startsWith("/collection");
   const isShopsActive = pathname?.startsWith("/shops");
+
+  // Only these roles can access a dashboard
+  const role = String(user?.role ?? "")
+    .trim()
+    .toLowerCase();
+
+  const hasDashboard = DASHBOARD_ROLES.includes(role);
 
   const closeDropdowns = () => {
     document.activeElement?.blur();
@@ -97,6 +106,23 @@ const Navbar = ({ needAuth = true }) => {
           </Link>
         </li>
       ))}
+
+      {/* Dashboard — seller/admin/superadmin only */}
+      {hasDashboard && (
+        <li>
+          <Link
+            href={`/dashboard/${role}`}
+            onClick={closeDropdowns}
+            className={
+              pathname?.startsWith(`/dashboard/${role}`)
+                ? activeLinkClass
+                : defaultLinkClass
+            }
+          >
+            Dashboard
+          </Link>
+        </li>
+      )}
 
       {/* Categories */}
       <li>

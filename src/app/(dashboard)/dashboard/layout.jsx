@@ -5,13 +5,34 @@ import {
   DashboardSidebar,
   SidebarProvider,
 } from "@/features/dashboard/common/layout/dashboard-sidebar";
-import { defaultRole } from "@/data/dashboard";
 import { useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+const DASHBOARD_ROLES = ["seller", "admin", "superadmin"];
 
 export default function DashboardLayout({ children }) {
+  const router = useRouter();
   const { data: session, status } = useSession();
 
-  const role = session?.user?.role ?? defaultRole;
+  const role = String(session?.user?.role ?? "")
+    .trim()
+    .toLowerCase();
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    // Not logged in
+    if (!session?.user) {
+      router.replace("/login");
+      return;
+    }
+
+    // Customer / invalid role → no dashboard
+    if (!DASHBOARD_ROLES.includes(role)) {
+      router.replace("/");
+    }
+  }, [session, status, role, router]);
 
   if (status === "loading") {
     return (
@@ -19,6 +40,11 @@ export default function DashboardLayout({ children }) {
         Loading...
       </div>
     );
+  }
+
+  // Don't render dashboard UI for customer/invalid role
+  if (!session?.user || !DASHBOARD_ROLES.includes(role)) {
+    return null;
   }
 
   return (
