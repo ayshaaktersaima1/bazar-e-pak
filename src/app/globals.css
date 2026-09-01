@@ -1,15 +1,57 @@
 @import "tailwindcss";
+
 @plugin "daisyui";
 
+html {
+  scroll-behavior: smooth;
+}
 
 body {
-    font-family: var(--font-inter);
-    background-color: #F7F5EF;
+  font-family: var(--font-inter);
+  background-color: #f7f5ef;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 h1,
 h2,
 h3,
 h4 {
-    font-family: var(--font-lora);
+  font-family: var(--font-lora);
+}
+
+/* Smooth interactions */
+a,
+button,
+input,
+textarea,
+select {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+/* Better scrolling on mobile */
+html {
+  scroll-padding-top: 80px;
+}
+
+/* Respect user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
