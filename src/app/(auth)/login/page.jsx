@@ -10,13 +10,12 @@ import {
   FaEye,
   FaEyeSlash,
   FaGoogle,
-  FaMotorcycle,
   FaShieldAlt,
   FaShoppingBag,
   FaStore,
   FaUser,
+  FaUserShield,
 } from "react-icons/fa";
-
 import { authClient } from "@/lib/auth-client";
 
 const LoginPage = () => {
@@ -50,12 +49,12 @@ const LoginPage = () => {
     } else if (role === "seller") {
       setValue("email", "seller-shop@bep.com");
       setValue("password", "seller@BEP");
-    } else if (role === "rider") {
-      setValue("email", "rider@bep.com");
-      setValue("password", "rider@BEP");
     } else if (role === "admin") {
       setValue("email", "admin@bep.com");
       setValue("password", "admin@BEP");
+    } else if (role === "superadmin") {
+      setValue("email", "superadmin@bep.com");
+      setValue("password", "superadmin@BEP");
     }
   }, [role, setValue]);
 
@@ -122,22 +121,19 @@ const LoginPage = () => {
   return (
     <main className="relative min-h-screen bg-[#F7F5EF]">
       {/* Left Background */}
-
       <div className="absolute bottom-0 left-0 top-0 hidden overflow-hidden lg:block lg:w-[42%] xl:w-[48%]">
         <Image
           src="/images/test.png"
           alt=""
           fill
           priority
-          className="object-cover object-left pointer-none select-none"
+          className="pointer-events-none object-cover object-left select-none"
         />
       </div>
 
       {/* Website Content */}
-
       <div className="relative mx-auto grid min-h-screen w-[90%] items-start gap-4 py-10 lg:grid-cols-[38%_1fr] xl:grid-cols-[42%_1fr] xl:gap-8">
         {/* Left Content */}
-
         <div className="relative z-10 hidden lg:block">
           <div className="max-w-[300px] xl:max-w-md">
             <h1 className="text-3xl font-bold leading-tight text-white xl:text-4xl">
@@ -148,13 +144,13 @@ const LoginPage = () => {
             <div className="mt-5 h-1 w-14 bg-[#E8BB44]" />
 
             <p className="mt-5 w-80 text-sm leading-6 text-gray-200 xl:text-base xl:leading-7">
-              Login to continue shopping, manage your store or handle deliveries
-              from your account.
+              Login to continue shopping, manage your store or manage your Bazar
+              E Pak account.
             </p>
 
             {/* Benefits */}
-
             <div className="mt-8 space-y-5">
+              {/* Shopping */}
               <div className="flex items-start gap-3 xl:gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44]">
                   <FaShoppingBag />
@@ -171,6 +167,7 @@ const LoginPage = () => {
                 </div>
               </div>
 
+              {/* Seller */}
               <div className="flex items-start gap-3 xl:gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44]">
                   <FaStore />
@@ -187,25 +184,27 @@ const LoginPage = () => {
                 </div>
               </div>
 
+              {/* Admin */}
               <div className="flex items-start gap-3 xl:gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44]">
-                  <FaMotorcycle />
+                  <FaShieldAlt />
                 </div>
 
                 <div>
                   <h3 className="font-semibold text-white">
-                    Manage Deliveries
+                    Manage the Platform
                   </h3>
 
                   <p className="mt-1 text-sm leading-5 text-gray-300">
-                    Riders can view and manage their delivery activities.
+                    Manage users, shops, products and platform activities.
                   </p>
                 </div>
               </div>
 
+              {/* Security */}
               <div className="flex items-start gap-3 xl:gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E8BB44] text-[#E8BB44]">
-                  <FaShieldAlt />
+                  <FaUserShield />
                 </div>
 
                 <div>
@@ -221,11 +220,9 @@ const LoginPage = () => {
         </div>
 
         {/* Right Side */}
-
         <div className="min-w-0 w-full">
           <div className="mx-auto w-full max-w-xl">
             {/* Back to Home + Register Link */}
-
             <div className="mb-5 flex items-center justify-between gap-3 text-sm">
               <Link
                 href="/"
@@ -249,7 +246,6 @@ const LoginPage = () => {
             </div>
 
             {/* Login Form */}
-
             <div className="rounded-2xl bg-white p-6 shadow-md sm:p-8">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-[#001B08] sm:text-3xl">
@@ -267,14 +263,12 @@ const LoginPage = () => {
                 noValidate
               >
                 {/* Roles */}
-
                 <p className="mb-3 text-sm font-semibold text-[#001B08]">
                   Login as Demo Role
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {/* Customer */}
-
                   <label className="cursor-pointer">
                     <input
                       type="radio"
@@ -293,7 +287,6 @@ const LoginPage = () => {
                   </label>
 
                   {/* Store Owner */}
-
                   <label className="cursor-pointer">
                     <input
                       type="radio"
@@ -311,27 +304,7 @@ const LoginPage = () => {
                     </div>
                   </label>
 
-                  {/* Rider */}
-
-                  <label className="cursor-pointer">
-                    <input
-                      type="radio"
-                      value="rider"
-                      className="peer hidden"
-                      {...register("role")}
-                    />
-
-                    <div className="rounded-xl border-2 border-gray-200 p-3 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
-                      <FaMotorcycle className="mx-auto text-2xl text-[#001B08]" />
-
-                      <h3 className="mt-2 text-xs font-semibold text-[#001B08]">
-                        Rider
-                      </h3>
-                    </div>
-                  </label>
-
                   {/* Admin */}
-
                   <label className="cursor-pointer">
                     <input
                       type="radio"
@@ -348,10 +321,27 @@ const LoginPage = () => {
                       </h3>
                     </div>
                   </label>
+
+                  {/* Super Admin / Developer */}
+                  <label className="cursor-pointer">
+                    <input
+                      type="radio"
+                      value="superadmin"
+                      className="peer hidden"
+                      {...register("role")}
+                    />
+
+                    <div className="rounded-xl border-2 border-gray-200 p-3 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
+                      <FaUserShield className="mx-auto text-2xl text-[#E8BB44]" />
+
+                      <h3 className="mt-2 text-xs font-semibold text-[#001B08]">
+                        Super Admin
+                      </h3>
+                    </div>
+                  </label>
                 </div>
 
                 {/* Email */}
-
                 <fieldset className="fieldset mt-5">
                   <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                     Email Address
@@ -383,7 +373,6 @@ const LoginPage = () => {
                 </fieldset>
 
                 {/* Password */}
-
                 <fieldset className="fieldset mt-4">
                   <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                     Password
@@ -409,7 +398,6 @@ const LoginPage = () => {
                     />
 
                     {/* Password Toggle */}
-
                     <button
                       type="button"
                       disabled={isLoading}
@@ -431,7 +419,6 @@ const LoginPage = () => {
                 </fieldset>
 
                 {/* Login Button */}
-
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -441,7 +428,6 @@ const LoginPage = () => {
                 </button>
 
                 {/* Divider */}
-
                 <div className="my-5 flex items-center gap-3">
                   <span className="h-px flex-1 bg-gray-200" />
 
@@ -453,7 +439,6 @@ const LoginPage = () => {
                 </div>
 
                 {/* Google */}
-
                 <button
                   type="button"
                   disabled={isLoading}
@@ -464,7 +449,6 @@ const LoginPage = () => {
                 </button>
 
                 {/* Mobile Register */}
-
                 <p className="mt-6 text-center text-sm text-gray-600 lg:hidden">
                   Don&apos;t have an account?{" "}
                   <Link
