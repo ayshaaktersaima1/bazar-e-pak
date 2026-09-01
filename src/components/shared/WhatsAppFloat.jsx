@@ -1,7 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaComments } from "react-icons/fa";
 
 const WhatsAppFloat = () => {
   return (
@@ -9,13 +7,13 @@ const WhatsAppFloat = () => {
       href="https://wa.me/923260882255"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat with us on WhatsApp"
+      aria-label="Chat with us"
       className="group fixed bottom-20 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#E8BB44] text-[#001B08] shadow-lg transition-all duration-300 hover:scale-110 hover:bg-white sm:bottom-22 sm:right-7 sm:h-14 sm:w-14"
     >
-      <FaWhatsapp className="text-2xl sm:text-3xl" />
+      <FaComments className="text-xl sm:text-2xl" />
 
       <span className="pointer-events-none absolute right-full mr-3 hidden whitespace-nowrap rounded-md bg-[#001B08] px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-300 group-hover:opacity-100 sm:block">
-        Chat with us
+        Need help? Chat with us
       </span>
     </Link>
   );

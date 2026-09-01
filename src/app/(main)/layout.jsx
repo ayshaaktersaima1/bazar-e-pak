@@ -2,7 +2,8 @@ import Footer from "@/components/shared/Footer";
 import LenisProvider from "@/components/shared/LenisProvider";
 import Navbar from "@/components/shared/Navbar";
 import React from "react";
-
+import WhatsAppFloat from "../../components/shared/WhatsAppFloat";
+import BackToTop from "../../components/shared/BackToTop";
 const layout = ({ children }) => {
   return (
     <div>
@@ -12,6 +13,9 @@ const layout = ({ children }) => {
       {children}
       {/* </LenisProvider> */}
       <Footer></Footer>
+
+      <WhatsAppFloat />
+      <BackToTop />
     </div>
   );
 };
