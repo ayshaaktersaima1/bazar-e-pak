@@ -17,12 +17,12 @@ const ProductDetailsPage = () => {
   const {
     products,
     loading,
-    getProductById,
+    getProductFromState,
   } = useProduct();
 
   const { getShopById } = useShop();
 
-  const product = getProductById(id);
+  const product = getProductFromState(id);
 
   const shop = product
     ? getShopById(product.shopId)
@@ -78,7 +78,7 @@ const ProductDetailsPage = () => {
           <div className="aspect-square overflow-hidden rounded-xl bg-white p-5 shadow-sm">
             <Image
               src={
-                product.images?.[0]
+                product.images?.[0] || "/placeholder-product.png"
               }
               alt={product.name}
               width={700}

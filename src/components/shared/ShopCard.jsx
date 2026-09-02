@@ -48,7 +48,7 @@ const ShopCard = ({
             {shop.name}
           </h3>
 
-          <p className="mt-2 line-clamp-2 text-sm leading-6 text-gray-500">
+          <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-gray-500">
             {shop.description}
           </p>
 
