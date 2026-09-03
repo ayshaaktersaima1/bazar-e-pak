@@ -75,17 +75,21 @@ const ProductDetailsPage = () => {
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
 
           {/* Product Image */}
-          <div className="aspect-square overflow-hidden rounded-xl bg-white p-5 shadow-sm">
+          <div className="relative aspect-square overflow-hidden rounded-xl bg-white p-5 shadow-sm">
             <Image
-              src={
-                product.images?.[0] || "/placeholder-product.png"
-              }
+              src={product.images?.[0] || "/images/placeholder.webp"}
               alt={product.name}
               width={700}
               height={700}
               className="h-full w-full object-contain"
               priority
             />
+
+            {typeof product.discount === "number" && product.discount > 0 && (
+              <span className="absolute right-5 top-5 rounded-full bg-[#E8BB44] px-3 py-1.5 text-sm font-bold text-[#001B08] shadow-sm">
+                -{product.discount}%
+              </span>
+            )}
           </div>
 
           {/* Product Information */}

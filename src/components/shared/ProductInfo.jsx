@@ -7,6 +7,7 @@ import {
     FaShoppingCart,
 } from "react-icons/fa";
 import { useCart } from "../../hooks/use-cart";
+import { discountPrice } from "@/utils/discount-price";
 
 const ProductInfo = ({ product, onAdded }) => {
     const { addToCart } = useCart();
@@ -36,31 +37,19 @@ const ProductInfo = ({ product, onAdded }) => {
                 {product.name}
             </h1>
 
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-                {product.discountPrice ? (
-                    <>
-                        <del className="text-lg font-semibold text-gray-400">
-                            PKR {product.price}
-                        </del>
-
-                        <p className="text-2xl font-bold text-[#001B08]">
-                            PKR {product.discountPrice}
-                        </p>
-
-                        <span className="rounded-full bg-[#E8BB44] px-2.5 py-1 text-xs font-bold text-[#001B08]">
-                            {Math.round(
-                                ((product.price - product.discountPrice) /
-                                    product.price) *
-                                    100,
-                            )}
-                            % OFF
-                        </span>
-                    </>
-                ) : (
-                    <p className="text-2xl font-bold text-[#001B08]">
+            <div className="mt-5 flex items-center gap-3">
+                {product.discount > 0 && (
+                    <del className="text-lg font-semibold text-gray-400">
                         PKR {product.price}
-                    </p>
+                    </del>
                 )}
+
+                <p className="text-2xl font-bold text-[#001B08]">
+                    PKR{" "}
+                    {product.discount > 0
+                        ? discountPrice(product.price, product.discount)
+                        : product.price}
+                </p>
             </div>
 
             <p className="mt-6 text-base leading-7 text-gray-600 md:text-lg md:leading-8">
