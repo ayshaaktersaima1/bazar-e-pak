@@ -2,7 +2,7 @@ export const teamMembers = [
   {
     id: 1,
     name: "MR. X",
-    role: "Full Stack Developer",
+    role: "Project Manager",
     image: "/images/team/mem1",
     bio: "Works across frontend and backend development to build reliable, scalable, and maintainable features for Bazar-e-Pak.",
     skills: ["Node.js", "Express.js", "MongoDB", "REST API"],
@@ -13,7 +13,7 @@ export const teamMembers = [
   {
     id: 2,
     name: "Ayesha Akter Saima",
-    role: "Frontend Developer",
+    role: "Full Stack Developer",
     image: "/images/team/mem2",
     bio: "Focused on creating responsive interfaces and intuitive user experiences that make Bazar-e-Pak simple and enjoyable to use.",
     skills: ["React", "Next.js", "Tailwind CSS", "UI/UX"],
