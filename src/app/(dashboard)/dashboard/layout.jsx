@@ -9,18 +9,18 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-const DASHBOARD_ROLES = ["seller", "admin", "superadmin"];
+const DASHBOARD_ROLES = ["seller", "admin", "super_admin"];
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = useSession();
 
   const role = String(session?.user?.role ?? "")
     .trim()
     .toLowerCase();
 
   useEffect(() => {
-    if (status === "loading") return;
+    if (isPending) return;
 
     // Not logged in
     if (!session?.user) {
@@ -32,9 +32,9 @@ export default function DashboardLayout({ children }) {
     if (!DASHBOARD_ROLES.includes(role)) {
       router.replace("/");
     }
-  }, [session, status, role, router]);
+  }, [session, isPending, role, router]);
 
-  if (status === "loading") {
+  if (isPending) {
     return (
       <div className="flex h-svh items-center justify-center bg-[#F7F8F6] text-sm text-[#5F6B63]">
         Loading...

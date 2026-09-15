@@ -1,23 +1,29 @@
 import {
     LayoutDashboard,
-    ShoppingBag,
-    Heart,
-    Wallet,
-    User,
     Store,
-    ClipboardList,
     BarChart3,
     Star,
     Users,
-    ShieldCheck,
     Boxes,
     Settings,
     Tags,
-    AlertTriangle,
-    Bike,
+    UserCheck,
+    UserCog,
+    UserPlus,
+    BadgePercent,
+    Megaphone,
+    PanelsTopLeft,
+    Search,
+    ScrollText,
+    Bell,
+    Activity,
+    ShieldCheck,
 } from "lucide-react";
 
 export const dashboardNav = {
+    // =====================================================
+    // SELLER
+    // =====================================================
     seller: [
         {
             section: "Overview",
@@ -31,32 +37,14 @@ export const dashboardNav = {
         },
 
         {
-            section: "Shop",
+            section: "Business Management",
             items: [
                 {
                     label: "My Shop",
+                    href: "/dashboard/seller/shop",
                     icon: Store,
-                    children: [
-                        {
-                            label: "Shop Overview",
-                            href: "/dashboard/seller/shop",
-                        },
-                        {
-                            label: "Shop CMS",
-                            href: "/dashboard/seller/shop/cms",
-                        },
-                        {
-                            label: "Shop Information",
-                            href: "/dashboard/seller/shop/settings",
-                        },
-                    ],
                 },
-            ],
-        },
 
-        {
-            section: "Catalog",
-            items: [
                 {
                     label: "Products",
                     icon: Boxes,
@@ -71,25 +59,11 @@ export const dashboardNav = {
                         },
                     ],
                 },
-            ],
-        },
 
-        {
-            section: "Orders",
-            items: [
                 {
-                    label: "Orders",
-                    icon: ClipboardList,
-                    children: [
-                        {
-                            label: "All Orders",
-                            href: "/dashboard/seller/orders",
-                        },
-                        {
-                            label: "Order History",
-                            href: "/dashboard/seller/orders/history",
-                        },
-                    ],
+                    label: "Offers & Discounts",
+                    href: "/dashboard/seller/offers",
+                    icon: BadgePercent,
                 },
             ],
         },
@@ -98,19 +72,34 @@ export const dashboardNav = {
             section: "Insights",
             items: [
                 {
+                    label: "Reviews",
+                    href: "/dashboard/seller/reviews",
+                    icon: Star,
+                },
+
+                {
                     label: "Analytics",
                     href: "/dashboard/seller/analytics",
                     icon: BarChart3,
                 },
+            ],
+        },
+
+        {
+            section: "Account",
+            items: [
                 {
-                    label: "Reviews",
-                    href: "/dashboard/seller/reviews",
-                    icon: Star,
+                    label: "Notifications",
+                    href: "/dashboard/seller/notifications",
+                    icon: Bell,
                 },
             ],
         },
     ],
 
+    // =====================================================
+    // ADMIN
+    // =====================================================
     admin: [
         {
             section: "Overview",
@@ -128,77 +117,212 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Users",
+                    href: "/dashboard/admin/users",
                     icon: Users,
-                    children: [
-                        {
-                            label: "All Users",
-                            href: "/dashboard/admin/users",
-                        },
-                    ],
+                    permission: "users.view",
                 },
 
                 {
                     label: "Shops",
+                    href: "/dashboard/admin/shops",
                     icon: Store,
-                    children: [
-                        {
-                            label: "All Shops",
-                            href: "/dashboard/admin/shops",
-                        },
-                    ],
-                },
-
-                {
-                    label: "Riders",
-                    icon: Bike,
-                    children: [
-                        {
-                            label: "All Riders",
-                            href: "/dashboard/admin/riders",
-                        },
-                    ],
-                },
-
-                {
-                    label: "Orders",
-                    icon: ClipboardList,
-                    children: [
-                        {
-                            label: "All Orders",
-                            href: "/dashboard/admin/orders",
-                        },
-                    ],
+                    permission: "shops.view",
                 },
 
                 {
                     label: "Products",
+                    href: "/dashboard/admin/products",
                     icon: Boxes,
-                    children: [
-                        {
-                            label: "All Products",
-                            href: "/dashboard/admin/products",
-                        },
-                    ],
+                    permission: "products.view",
                 },
             ],
         },
 
         {
-            section: "Verification",
+            section: "Moderation",
             items: [
                 {
-                    label: "Verification",
-                    icon: ShieldCheck,
-                    children: [
-                        {
-                            label: "Shop Verification",
-                            href: "/dashboard/admin/verification/shops",
-                        },
-                        {
-                            label: "Seller Verification",
-                            href: "/dashboard/admin/verification/sellers",
-                        },
-                    ],
+                    label: "Reviews",
+                    href: "/dashboard/admin/reviews",
+                    icon: Star,
+                    permission: "reviews.view",
+                },
+            ],
+        },
+
+        {
+            section: "Insights",
+            items: [
+                {
+                    label: "Analytics",
+                    href: "/dashboard/admin/analytics",
+                    icon: BarChart3,
+                    permission: "analytics.view",
+                },
+            ],
+        },
+
+        {
+            section: "Account",
+            items: [
+                {
+                    label: "Notifications",
+                    href: "/dashboard/admin/notifications",
+                    icon: Bell,
+                },
+            ],
+        },
+    ],
+
+    // =====================================================
+    // SUPER ADMIN
+    // =====================================================
+    super_admin: [
+        {
+            section: "Overview",
+            items: [
+                {
+                    label: "Dashboard",
+                    href: "/dashboard/superadmin",
+                    icon: LayoutDashboard,
+                },
+            ],
+        },
+
+        {
+            section: "User Management",
+            items: [
+                {
+                    label: "Admins",
+                    href: "/dashboard/superadmin/admins",
+                    icon: UserCog,
+                },
+
+                {
+                    label: "Users",
+                    href: "/dashboard/superadmin/users",
+                    icon: Users,
+                },
+            ],
+        },
+
+        {
+            section: "Seller Management",
+            items: [
+                {
+                    label: "Seller Applications",
+                    href: "/dashboard/superadmin/seller-applications",
+                    icon: UserCheck,
+                },
+
+                {
+                    label: "Create Seller & Shop",
+                    href: "/dashboard/superadmin/create-seller-shop",
+                    icon: UserPlus,
+                },
+
+                {
+                    label: "Shops",
+                    href: "/dashboard/superadmin/shops",
+                    icon: Store,
+                },
+
+                {
+                    label: "Native Shops",
+                    href: "/dashboard/superadmin/native-shops",
+                    icon: Store,
+                },
+            ],
+        },
+
+        {
+            section: "Product Management",
+            items: [
+                {
+                    label: "Products",
+                    href: "/dashboard/superadmin/products",
+                    icon: Boxes,
+                },
+
+                {
+                    label: "Native Products",
+                    href: "/dashboard/superadmin/native-products",
+                    icon: Boxes,
+                },
+
+                {
+                    label: "Categories",
+                    href: "/dashboard/superadmin/categories",
+                    icon: Tags,
+                },
+
+                {
+                    label: "Offers & Discounts",
+                    href: "/dashboard/superadmin/offers",
+                    icon: BadgePercent,
+                },
+            ],
+        },
+
+        {
+            section: "Content Management",
+            items: [
+                {
+                    label: "Campaigns",
+                    href: "/dashboard/superadmin/campaigns",
+                    icon: Megaphone,
+                },
+
+                {
+                    label: "CMS",
+                    href: "/dashboard/superadmin/cms",
+                    icon: PanelsTopLeft,
+                },
+
+                {
+                    label: "Team",
+                    href: "/dashboard/superadmin/team",
+                    icon: Users,
+                },
+            ],
+        },
+
+        {
+            section: "Moderation",
+            items: [
+                {
+                    label: "Reviews",
+                    href: "/dashboard/superadmin/reviews",
+                    icon: Star,
+                },
+            ],
+        },
+
+        {
+            section: "Analytics & Monitoring",
+            items: [
+                {
+                    label: "Analytics",
+                    href: "/dashboard/superadmin/analytics",
+                    icon: BarChart3,
+                },
+
+                {
+                    label: "Search Analytics",
+                    href: "/dashboard/superadmin/search-analytics",
+                    icon: Search,
+                },
+
+                {
+                    label: "Audit Logs",
+                    href: "/dashboard/superadmin/audit-logs",
+                    icon: ScrollText,
+                },
+
+                {
+                    label: "System Health",
+                    href: "/dashboard/superadmin/system-health",
+                    icon: Activity,
                 },
             ],
         },
@@ -207,26 +331,15 @@ export const dashboardNav = {
             section: "Platform",
             items: [
                 {
-                    label: "Categories",
-                    icon: Tags,
-                    children: [
-                        {
-                            label: "All Categories",
-                            href: "/dashboard/admin/categories",
-                        },
-                    ],
+                    label: "Notifications",
+                    href: "/dashboard/superadmin/notifications",
+                    icon: Bell,
                 },
 
                 {
-                    label: "Reports",
-                    href: "/dashboard/admin/reports",
-                    icon: BarChart3,
-                },
-
-                {
-                    label: "Complaints",
-                    href: "/dashboard/admin/complaints",
-                    icon: AlertTriangle,
+                    label: "Platform Settings",
+                    href: "/dashboard/superadmin/settings",
+                    icon: Settings,
                 },
             ],
         },
@@ -245,6 +358,8 @@ export const dashboardSettings = {
         href: "/dashboard/admin/settings",
         icon: Settings,
     },
+
+    super_admin: null,
 };
 
 export const defaultRole = "seller";

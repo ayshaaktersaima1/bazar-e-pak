@@ -1,25 +1,44 @@
-// import Banner from "@/components/homepage/Banner";
-
 import BestSellers from "@/components/homepage/BestSellers";
 import Categories from "@/components/homepage/Categories";
 import Features from "@/components/homepage/Features";
 import WhyChooseUs from "@/components/homepage/WhyChooseUs";
 import FadeUp from "@/components/shared/FadeUp";
-import Image from "next/image";
-import ShopsSection from "../../components/homepage/ShopsSection";
+import ShopsSection from "@/components/homepage/ShopsSection";
 import BannerDiscount from "@/components/homepage/BannerDiscount";
-import MissionVission from "../../components/homepage/MissionVission";
+import MissionVission from "@/components/homepage/MissionVission";
+import { serverApi } from "@/lib/server.js";
 
+export default async function Home() {
+  let cmsContent = [];
 
-export default function Home() {
+  try {
+    cmsContent = await serverApi.get(
+      "/api/cms/public?locale=en",
+      {},
+      {
+        auth: false,
+      },
+    );
+  } catch {
+    cmsContent = [];
+  }
+
+  const heroContent = cmsContent.find(
+    (item) => item.key === "homepage.hero",
+  );
+
+  const missionVisionContent = cmsContent.find(
+    (item) => item.key === "homepage.vision-mission",
+  );
+
   return (
     <div>
-      {/* <Banner></Banner> */}
-      <BannerDiscount></BannerDiscount>
+      <BannerDiscount cmsItem={heroContent} />
 
       <FadeUp>
-        <MissionVission></MissionVission>
+        <MissionVission cmsItem={missionVisionContent} />
       </FadeUp>
+
       <FadeUp>
         <Features />
       </FadeUp>
@@ -27,6 +46,7 @@ export default function Home() {
       <FadeUp>
         <ShopsSection />
       </FadeUp>
+
       <FadeUp>
         <Categories />
       </FadeUp>
@@ -38,8 +58,6 @@ export default function Home() {
       <FadeUp>
         <BestSellers />
       </FadeUp>
-
-  
     </div>
   );
 }

@@ -1,0 +1,231 @@
+"use client";
+
+import Image from "next/image";
+import {
+    Star,
+    Trash2,
+} from "lucide-react";
+
+const ProductColumns = ({
+    onDelete,
+    onFeatured,
+}) => [
+        {
+            key: "name",
+            header: "Product",
+
+            render: (product) => (
+                <div className="flex min-w-[220px] items-center gap-3">
+                    <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-[#F7F5EF]">
+                        {product.images?.[0] ? (
+                            <Image
+                                src={product.images[0]}
+                                alt={
+                                    product.name ||
+                                    "Product"
+                                }
+                                fill
+                                sizes="44px"
+                                className="object-cover"
+                            />
+                        ) : (
+                            <span className="flex h-full items-center justify-center text-xs text-[#98A2B3]">
+                                N/A
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="min-w-0">
+                        <p className="truncate font-semibold text-[#001B08]">
+                            {product.name}
+                        </p>
+
+                        <p className="text-xs text-[#667085]">
+                            {product.categoryId?.name ||
+                                "Uncategorized"}
+                        </p>
+                    </div>
+                </div>
+            ),
+        },
+
+        {
+            key: "shop",
+            header: "Shop",
+
+            render: (product) => (
+                <div className="min-w-[130px]">
+                    <p className="text-sm font-medium text-[#001B08]">
+                        {product.shopId?.name ||
+                            product.shopName ||
+                            "N/A"}
+                    </p>
+
+                    {product.shopId?._id && (
+                        <p className="mt-1 text-xs text-[#98A2B3]">
+                            {product.shopId._id}
+                        </p>
+                    )}
+                </div>
+            ),
+        },
+
+        {
+            key: "seller",
+            header: "Seller",
+
+            render: (product) => {
+                const seller =
+                    product.sellerId;
+
+                return (
+                    <div className="min-w-[140px]">
+                        <p className="text-sm font-medium text-[#001B08]">
+                            {seller?.name ||
+                                seller?.email ||
+                                "N/A"}
+                        </p>
+
+                        <p className="mt-1 max-w-[180px] truncate text-xs text-[#98A2B3]">
+                            {typeof seller ===
+                                "string"
+                                ? seller
+                                : seller?._id ||
+                                ""}
+                        </p>
+                    </div>
+                );
+            },
+        },
+
+        {
+            key: "price",
+            header: "Price",
+
+            render: (product) => {
+                const price =
+                    Number(product.price) || 0;
+
+                const discount =
+                    Number(
+                        product.discount,
+                    ) || 0;
+
+                const finalPrice =
+                    price -
+                    (price * discount) /
+                    100;
+
+                return (
+                    <div>
+                        <p className="font-semibold text-[#001B08]">
+                            PKR
+                            {finalPrice.toFixed(
+                                2,
+                            )}
+                        </p>
+
+                        {discount > 0 && (
+                            <p className="text-xs text-[#98A2B3] line-through">
+                                PKR
+                                {price.toFixed(
+                                    2,
+                                )}
+                            </p>
+                        )}
+                    </div>
+                );
+            },
+        },
+
+        {
+            key: "stock",
+            header: "Stock",
+
+            render: (product) => (
+                <span
+                    className={
+                        Number(
+                            product.stock,
+                        ) > 0
+                            ? "font-semibold text-[#166534]"
+                            : "font-semibold text-[#DC2626]"
+                    }
+                >
+                    {product.stock ?? 0}
+                </span>
+            ),
+        },
+
+        {
+            key: "status",
+            header: "Status",
+
+            render: (product) => (
+                <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${product.status ===
+                        "active"
+                        ? "bg-[#DCFCE7] text-[#166534]"
+                        : "bg-[#F3F4F6] text-[#667085]"
+                        }`}
+                >
+                    {product.status}
+                </span>
+            ),
+        },
+
+        {
+            key: "isFeatured",
+            header: "Featured",
+
+            render: (product) => (
+                <button
+                    type="button"
+                    onClick={() =>
+                        onFeatured?.(
+                            product,
+                        )
+                    }
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${product.isFeatured
+                        ? "bg-[#FEF3C7] text-[#92400E]"
+                        : "bg-[#F3F4F6] text-[#667085]"
+                        }`}
+                >
+                    <Star
+                        size={13}
+                        fill={
+                            product.isFeatured
+                                ? "currentColor"
+                                : "none"
+                        }
+                    />
+
+                    {product.isFeatured
+                        ? "Featured"
+                        : "Normal"}
+                </button>
+            ),
+        },
+
+        {
+            key: "actions",
+            header: "Actions",
+
+            render: (product) => (
+                <button
+                    type="button"
+                    onClick={() =>
+                        onDelete?.(
+                            product,
+                        )
+                    }
+                    title="Delete product"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[#DC2626] hover:bg-[#FEF2F2]"
+                >
+                    <Trash2 size={16} />
+                </button>
+            ),
+        },
+    ];
+
+export default ProductColumns;

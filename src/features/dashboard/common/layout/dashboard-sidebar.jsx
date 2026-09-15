@@ -5,11 +5,18 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { PanelLeft, LogOut, Settings, ChevronDown } from "lucide-react";
-import { dashboardNav, defaultRole } from "@/data/dashboard";
+import {
+  dashboardNav,
+  dashboardSettings,
+  defaultRole,
+} from "@/data/dashboard";
 import { useSession, authClient } from "../../../../lib/auth-client";
 import Image from "next/image";
+import useApi from "@/hooks/use-api";
 
 const SidebarContext = createContext(null);
+
+
 
 export function SidebarProvider({ children }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -141,9 +148,8 @@ function NavTooltip({ label, targetRef, show }) {
 function SidebarTopBar({ collapsed, toggleSidebar }) {
   return (
     <div
-      className={`group relative flex h-20 items-center border-b border-[#D9A928]/20 ${
-        collapsed ? "justify-center" : "justify-between px-3"
-      }`}
+      className={`group relative flex h-20 items-center border-b border-[#D9A928]/20 ${collapsed ? "justify-center" : "justify-between px-3"
+        }`}
     >
       {!collapsed ? (
         <>
@@ -206,18 +212,17 @@ function AccountHeader({ collapsed }) {
 
   const initials = user?.name
     ? user.name
-        .split(" ")
-        .map((name) => name[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
+      .split(" ")
+      .map((name) => name[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase()
     : "U";
 
   return (
     <div
-      className={`flex items-center gap-2.5 px-3 py-4 ${
-        collapsed ? "justify-center" : ""
-      }`}
+      className={`flex items-center gap-2.5 px-3 py-4 ${collapsed ? "justify-center" : ""
+        }`}
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#D9A928] bg-[#D9A928] text-xs font-semibold text-[#002B12]">
         {user?.image ? (
@@ -254,9 +259,9 @@ function NavItem({ item, collapsed, active, pathname }) {
 
   const childActive = hasChildren
     ? item.children.some(
-        (child) =>
-          pathname === child.href || pathname.startsWith(`${child.href}/`),
-      )
+      (child) =>
+        pathname === child.href || pathname.startsWith(`${child.href}/`),
+    )
     : false;
 
   const [open, setOpen] = useState(childActive);
@@ -275,27 +280,24 @@ function NavItem({ item, collapsed, active, pathname }) {
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-all ${
-            childActive
-              ? "bg-[#D9A928]/10 text-[#F0B92E]"
-              : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
-          }`}
+          className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-all ${childActive
+            ? "bg-[#D9A928]/10 text-[#F0B92E]"
+            : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+            }`}
         >
           <Icon className="h-[18px] w-[18px] shrink-0" />
 
           <span className="flex-1 truncate text-left">{item.label}</span>
 
           <ChevronDown
-            className={`h-4 w-4 shrink-0 transition-transform ${
-              open ? "rotate-180" : ""
-            }`}
+            className={`h-4 w-4 shrink-0 transition-transform ${open ? "rotate-180" : ""
+              }`}
           />
         </button>
 
         <div
-          className={`grid transition-[grid-template-rows] duration-200 ${
-            open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-          }`}
+          className={`grid transition-[grid-template-rows] duration-200 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
         >
           <div className="overflow-hidden">
             <ul className="ml-5 mt-1 space-y-1 border-l border-[#D9A928]/20 pl-2">
@@ -303,11 +305,10 @@ function NavItem({ item, collapsed, active, pathname }) {
                 <li key={child.href}>
                   <Link
                     href={child.href}
-                    className={`flex items-center rounded-md px-3 py-2 text-sm transition-all ${
-                      pathname === child.href
-                        ? "bg-[#D9A928] font-medium text-[#002B12]"
-                        : "text-[#B7C4BC] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
-                    }`}
+                    className={`flex items-center rounded-md px-3 py-2 text-sm transition-all ${pathname === child.href
+                      ? "bg-[#D9A928] font-medium text-[#002B12]"
+                      : "text-[#B7C4BC] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+                      }`}
                   >
                     {child.label}
                   </Link>
@@ -329,11 +330,10 @@ function NavItem({ item, collapsed, active, pathname }) {
           onClick={() => setOpen((value) => !value)}
           onMouseEnter={() => setTooltipVisible(true)}
           onMouseLeave={() => setTooltipVisible(false)}
-          className={`flex w-full items-center justify-center rounded-md px-2.5 py-2.5 transition-all ${
-            childActive
-              ? "bg-[#D9A928] text-[#002B12]"
-              : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
-          }`}
+          className={`flex w-full items-center justify-center rounded-md px-2.5 py-2.5 transition-all ${childActive
+            ? "bg-[#D9A928] text-[#002B12]"
+            : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+            }`}
         >
           <Icon className="h-[18px] w-[18px]" />
         </button>
@@ -355,11 +355,10 @@ function NavItem({ item, collapsed, active, pathname }) {
                 <li key={child.href}>
                   <Link
                     href={child.href}
-                    className={`block rounded-md px-3 py-2 text-sm ${
-                      pathname === child.href
-                        ? "bg-[#D9A928] text-[#002B12]"
-                        : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
-                    }`}
+                    className={`block rounded-md px-3 py-2 text-sm ${pathname === child.href
+                      ? "bg-[#D9A928] text-[#002B12]"
+                      : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+                      }`}
                   >
                     {child.label}
                   </Link>
@@ -379,11 +378,10 @@ function NavItem({ item, collapsed, active, pathname }) {
         href={item.href}
         onMouseEnter={() => setTooltipVisible(true)}
         onMouseLeave={() => setTooltipVisible(false)}
-        className={`flex items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-all ${
-          active
-            ? "bg-[#D9A928] text-[#002B12] shadow-sm"
-            : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
-        } ${collapsed ? "justify-center" : ""}`}
+        className={`flex items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-all ${active
+          ? "bg-[#D9A928] text-[#002B12] shadow-sm"
+          : "text-[#E8E8E8] hover:bg-[#D9A928]/10 hover:text-[#F0B92E]"
+          } ${collapsed ? "justify-center" : ""}`}
       >
         <Icon className="h-[18px] w-[18px] shrink-0" />
 
@@ -418,9 +416,8 @@ function SignOutButton({ collapsed }) {
         onClick={handleSignOut}
         onMouseEnter={() => setTooltipVisible(true)}
         onMouseLeave={() => setTooltipVisible(false)}
-        className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium text-[#E8E8E8] transition-all hover:bg-red-500/10 hover:text-red-400 ${
-          collapsed ? "justify-center" : ""
-        }`}
+        className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium text-[#E8E8E8] transition-all hover:bg-red-500/10 hover:text-red-400 ${collapsed ? "justify-center" : ""
+          }`}
       >
         <LogOut className="h-[18px] w-[18px] shrink-0" />
 
@@ -436,11 +433,58 @@ function SignOutButton({ collapsed }) {
   );
 }
 
-function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
-  const sections = dashboardNav[role] ?? dashboardNav[defaultRole];
+function SidebarBody({
+  collapsed,
+  toggleSidebar,
+  role,
+  pathname,
+  permissions = [],
+  permissionsLoaded = true,
+  onNavigate,
+}) {
+  const allSections =
+    dashboardNav[role] ??
+    dashboardNav[defaultRole];
 
-  const settingsHref = `/dashboard/${role}/settings`;
+  const hasPermission = (permission) => {
+    if (!permission) {
+      return true;
+    }
 
+    if (role === "super_admin") {
+      return true;
+    }
+
+    if (role !== "admin") {
+      return true;
+    }
+
+    return permissions.includes(
+      permission,
+    );
+  };
+
+  const sections =
+    role === "admin" &&
+      !permissionsLoaded
+      ? []
+      : allSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter(
+            (item) =>
+              hasPermission(
+                item.permission,
+              ),
+          ),
+        }))
+        .filter(
+          (section) =>
+            section.items.length > 0,
+        );
+
+  const settingsItem =
+    dashboardSettings[role] ?? null;
   return (
     <div className="flex h-full flex-col bg-[#002B12]">
       <SidebarTopBar collapsed={collapsed} toggleSidebar={toggleSidebar} />
@@ -478,16 +522,14 @@ function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
 
       <div className="border-t border-[#D9A928]/20 px-2 py-3">
         <ul className="space-y-1">
-          <NavItem
-            item={{
-              label: "Settings",
-              href: settingsHref,
-              icon: Settings,
-            }}
-            collapsed={collapsed}
-            active={pathname === settingsHref}
-            pathname={pathname}
-          />
+          {settingsItem && (
+            <NavItem
+              item={settingsItem}
+              collapsed={collapsed}
+              active={pathname === settingsItem.href}
+              pathname={pathname}
+            />
+          )}
 
           <SignOutButton collapsed={collapsed} />
         </ul>
@@ -496,11 +538,121 @@ function SidebarBody({ collapsed, toggleSidebar, role, pathname, onNavigate }) {
   );
 }
 
-export function DashboardSidebar({ role = defaultRole }) {
-  const { collapsed, toggleSidebar, isMobile, mobileOpen, setMobileOpen } =
-    useSidebar();
+export function DashboardSidebar({
+  role = defaultRole,
+}) {
+  const {
+    collapsed,
+    toggleSidebar,
+    isMobile,
+    mobileOpen,
+    setMobileOpen,
+  } = useSidebar();
+
+  const { data: session } =
+    useSession();
+
+  const { get } = useApi();
+
+  const [permissions, setPermissions] =
+    useState([]);
+
+  const [
+    permissionsLoaded,
+    setPermissionsLoaded,
+  ] = useState(false);
 
   const pathname = usePathname();
+
+  useEffect(() => {
+    const loadPermissions = async () => {
+      const user = session?.user;
+
+      if (!user) {
+        return;
+      }
+
+      if (role === "super_admin") {
+        setPermissions([]);
+        setPermissionsLoaded(true);
+        return;
+      }
+
+      if (role !== "admin") {
+        setPermissions([]);
+        setPermissionsLoaded(true);
+        return;
+      }
+
+      if (!user.email) {
+        setPermissions([]);
+        setPermissionsLoaded(true);
+        return;
+      }
+
+      const params =
+        new URLSearchParams();
+
+      params.set(
+        "search",
+        user.email,
+      );
+
+      params.set(
+        "role",
+        "admin",
+      );
+
+      params.set(
+        "limit",
+        "10",
+      );
+
+      const result = await get(
+        `/api/users?${params.toString()}`,
+        {},
+        {
+          showError: false,
+        },
+      );
+
+      if (!result.success) {
+        setPermissions([]);
+        setPermissionsLoaded(true);
+        return;
+      }
+
+      const users =
+        Array.isArray(result.data)
+          ? result.data
+          : [];
+
+      const currentUser =
+        users.find(
+          (item) =>
+            String(item._id) ===
+            String(user.id) ||
+            item.email ===
+            user.email,
+        );
+
+      setPermissions(
+        Array.isArray(
+          currentUser?.permissions,
+        )
+          ? currentUser.permissions
+          : [],
+      );
+
+      setPermissionsLoaded(true);
+    };
+
+    loadPermissions();
+  }, [
+    role,
+    session?.user,
+    get,
+  ]);
 
   if (isMobile) {
     return (
@@ -513,15 +665,16 @@ export function DashboardSidebar({ role = defaultRole }) {
         )}
 
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-[#D9A928]/20 bg-[#002B12] shadow-2xl transition-transform duration-200 ${
-            mobileOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-[#D9A928]/20 bg-[#002B12] shadow-2xl transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
         >
           <SidebarBody
             collapsed={false}
             toggleSidebar={toggleSidebar}
             role={role}
             pathname={pathname}
+            permissions={permissions}
+            permissionsLoaded={permissionsLoaded}
             onNavigate={() => setMobileOpen(false)}
           />
         </aside>
@@ -531,15 +684,16 @@ export function DashboardSidebar({ role = defaultRole }) {
 
   return (
     <aside
-      className={`sticky top-0 hidden h-svh shrink-0 border-r border-[#D9A928]/20 bg-[#002B12] shadow-[4px_0_20px_rgba(0,0,0,0.08)] transition-[width] duration-200 md:block ${
-        collapsed ? "w-[72px]" : "w-64"
-      }`}
+      className={`sticky top-0 hidden h-svh shrink-0 border-r border-[#D9A928]/20 bg-[#002B12] shadow-[4px_0_20px_rgba(0,0,0,0.08)] transition-[width] duration-200 md:block ${collapsed ? "w-[72px]" : "w-64"
+        }`}
     >
       <SidebarBody
         collapsed={collapsed}
         toggleSidebar={toggleSidebar}
         role={role}
         pathname={pathname}
+        permissions={permissions}
+        permissionsLoaded={permissionsLoaded}
       />
     </aside>
   );

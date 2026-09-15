@@ -4,7 +4,11 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "../../../lib/auth-client";
 
-const DASHBOARD_ROLES = ["seller", "admin", "superadmin"];
+const DASHBOARD_ROUTES = {
+  seller: "/dashboard/seller",
+  admin: "/dashboard/admin",
+  super_admin: "/dashboard/superadmin",
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -17,8 +21,10 @@ export default function DashboardPage() {
       .trim()
       .toLowerCase();
 
-    if (DASHBOARD_ROLES.includes(role)) {
-      router.replace(`/dashboard/${role}`);
+    const dashboardRoute = DASHBOARD_ROUTES[role];
+
+    if (dashboardRoute) {
+      router.replace(dashboardRoute);
       return;
     }
 

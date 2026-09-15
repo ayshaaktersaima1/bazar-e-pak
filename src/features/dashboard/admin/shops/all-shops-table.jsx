@@ -2,64 +2,157 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 
 import DataTable from "@/features/dashboard/common/table/data-table";
+import ConfirmationModal from "@/components/shared/confirmation-modal";
+import useApi from "@/hooks/use-api";
+
 import { getShopColumns } from "./shop-columns";
 
-const AllShopsTable = ({ shops }) => {
+const AllShopsTable = ({
+    shops,
+    currentRole,
+}) => {
     const router = useRouter();
-    const [loadingId, setLoadingId] = useState(null);
 
-    const handleStatusChange = async (shopId, status) => {
-        setLoadingId(shopId);
+    const {
+        patch,
+        delete: deleteRequest,
+    } = useApi();
 
-        try {
-            const { data } = await authClient.token();
+    const [
+        statusLoadingId,
+        setStatusLoadingId,
+    ] = useState(null);
 
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/shops/${shopId}/status`,
-                {
-                    method: "PATCH",
+    const [
+        deleteShopTarget,
+        setDeleteShopTarget,
+    ] = useState(null);
 
-                    headers: {
-                        "Content-Type": "application/json",
-                        authorization: `Bearer ${data?.token}`,
-                    },
+    const [
+        deleteLoading,
+        setDeleteLoading,
+    ] = useState(false);
 
-                    body: JSON.stringify({ status }),
-                },
-            );
+    const handleStatusChange = async (
+        shopId,
+        status,
+    ) => {
+        setStatusLoadingId(shopId);
 
-            const result = await res.json();
+        const result = await patch(
+            `/api/shops/${shopId}/status`,
+            {
+                status,
+            },
+            {},
+            {
+                showSuccess: true,
+                successMessage:
+                    "Shop status updated successfully",
+            },
+        );
 
-            if (!res.ok || !result.success) {
-                throw new Error(
-                    result.message ||
-                        "Failed to update shop status",
-                );
-            }
+        setStatusLoadingId(null);
 
-            router.refresh();
-        } catch (error) {
-            console.error(error);
-            alert(error.message);
-        } finally {
-            setLoadingId(null);
+        if (!result.success) {
+            return;
         }
+
+        window.location.reload();
     };
 
+    const handleEdit = (shop) => {
+        router.push(
+            `/dashboard/superadmin/shops/${shop._id}/edit`,
+        );
+    };
+
+    const handleDeleteClick = (
+        shop,
+    ) => {
+        setDeleteShopTarget(shop);
+    };
+
+    const handleDeleteConfirm =
+        async () => {
+            if (!deleteShopTarget?._id) {
+                return;
+            }
+
+            setDeleteLoading(true);
+
+            const result =
+                await deleteRequest(
+                    `/api/shops/${deleteShopTarget._id}`,
+                    {},
+                    {
+                        showSuccess: true,
+                        successMessage:
+                            "Shop deleted successfully",
+                    },
+                );
+
+            setDeleteLoading(false);
+
+            if (!result.success) {
+                return;
+            }
+
+            setDeleteShopTarget(null);
+
+            window.location.reload();
+        };
+
     const columns = getShopColumns({
-        onStatusChange: handleStatusChange,
-        loadingId,
+        currentRole,
+        statusLoadingId,
+        onStatusChange:
+            handleStatusChange,
+        onEdit: handleEdit,
+        onDelete:
+            handleDeleteClick,
     });
 
     return (
-        <DataTable
-            columns={columns}
-            data={shops}
-            emptyMessage="No shops found."
-        />
+        <>
+            <DataTable
+                columns={columns}
+                data={shops}
+                emptyMessage="No shops found."
+            />
+
+            <ConfirmationModal
+                open={Boolean(
+                    deleteShopTarget,
+                )}
+                title="Delete Shop"
+                message={
+                    deleteShopTarget
+                        ? `Are you sure you want to delete "${deleteShopTarget.name}"? This action cannot be undone.`
+                        : ""
+                }
+                confirmText="Delete"
+                cancelText="Cancel"
+                variant="danger"
+                loading={
+                    deleteLoading
+                }
+                onConfirm={
+                    handleDeleteConfirm
+                }
+                onCancel={() => {
+                    if (
+                        !deleteLoading
+                    ) {
+                        setDeleteShopTarget(
+                            null,
+                        );
+                    }
+                }}
+            />
+        </>
     );
 };
 

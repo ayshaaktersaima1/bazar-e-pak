@@ -106,9 +106,11 @@ const DataTable = ({
                       {emptyMessage}
                     </p>
 
-                    <p className="mt-1 text-xs text-zinc-400">
-                      Try changing your search or filter.
-                    </p>
+                    {(search || filters.length > 0) && (
+                      <p className="mt-1 text-xs text-zinc-400">
+                        Try changing your search or filter.
+                      </p>
+                    )}
                   </td>
                 </tr>
               )}

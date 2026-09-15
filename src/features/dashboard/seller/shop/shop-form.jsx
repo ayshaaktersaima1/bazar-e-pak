@@ -3,10 +3,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
-  Building2,
   Image as ImageIcon,
-  Mail,
-  MapPin,
   Phone,
   Save,
   Store,
@@ -14,6 +11,7 @@ import {
 
 const defaultValues = {
   name: "",
+  slug: "",
   description: "",
   logo: "",
   banner: "",
@@ -25,13 +23,15 @@ const defaultValues = {
 const inputClass =
   "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[#D9A928] focus:ring-2 focus:ring-[#D9A928]/15";
 
-const labelClass = "mb-1.5 block text-sm font-medium text-zinc-700";
+const labelClass =
+  "mb-1.5 block text-sm font-medium text-zinc-700";
 
 export default function ShopForm({
   initialData,
   onSubmit,
   loading = false,
   submitLabel = "Save Changes",
+  showSlug = false,
 }) {
   const {
     register,
@@ -45,6 +45,7 @@ export default function ShopForm({
   useEffect(() => {
     reset({
       name: initialData?.name || "",
+      slug: initialData?.slug || "",
       description: initialData?.description || "",
       logo: initialData?.logo || "",
       banner: initialData?.banner || "",
@@ -55,11 +56,20 @@ export default function ShopForm({
   }, [initialData, reset]);
 
   const submit = async (data) => {
-    await onSubmit(data);
+    const payload = { ...data };
+
+    if (!showSlug) {
+      delete payload.slug;
+    }
+
+    await onSubmit(payload);
   };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="space-y-8">
+    <form
+      onSubmit={handleSubmit(submit)}
+      className="space-y-8"
+    >
       <section>
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#002B12]/5">
@@ -70,6 +80,7 @@ export default function ShopForm({
             <h2 className="text-base font-semibold text-zinc-900">
               Basic Information
             </h2>
+
             <p className="text-xs text-zinc-500">
               Information customers will see about your shop.
             </p>
@@ -77,19 +88,23 @@ export default function ShopForm({
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <label className={labelClass}>Shop Name</label>
+          <div className={showSlug ? "" : "md:col-span-2"}>
+            <label className={labelClass}>
+              Shop Name
+            </label>
 
             <input
               {...register("name", {
                 required: "Shop name is required",
                 minLength: {
                   value: 2,
-                  message: "Shop name must be at least 2 characters",
+                  message:
+                    "Shop name must be at least 2 characters",
                 },
                 maxLength: {
                   value: 100,
-                  message: "Shop name cannot exceed 100 characters",
+                  message:
+                    "Shop name cannot exceed 100 characters",
                 },
               })}
               placeholder="Enter your shop name"
@@ -103,14 +118,44 @@ export default function ShopForm({
             )}
           </div>
 
+          {showSlug && (
+            <div>
+              <label className={labelClass}>
+                Slug
+              </label>
+
+              <input
+                {...register("slug", {
+                  required: "Slug is required",
+                  pattern: {
+                    value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                    message:
+                      "Use lowercase letters, numbers and hyphens only",
+                  },
+                })}
+                placeholder="example-shop"
+                className={inputClass}
+              />
+
+              {errors.slug && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.slug.message}
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="md:col-span-2">
-            <label className={labelClass}>Description</label>
+            <label className={labelClass}>
+              Description
+            </label>
 
             <textarea
               {...register("description", {
                 maxLength: {
                   value: 2000,
-                  message: "Description cannot exceed 2000 characters",
+                  message:
+                    "Description cannot exceed 2000 characters",
                 },
               })}
               rows={5}
@@ -137,6 +182,7 @@ export default function ShopForm({
             <h2 className="text-base font-semibold text-zinc-900">
               Shop Branding
             </h2>
+
             <p className="text-xs text-zinc-500">
               Add your shop logo and banner image URLs.
             </p>
@@ -145,7 +191,9 @@ export default function ShopForm({
 
         <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <label className={labelClass}>Logo URL</label>
+            <label className={labelClass}>
+              Logo URL
+            </label>
 
             <input
               {...register("logo")}
@@ -156,7 +204,9 @@ export default function ShopForm({
           </div>
 
           <div>
-            <label className={labelClass}>Banner URL</label>
+            <label className={labelClass}>
+              Banner URL
+            </label>
 
             <input
               {...register("banner")}
@@ -178,6 +228,7 @@ export default function ShopForm({
             <h2 className="text-base font-semibold text-zinc-900">
               Contact Information
             </h2>
+
             <p className="text-xs text-zinc-500">
               How customers can contact your shop.
             </p>
@@ -186,23 +237,52 @@ export default function ShopForm({
 
         <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <label className={labelClass}>Phone</label>
+            <label className={labelClass}>
+              Phone
+            </label>
 
             <input
-              {...register("phone")}
-              placeholder="01700000000"
+              {...register("phone", {
+                required:
+                  "Shop phone number is required",
+                pattern: {
+                  value: /^03\d{9}$/,
+                  message:
+                    "Enter a valid 11-digit Pakistani mobile number starting with 03",
+                },
+              })}
+              type="tel"
+              inputMode="numeric"
+              maxLength={11}
+              placeholder="03001234567"
+              onInput={(event) => {
+                event.currentTarget.value =
+                  event.currentTarget.value
+                    .replace(/\D/g, "")
+                    .slice(0, 11);
+              }}
               className={inputClass}
             />
+
+            {errors.phone && (
+              <p className="mt-1 text-xs text-red-500">
+                {errors.phone.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className={labelClass}>Email</label>
+            <label className={labelClass}>
+              Email
+            </label>
 
             <input
               {...register("email", {
                 validate: (value) =>
                   !value ||
-                  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ||
+                  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                    value,
+                  ) ||
                   "Enter a valid email address",
               })}
               type="email"
@@ -218,7 +298,9 @@ export default function ShopForm({
           </div>
 
           <div className="md:col-span-2">
-            <label className={labelClass}>Address</label>
+            <label className={labelClass}>
+              Address
+            </label>
 
             <input
               {...register("address")}

@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { ImagePlus, Plus, Trash2 } from "lucide-react";
+import {
+  ImagePlus,
+  Plus,
+  Trash2,
+} from "lucide-react";
 
 const defaultValues = {
   name: "",
@@ -24,7 +28,6 @@ const ProductForm = ({
   onCancel,
 }) => {
   const isEdit = Boolean(product);
-  const [step, setStep] = useState(1);
 
   const initialValues = useMemo(() => {
     if (!product) {
@@ -36,14 +39,30 @@ const ProductForm = ({
 
     return {
       name: product.name ?? "",
-      description: product.description ?? "",
+      description:
+        product.description ?? "",
       price: product.price ?? "",
       stock: product.stock ?? "",
-      discount: product.discount ?? 0,
-      categoryId: product.categoryId?._id ?? product.categoryId ?? "",
-      shopId: product.shopId?._id ?? product.shopId ?? shopId,
-      status: product.status ?? "active",
-      images: product.images?.length ? product.images : [""],
+      discount:
+        product.discount ?? 0,
+
+      categoryId:
+        product.categoryId?._id ??
+        product.categoryId ??
+        "",
+
+      shopId:
+        product.shopId?._id ??
+        product.shopId ??
+        shopId,
+
+      status:
+        product.status ?? "active",
+
+      images:
+        product.images?.length
+          ? product.images
+          : [""],
     };
   }, [product, shopId]);
 
@@ -61,139 +80,216 @@ const ProductForm = ({
 
   useEffect(() => {
     reset(initialValues);
-    setStep(1);
   }, [initialValues, reset]);
 
-  const images = watch("images") || [""];
-  const price = Number(watch("price")) || 0;
-  const discount = Number(watch("discount")) || 0;
+  const images =
+    watch("images") || [""];
 
-  const finalPrice = Math.max(0, price - (price * discount) / 100);
+  const price =
+    Number(watch("price")) || 0;
+
+  const discount =
+    Number(watch("discount")) || 0;
+
+  const finalPrice = Math.max(
+    0,
+    price - (price * discount) / 100,
+  );
 
   const submit = (values) => {
-    onSubmit?.({
+    const payload = {
       ...values,
-      shopId,
+
       price: Number(values.price),
+
       stock: Number(values.stock),
-      discount: Number(values.discount || 0),
-      images: values.images.filter(Boolean),
-    });
+
+      discount: Number(
+        values.discount || 0,
+      ),
+
+      images: (
+        values.images || []
+      ).filter(Boolean),
+    };
+
+    /*
+     * Seller:
+     * shopId exists, so keep it.
+     *
+     * Native Product:
+     * no shopId is passed, so remove it.
+     */
+    if (shopId) {
+      payload.shopId = shopId;
+    } else {
+      delete payload.shopId;
+    }
+
+    onSubmit?.(payload);
   };
 
   const addImage = () => {
     if (images.length < 10) {
-      setValue("images", [...images, ""]);
+      setValue("images", [
+        ...images,
+        "",
+      ]);
     }
   };
 
   const removeImage = (index) => {
-    const next = images.filter((_, i) => i !== index);
+    const next = images.filter(
+      (_, i) => i !== index,
+    );
 
-    setValue("images", next.length ? next : [""]);
+    setValue(
+      "images",
+      next.length
+        ? next
+        : [""],
+    );
   };
 
   const input =
     "w-full rounded-lg border border-[#E5E2D8] bg-white px-3 py-2.5 text-sm text-[#001B08] outline-none focus:border-[#D9A928] focus:ring-2 focus:ring-[#D9A928]/20";
 
-  const label = "mb-2 block text-sm font-semibold text-[#001B08]";
+  const label =
+    "mb-2 block text-sm font-semibold text-[#001B08]";
 
   return (
-    <form onSubmit={handleSubmit(submit)}>
-      <div className="mb-8 flex items-center gap-2">
-        {[1, 2, 3].map((item) => (
-          <div key={item} className="flex flex-1 items-center gap-2">
-            <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                step >= item
-                  ? "bg-[#D9A928] text-[#001B08]"
-                  : "bg-[#E5E2D8] text-[#6B7280]"
-              }`}
-            >
-              {item}
-            </div>
+    <form
+      onSubmit={handleSubmit(submit)}
+      className="space-y-6"
+    >
+      {/* Product Information */}
+      <div className="rounded-2xl border border-[#E5E2D8] bg-white p-5">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-[#001B08]">
+            Product Information
+          </h2>
 
-            {item < 3 && (
-              <div
-                className={`h-1 flex-1 rounded ${
-                  step > item ? "bg-[#D9A928]" : "bg-[#E5E2D8]"
-                }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+          <p className="mt-1 text-sm text-gray-500">
+            Enter the basic product
+            details.
+          </p>
+        </div>
 
-      {step === 1 && (
         <div className="space-y-5">
           <div>
-            <label className={label}>Product Name</label>
+            <label className={label}>
+              Product Name
+            </label>
 
             <input
               {...register("name", {
-                required: "Product name is required",
+                required:
+                  "Product name is required",
+
                 minLength: {
                   value: 2,
-                  message: "Minimum 2 characters",
+                  message:
+                    "Minimum 2 characters",
                 },
+
                 maxLength: {
                   value: 150,
-                  message: "Maximum 150 characters",
+                  message:
+                    "Maximum 150 characters",
                 },
               })}
-              className={`${input} ${errors.name ? "border-red-500" : ""}`}
               placeholder="Enter product name"
+              className={`${input} ${errors.name
+                  ? "border-red-500"
+                  : ""
+                }`}
             />
 
             {errors.name && (
-              <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
+              <p className="mt-1 text-xs text-red-600">
+                {errors.name.message}
+              </p>
             )}
           </div>
 
           <div>
-            <label className={label}>Description</label>
+            <label className={label}>
+              Description
+            </label>
 
             <textarea
-              {...register("description", {
-                required: "Description is required",
-                maxLength: {
-                  value: 5000,
-                  message: "Maximum 5000 characters",
+              {...register(
+                "description",
+                {
+                  required:
+                    "Description is required",
+
+                  maxLength: {
+                    value: 5000,
+                    message:
+                      "Maximum 5000 characters",
+                  },
                 },
-              })}
-              rows={6}
-              className={`${input} resize-none ${
-                errors.description ? "border-red-500" : ""
-              }`}
+              )}
+              rows={5}
               placeholder="Describe your product..."
+              className={`${input} resize-none ${errors.description
+                  ? "border-red-500"
+                  : ""
+                }`}
             />
 
             {errors.description && (
               <p className="mt-1 text-xs text-red-600">
-                {errors.description.message}
+                {
+                  errors.description
+                    .message
+                }
               </p>
             )}
           </div>
         </div>
-      )}
+      </div>
 
-      {step === 2 && (
+      {/* Pricing and Inventory */}
+      <div className="rounded-2xl border border-[#E5E2D8] bg-white p-5">
+        <div className="mb-5">
+          <h2 className="text-lg font-bold text-[#001B08]">
+            Pricing & Inventory
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Set the price, stock,
+            discount and category.
+          </p>
+        </div>
+
         <div className="grid gap-5 md:grid-cols-2">
+          {/* Price */}
           <div>
-            <label className={label}>Price</label>
+            <label className={label}>
+              Price (PKR)
+            </label>
 
             <input
               type="number"
               min="0"
               step="0.01"
               {...register("price", {
-                required: "Price is required",
+                required:
+                  "Price is required",
+
                 min: {
                   value: 0,
-                  message: "Price cannot be negative",
+                  message:
+                    "Price cannot be negative",
                 },
               })}
-              className={input}
+              placeholder="Enter price"
+              className={`${input} ${errors.price
+                  ? "border-red-500"
+                  : ""
+                }`}
             />
 
             {errors.price && (
@@ -203,22 +299,33 @@ const ProductForm = ({
             )}
           </div>
 
+          {/* Stock */}
           <div>
-            <label className={label}>Stock</label>
+            <label className={label}>
+              Stock
+            </label>
 
             <input
               type="number"
               min="0"
               step="1"
               {...register("stock", {
-                required: "Stock is required",
+                required:
+                  "Stock is required",
+
                 min: {
                   value: 0,
-                  message: "Stock cannot be negative",
+                  message:
+                    "Stock cannot be negative",
                 },
+
                 valueAsNumber: true,
               })}
-              className={input}
+              placeholder="Enter stock"
+              className={`${input} ${errors.stock
+                  ? "border-red-500"
+                  : ""
+                }`}
             />
 
             {errors.stock && (
@@ -228,176 +335,256 @@ const ProductForm = ({
             )}
           </div>
 
+          {/* Discount */}
           <div>
-            <label className={label}>Discount (%)</label>
+            <label className={label}>
+              Discount (%)
+            </label>
 
             <input
               type="number"
               min="0"
               max="100"
-              {...register("discount", {
-                min: {
-                  value: 0,
-                  message: "Discount cannot be negative",
+              {...register(
+                "discount",
+                {
+                  min: {
+                    value: 0,
+                    message:
+                      "Discount cannot be negative",
+                  },
+
+                  max: {
+                    value: 100,
+                    message:
+                      "Discount cannot exceed 100%",
+                  },
                 },
-                max: {
-                  value: 100,
-                  message: "Discount cannot exceed 100%",
-                },
-              })}
-              className={input}
+              )}
+              placeholder="Enter discount"
+              className={`${input} ${errors.discount
+                  ? "border-red-500"
+                  : ""
+                }`}
             />
 
-            <p className="mt-2 text-xs text-[#6B7280]">
+            {errors.discount && (
+              <p className="mt-1 text-xs text-red-600">
+                {
+                  errors.discount
+                    .message
+                }
+              </p>
+            )}
+
+            <p className="mt-2 text-xs text-gray-500">
               Final price:{" "}
-              <span className="font-bold text-[#001B08]">
-                ৳{finalPrice.toFixed(2)}
+              <span className="font-semibold text-[#001B08]">
+                PKR{" "}
+                {finalPrice.toFixed(
+                  2,
+                )}
               </span>
             </p>
           </div>
 
+          {/* Status */}
           <div>
-            <label className={label}>Status</label>
+            <label className={label}>
+              Status
+            </label>
 
-            <select {...register("status")} className={input}>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+            <select
+              {...register("status")}
+              className={input}
+            >
+              <option value="active">
+                Active
+              </option>
+
+              <option value="inactive">
+                Inactive
+              </option>
             </select>
           </div>
 
+          {/* Category */}
           <div className="md:col-span-2">
-            <label className={label}>Category</label>
+            <label className={label}>
+              Category
+            </label>
 
             <select
-              {...register("categoryId", {
-                required: "Category is required",
-              })}
-              className={`${input} ${
-                errors.categoryId ? "border-red-500" : ""
-              }`}
+              {...register(
+                "categoryId",
+                {
+                  required:
+                    "Category is required",
+                },
+              )}
+              className={`${input} ${errors.categoryId
+                  ? "border-red-500"
+                  : ""
+                }`}
             >
-              <option value="">Select category</option>
+              <option value="">
+                Select category
+              </option>
 
-              {categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
+              {categories.map(
+                (category) => (
+                  <option
+                    key={
+                      category._id
+                    }
+                    value={
+                      category._id
+                    }
+                  >
+                    {
+                      category.name
+                    }
+                  </option>
+                ),
+              )}
             </select>
 
             {errors.categoryId && (
               <p className="mt-1 text-xs text-red-600">
-                {errors.categoryId.message}
+                {
+                  errors.categoryId
+                    .message
+                }
               </p>
             )}
           </div>
         </div>
-      )}
+      </div>
 
-      {step === 3 && (
-        <div>
-          <div className="mb-5 flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-[#001B08]">Product Images</h3>
+      {/* Images */}
+      <div className="rounded-2xl border border-[#E5E2D8] bg-white p-5">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-[#001B08]">
+              Product Images
+            </h2>
 
-              <p className="mt-1 text-xs text-[#6B7280]">
-                Add up to 10 image URLs.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={addImage}
-              disabled={images.length >= 10}
-              className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#D9A928] px-3 text-sm font-semibold text-[#001B08] hover:bg-[#E8BB44] disabled:opacity-50"
-            >
-              <Plus size={15} />
-              Add Image
-            </button>
+            <p className="mt-1 text-sm text-gray-500">
+              Add up to 10 product
+              image URLs.
+            </p>
           </div>
 
-          <div className="space-y-3">
-            {images.map((_, index) => (
-              <div key={index} className="flex gap-2">
+          <button
+            type="button"
+            onClick={addImage}
+            disabled={
+              images.length >= 10
+            }
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#D9A928] px-4 text-sm font-semibold text-[#001B08] transition hover:bg-[#E8BB44] disabled:opacity-50"
+          >
+            <Plus size={16} />
+            Add Image
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {images.map(
+            (_, index) => (
+              <div
+                key={index}
+                className="flex gap-2"
+              >
                 <div className="relative flex-1">
                   <ImagePlus
                     size={17}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
 
                   <input
-                    {...register(`images.${index}`, {
-                      pattern: {
-                        value: /^https?:\/\/.+/i,
-                        message: "Enter a valid image URL",
+                    {...register(
+                      `images.${index}`,
+                      {
+                        pattern: {
+                          value:
+                            /^https?:\/\/.+/i,
+
+                          message:
+                            "Enter a valid image URL",
+                        },
                       },
-                    })}
+                    )}
                     type="url"
-                    className={`${input} pl-10 ${
-                      errors.images?.[index] ? "border-red-500" : ""
-                    }`}
                     placeholder="https://example.com/image.jpg"
+                    className={`${input} pl-10 ${errors.images?.[
+                        index
+                      ]
+                        ? "border-red-500"
+                        : ""
+                      }`}
                   />
+
+                  {errors.images?.[
+                    index
+                  ] && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {
+                          errors.images[
+                            index
+                          ]?.message
+                        }
+                      </p>
+                    )}
                 </div>
 
                 <button
                   type="button"
-                  onClick={() => removeImage(index)}
-                  disabled={images.length === 1}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#E5E2D8] text-red-500 hover:bg-red-50 disabled:opacity-40"
+                  onClick={() =>
+                    removeImage(
+                      index,
+                    )
+                  }
+                  disabled={
+                    images.length ===
+                    1
+                  }
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#E5E2D8] text-red-500 transition hover:bg-red-50 disabled:opacity-40"
+                  title="Remove image"
                 >
-                  <Trash2 size={17} />
+                  <Trash2
+                    size={17}
+                  />
                 </button>
               </div>
-            ))}
-          </div>
+            ),
+          )}
         </div>
-      )}
+      </div>
 
-      <div className="mt-8 flex items-center justify-between border-t border-[#E5E2D8] pt-5">
+      {/* Buttons */}
+      <div className="flex justify-end gap-3 border-t border-[#E5E2D8] pt-5">
         <button
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className="h-10 rounded-lg border border-[#E5E2D8] px-5 text-sm font-semibold text-[#6B7280] hover:border-[#002B12] hover:text-[#002B12] disabled:opacity-50"
+          className="h-11 rounded-lg border border-[#E5E2D8] px-6 text-sm font-semibold text-gray-600 transition hover:border-[#002B12] hover:text-[#002B12] disabled:opacity-50"
         >
           Cancel
         </button>
 
-        <div className="flex gap-2">
-          {step > 1 && (
-            <button
-              type="button"
-              onClick={() => setStep((s) => s - 1)}
-              disabled={loading}
-              className="h-10 rounded-lg border border-[#002B12] px-5 text-sm font-semibold text-[#002B12] hover:bg-[#002B12] hover:text-white disabled:opacity-50"
-            >
-              Back
-            </button>
-          )}
-
-          {step < 3 ? (
-            <button
-              type="button"
-              onClick={() => setStep((s) => s + 1)}
-              className="h-10 rounded-lg bg-[#002B12] px-5 text-sm font-semibold text-white hover:bg-[#003817]"
-            >
-              Continue
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loading}
-              className="h-10 min-w-32 rounded-lg bg-[#D9A928] px-5 text-sm font-semibold text-[#001B08] hover:bg-[#E8BB44] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading
-                ? "Creating..."
-                : isEdit
-                  ? "Update Product"
-                  : "Create Product"}
-            </button>
-          )}
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="h-11 min-w-36 rounded-lg bg-[#D9A928] px-6 text-sm font-semibold text-[#001B08] transition hover:bg-[#E8BB44] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loading
+            ? isEdit
+              ? "Updating..."
+              : "Creating..."
+            : isEdit
+              ? "Update Product"
+              : "Create Product"}
+        </button>
       </div>
     </form>
   );

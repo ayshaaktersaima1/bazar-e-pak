@@ -1,16 +1,31 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import toast from "react-hot-toast";
-import { authClient } from "../lib/auth-client";
-
-
+import {
+  authClient,
+  useSession,
+} from "../lib/auth-client";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
+  const { data: session, status } = useSession();
+
+  const role = String(session?.user?.role ?? "")
+    .trim()
+    .toLowerCase();
+
+  const canUseCart = role === "customer";
 
   const [cart, setCart] = useState(null);
 
@@ -19,7 +34,7 @@ export const CartProvider = ({ children }) => {
   const [actionLoading, setActionLoading] = useState(false);
 
   // Token
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     try {
       const { data: tokenData } = await authClient.token();
 
@@ -34,7 +49,7 @@ export const CartProvider = ({ children }) => {
     } catch {
       return null;
     }
-  };
+  }, []);
 
   // Message
   const getUserMessage = (message, fallback) => {
@@ -71,7 +86,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // Fetch cart
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     if (!baseUrl) {
       setCart(null);
       return null;
@@ -95,7 +110,10 @@ export const CartProvider = ({ children }) => {
 
       const data = await response.json();
 
-      if (response.status === 401) {
+      if (
+        response.status === 401 ||
+        response.status === 403
+      ) {
         setCart(null);
         return null;
       }
@@ -116,14 +134,33 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [baseUrl, getAuthHeaders]);
 
   // Load cart
   useEffect(() => {
-    if (!baseUrl) return;
+    if (!baseUrl || status === "loading") {
+      return;
+    }
 
-    setTimeout(() => fetchCart(), 0);
-  }, [baseUrl]);
+    if (!session?.user || !canUseCart) {
+      setTimeout(() => {
+        setCart(null);
+        setLoading(false);
+      }, 0);
+
+      return;
+    }
+
+    setTimeout(() => {
+      fetchCart();
+    }, 0);
+  }, [
+    baseUrl,
+    status,
+    session?.user,
+    canUseCart,
+    fetchCart,
+  ]);
 
   // Add item
   const addToCart = async (product, quantity = 1) => {

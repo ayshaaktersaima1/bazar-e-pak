@@ -8,6 +8,7 @@ import {
   FaChevronRight,
   FaUserCircle,
   FaCog,
+  FaStore,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { authClient } from "../../lib/auth-client";
@@ -39,7 +40,11 @@ const THEMES = {
   },
 };
 
-const DASHBOARD_ROLES = ["seller", "admin", "superadmin"];
+const DASHBOARD_ROUTES = {
+  seller: "/dashboard/seller",
+  admin: "/dashboard/admin",
+  super_admin: "/dashboard/superadmin",
+};
 
 const AvatarDropdown = ({ user, variant = "default" }) => {
   const router = useRouter();
@@ -58,12 +63,17 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
 
   const initial = name.trim().charAt(0).toUpperCase();
 
-  // Only seller/admin/superadmin have dashboard access
-  const hasDashboard = DASHBOARD_ROLES.includes(role);
+  const dashboardHref = DASHBOARD_ROUTES[role] ?? null;
 
-  const dashboardHref = hasDashboard ? `/dashboard/${role}` : null;
-  const profileHref = hasDashboard ? `/dashboard/${role}/profile` : null;
-  const settingsHref = hasDashboard ? `/dashboard/${role}/settings` : null;
+  const hasDashboard = Boolean(dashboardHref);
+
+  const profileHref = hasDashboard
+    ? `${dashboardHref}/profile`
+    : null;
+
+  const settingsHref = hasDashboard
+    ? `${dashboardHref}/settings`
+    : null;
 
   const handleSignOut = async () => {
     try {
@@ -231,6 +241,37 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
 
                   <span className="block text-[11px] text-gray-400">
                     Preferences and security
+                  </span>
+                </span>
+
+                <FaChevronRight className="text-[10px] text-gray-300 transition-transform group-hover:translate-x-1" />
+              </Link>
+
+              <div className="my-1 border-t border-zinc-100" />
+            </>
+          )}
+
+          {/* Become a Seller — customers only */}
+          {role === "customer" && (
+            <>
+              <Link
+                href="/become-a-seller"
+                onClick={() => document.activeElement?.blur()}
+                className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#F7F5EF]"
+              >
+                <span
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${theme.itemIconBg}`}
+                >
+                  <FaStore />
+                </span>
+
+                <span className="flex-1">
+                  <span className="block text-sm font-medium text-[#001B08]">
+                    Become a Seller
+                  </span>
+
+                  <span className="block text-[11px] text-gray-400">
+                    Apply to sell on PakBazaar
                   </span>
                 </span>
 
