@@ -76,7 +76,9 @@ const AdminReviewsPage = async () => {
                 </h1>
 
                 <p className="mt-2 text-sm text-[#4B5563]">
-                    View and moderate customer reviews across the platform.
+                    {canModerate
+                        ? "View and moderate customer reviews across the platform."
+                        : "View customer reviews across the platform."}
                 </p>
             </div>
 

@@ -2,16 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
+
 import {
   FaArrowRight,
   FaStore,
   FaStar,
 } from "react-icons/fa";
 
+import useApi from "@/hooks/use-api";
+
 const ShopCard = ({
   shop,
   variant = "default",
 }) => {
+  const api = useApi();
+
+  const trackShopClick = () => {
+    if (!shop?._id) return;
+
+    api.post(
+      "/api/analytics/events",
+      {
+        eventType: "SHOP_CLICK",
+        shopId: shop._id,
+        source: "shop_card",
+        page: window.location.pathname,
+      },
+      {},
+      {
+        auth: false,
+        showError: false,
+        showSuccess: false,
+      },
+    );
+  };
+
   if (variant === "homepage") {
     return (
       <div className="flex h-full flex-col overflow-hidden rounded-xl bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
@@ -60,6 +85,7 @@ const ShopCard = ({
 
           <Link
             href={`/shops/${shop._id}`}
+            onClick={trackShopClick}
             className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
           >
             Visit Shop
@@ -120,6 +146,7 @@ const ShopCard = ({
 
         <Link
           href={`/shops/${shop._id}`}
+          onClick={trackShopClick}
           className="mt-5 inline-flex items-center justify-center gap-2 rounded-md border border-[#001B08] px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#001B08] hover:text-white"
         >
           View Shop

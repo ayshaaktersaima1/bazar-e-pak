@@ -72,15 +72,17 @@ export const dashboardNav = {
             section: "Insights",
             items: [
                 {
-                    label: "Reviews",
-                    href: "/dashboard/seller/reviews",
-                    icon: Star,
+                    label: "Analytics",
+                    href: "/dashboard/admin/analytics",
+                    icon: BarChart3,
+                    permission: "analytics.view",
                 },
 
                 {
-                    label: "Analytics",
-                    href: "/dashboard/seller/analytics",
-                    icon: BarChart3,
+                    label: "Search Analytics",
+                    href: "/dashboard/admin/search-analytics",
+                    icon: Search,
+                    permission: "analytics.view",
                 },
             ],
         },

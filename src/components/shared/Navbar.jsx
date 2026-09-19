@@ -3,25 +3,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaBars, FaWhatsapp } from "react-icons/fa";
 
 import CartButton from "./CartButton";
 import ProductSearch from "./ProductSearch";
 import AvatarDropdown from "./AvatarDropdown";
+import AnalyticsLink from "./AnalyticsLink";
 
 import { useSession } from "../../lib/auth-client";
 import { useCategory } from "@/hooks/use-categories";
+import useApi from "@/hooks/use-api";
 
 import { navLinks, authNavLinks } from "@/data/navbar";
-
-const DASHBOARD_ROLES = ["seller", "admin", "superadmin"];
 
 const Navbar = ({ needAuth = true }) => {
   const { data: session } = useSession();
   const user = session?.user;
 
   const { categories } = useCategory();
+  const api = useApi();
+
+  const [whatsappNumber, setWhatsappNumber] = useState("923260882255");
 
   const pathname = usePathname();
   const navbarRef = useRef(null);
@@ -37,13 +40,6 @@ const Navbar = ({ needAuth = true }) => {
 
   const isCollectionActive = pathname?.startsWith("/collection");
   const isShopsActive = pathname?.startsWith("/shops");
-
-  // Only these roles can access a dashboard
-  const role = String(user?.role ?? "")
-    .trim()
-    .toLowerCase();
-
-  const hasDashboard = DASHBOARD_ROLES.includes(role);
 
   const closeDropdowns = () => {
     document.activeElement?.blur();
@@ -71,6 +67,42 @@ const Navbar = ({ needAuth = true }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const result = await api.get(
+        "/api/settings/public",
+        {},
+        {
+          auth: false,
+          showError: false,
+        },
+      );
+
+      if (!result?.success || !Array.isArray(result.data)) return;
+
+      const contactSetting = result.data.find(
+        (item) => item.key === "contact",
+      );
+
+      const savedWhatsapp = contactSetting?.value?.whatsapp;
+
+      if (!savedWhatsapp) return;
+
+      const cleaned = String(savedWhatsapp)
+        .replace(/\s+/g, "")
+        .replace(/-/g, "")
+        .replace(/\+/g, "");
+
+      if (cleaned.startsWith("0")) {
+        setWhatsappNumber(`92${cleaned.slice(1)}`);
+      } else {
+        setWhatsappNumber(cleaned);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const visibleNavLinks = navLinks.filter((link) => {
     if (link.auth === "authenticated") return !!user;
     if (link.auth === "guest") return !user;
@@ -80,11 +112,11 @@ const Navbar = ({ needAuth = true }) => {
 
   const visibleAuthLinks = needAuth
     ? authNavLinks.filter((link) => {
-        if (link.auth === "guest") return !user;
-        if (link.auth === "authenticated") return !!user;
+      if (link.auth === "guest") return !user;
+      if (link.auth === "authenticated") return !!user;
 
-        return true;
-      })
+      return true;
+    })
     : [];
 
   const renderNavItems = (isMobile = false) => (
@@ -107,28 +139,15 @@ const Navbar = ({ needAuth = true }) => {
         </li>
       ))}
 
-      {/* Dashboard — seller/admin/superadmin only */}
-      {hasDashboard && (
-        <li>
-          <Link
-            href={`/dashboard/${role}`}
-            onClick={closeDropdowns}
-            className={
-              pathname?.startsWith(`/dashboard/${role}`)
-                ? activeLinkClass
-                : defaultLinkClass
-            }
-          >
-            Dashboard
-          </Link>
-        </li>
-      )}
-
       {/* Categories */}
       <li>
         <details>
           <summary
-            className={isCollectionActive ? activeLinkClass : defaultLinkClass}
+            className={
+              isCollectionActive
+                ? activeLinkClass
+                : defaultLinkClass
+            }
           >
             Categories
           </summary>
@@ -175,8 +194,12 @@ const Navbar = ({ needAuth = true }) => {
   );
 
   return (
-    <nav ref={navbarRef} className="sticky top-0 z-50 bg-[#001B08] text-white">
+    <nav
+      ref={navbarRef}
+      className="sticky top-0 z-50 bg-[#001B08] text-white"
+    >
       <div className="mx-auto flex min-h-20 w-[92%] max-w-[1600px] items-center justify-between gap-2 py-1.5 sm:gap-3 lg:gap-4">
+
         {/* Logo + Mobile Menu */}
         <div className="flex min-w-0 shrink-0 items-center">
           <div className="dropdown lg:hidden">
@@ -200,7 +223,11 @@ const Navbar = ({ needAuth = true }) => {
             </ul>
           </div>
 
-          <Link href="/" onClick={closeDropdowns} className="block shrink-0">
+          <Link
+            href="/"
+            onClick={closeDropdowns}
+            className="block shrink-0"
+          >
             <Image
               src="/images/logo.webp"
               alt="Bazaar E Pak"
@@ -221,21 +248,24 @@ const Navbar = ({ needAuth = true }) => {
 
         {/* Right Actions */}
         <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
+
           {/* Search */}
           <div className="hidden w-[180px] shrink-0 lg:block xl:w-[220px] 2xl:w-[250px]">
             <ProductSearch />
           </div>
 
           {/* WhatsApp */}
-          <Link
-            href="https://wa.me/923260882255"
+          <AnalyticsLink
+            href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
+            eventType="WHATSAPP_CLICK"
+            source="navbar"
             className="btn btn-circle btn-ghost h-10 min-h-10 w-10 shrink-0 px-0 text-[#E8BB44] sm:h-11 sm:min-h-11 sm:w-11"
             aria-label="Contact on WhatsApp"
           >
             <FaWhatsapp className="text-xl sm:text-2xl" />
-          </Link>
+          </AnalyticsLink>
 
           {/* Cart */}
           <div className="flex h-10 w-10 shrink-0 items-center justify-center sm:h-11 sm:w-11">

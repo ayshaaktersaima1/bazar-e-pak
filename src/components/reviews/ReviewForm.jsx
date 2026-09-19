@@ -64,10 +64,41 @@ const ReviewForm = ({
         if (result.success) {
             onReviewAdded(result.data);
 
+            try {
+                await fetch(
+                    `${baseUrl}/api/analytics/events`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            eventType: "REVIEW_CREATED",
+                            productId:
+                                reviewType === "product"
+                                    ? productId
+                                    : undefined,
+                            shopId:
+                                reviewType === "shop"
+                                    ? shopId
+                                    : undefined,
+                            source: "review_form",
+                            page: window.location.pathname,
+                            metadata: {
+                                reviewType,
+                            },
+                        }),
+                    }
+                );
+            } catch {
+                // Analytics failure should never block review submission.
+            }
+
             setRating(5);
             setComment("");
         }
     };
+
     return (
         <form
             onSubmit={handleSubmit}

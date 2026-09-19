@@ -3,10 +3,11 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { serverApi } from "@/lib/server";
-
 import StatsCard from "@/features/dashboard/common/ui/stats-card";
-import DashboardCard from "@/features/dashboard/common/ui/dashboard-card";
+import DashboardCard from "@/features/dashboard/common/ui/dahboard-card";
 import DataTable from "@/features/dashboard/common/table/data-table";
+
+
 
 const SellerAnalyticsPage =
   async () => {

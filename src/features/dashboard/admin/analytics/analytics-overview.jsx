@@ -4,20 +4,28 @@ import DataTable from "../../common/table/data-table";
 import DashboardCard from "../../common/ui/dahboard-card";
 import StatsCard from "../../common/ui/stats-card";
 
-
-
 const AnalyticsOverview = ({
     analytics = {},
     rankings = [],
 }) => {
-    const totals =
-        analytics.totals ?? {};
+    const totals = analytics.totals ?? {};
+    const sourceComparison = analytics.sourceComparison ?? {};
+    const events = analytics.events ?? [];
 
-    const sourceComparison =
-        analytics.sourceComparison ?? {};
+    const getEventCount = (eventType) => {
+        const event = events.find(
+            (item) => item._id === eventType
+        );
 
-    const events =
-        analytics.events ?? [];
+        return event?.count ?? 0;
+    };
+
+    const productViews = getEventCount("PRODUCT_VIEW");
+    const productClicks = getEventCount("PRODUCT_CLICK");
+    const addToCart = getEventCount("ADD_TO_CART");
+    const shopViews = getEventCount("SHOP_VIEW");
+    const shopClicks = getEventCount("SHOP_CLICK");
+    const categoryViews = getEventCount("CATEGORY_VIEW");
 
     const eventColumns = [
         {
@@ -89,6 +97,44 @@ const AnalyticsOverview = ({
                     label="Published Reviews"
                     value={totals.reviews}
                 />
+            </div>
+
+            <div>
+                <h2 className="mb-4 text-xl font-bold text-[#001B08]">
+                    Engagement Activity
+                </h2>
+
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <StatsCard
+                        label="Product Views"
+                        value={productViews}
+                    />
+
+                    <StatsCard
+                        label="Product Clicks"
+                        value={productClicks}
+                    />
+
+                    <StatsCard
+                        label="Add to Cart"
+                        value={addToCart}
+                    />
+
+                    <StatsCard
+                        label="Shop Views"
+                        value={shopViews}
+                    />
+
+                    <StatsCard
+                        label="Shop Clicks"
+                        value={shopClicks}
+                    />
+
+                    <StatsCard
+                        label="Category Views"
+                        value={categoryViews}
+                    />
+                </div>
             </div>
 
             <div>

@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 
 import { useCart } from "@/hooks/use-cart";
+import useApi from "@/hooks/use-api";
 
 const DiscountBadge = ({ discount }) => {
   if (typeof discount !== "number" || discount <= 0) {
@@ -51,6 +52,8 @@ const ProductCard = ({
   product,
   variant = "product",
 }) => {
+  const api = useApi();
+
   const {
     addToCart,
     increaseQuantity,
@@ -74,6 +77,26 @@ const ProductCard = ({
     product?.name ||
     "Product";
 
+  const trackProductClick = () => {
+    if (!productId) return;
+
+    api.post(
+      "/api/analytics/events",
+      {
+        eventType: "PRODUCT_CLICK",
+        productId,
+        source: "product_card",
+        page: window.location.pathname,
+      },
+      {},
+      {
+        auth: false,
+        showError: false,
+        showSuccess: false,
+      },
+    );
+  };
+
   if (variant === "homepage") {
     return (
       <div className="flex h-[410px] w-full flex-col rounded-xl bg-white p-3 shadow-sm">
@@ -91,6 +114,7 @@ const ProductCard = ({
           <div className="absolute inset-0 flex items-center justify-center bg-[#001B08]/50 opacity-0 transition duration-300 group-hover:opacity-100">
             <Link
               href={`/products/${productId}`}
+              onClick={trackProductClick}
               className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
             >
               View Details
@@ -134,14 +158,19 @@ const ProductCard = ({
           </h3>
 
           <div className="mt-1">
-            <DiscountPrice product={product} variant="cart" />
+            <DiscountPrice
+              product={product}
+              variant="cart"
+            />
           </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-2 rounded-md border border-gray-200 bg-[#F7F5EF] p-1">
           <button
             type="button"
-            onClick={() => decreaseQuantity(productId)}
+            onClick={() =>
+              decreaseQuantity(productId)
+            }
             className="flex h-7 w-7 items-center justify-center rounded bg-white text-[#001B08] shadow-sm transition hover:bg-[#E8BB44]"
           >
             <FaMinus size={10} />
@@ -153,7 +182,9 @@ const ProductCard = ({
 
           <button
             type="button"
-            onClick={() => increaseQuantity(productId)}
+            onClick={() =>
+              increaseQuantity(productId)
+            }
             className="flex h-7 w-7 items-center justify-center rounded bg-white text-[#001B08] shadow-sm transition hover:bg-[#E8BB44]"
           >
             <FaPlus size={10} />
@@ -162,7 +193,9 @@ const ProductCard = ({
 
         <button
           type="button"
-          onClick={() => removeFromCart(productId)}
+          onClick={() =>
+            removeFromCart(productId)
+          }
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition hover:bg-red-50 hover:text-red-500"
         >
           <FaTrash size={14} />
@@ -174,6 +207,7 @@ const ProductCard = ({
   return (
     <Link
       href={`/products/${productId}`}
+      onClick={trackProductClick}
       className="group flex h-full flex-col rounded-xl bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-[#FAFAFA]">

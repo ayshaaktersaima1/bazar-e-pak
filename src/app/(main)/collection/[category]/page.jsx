@@ -1,4 +1,5 @@
 import CategoryPageContent from "@/components/category/CategoryPageContent";
+import CategoryViewTracker from "@/components/category/CategoryViewTracker";
 import { getData } from "@/lib/api";
 
 const CategoryPage = async ({ params }) => {
@@ -11,10 +12,19 @@ const CategoryPage = async ({ params }) => {
     );
 
     return (
-        <CategoryPageContent
-            category={category}
-            categoryInfo={categoryInfo}
-        />
+        <>
+            {categoryInfo?._id && (
+                <CategoryViewTracker
+                    categoryId={categoryInfo._id}
+                    categorySlug={category}
+                />
+            )}
+
+            <CategoryPageContent
+                category={category}
+                categoryInfo={categoryInfo}
+            />
+        </>
     );
 };
 

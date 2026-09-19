@@ -12,6 +12,8 @@ import {
 
 import ProductCard from "../../../../components/shared/ProductCard";
 import ShopReview from "@/components/shared/ShopReview";
+import ShopViewTracker from "@/components/shared/ShopViewTracker";
+import AnalyticsLink from "@/components/shared/AnalyticsLink";
 
 const ShopDetailsPage = async ({ params }) => {
   const { id } = await params;
@@ -53,6 +55,10 @@ const ShopDetailsPage = async ({ params }) => {
   const shopData = await shopRes.json();
   const shop = shopData.data;
 
+  const locationUrl = shop.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}`
+    : null;
+
   // Get products of this shop
   const productRes = await fetch(
     `${baseUrl}/api/products?shopId=${shop._id}`,
@@ -85,6 +91,8 @@ const ShopDetailsPage = async ({ params }) => {
 
   return (
     <main className="min-h-screen bg-[#F7F5EF]">
+
+      <ShopViewTracker shopId={shop._id} />
 
       {/* Shop Hero */}
       <section className="bg-[#001B08] py-12 md:py-16">
@@ -176,9 +184,23 @@ const ShopDetailsPage = async ({ params }) => {
                       Location
                     </p>
 
-                    <p className="mt-1">
-                      {shop.address || "Not provided"}
-                    </p>
+                    {locationUrl ? (
+                      <AnalyticsLink
+                        href={locationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        eventType="LOCATION_CLICK"
+                        source="shop_details"
+                        shopId={shop._id}
+                        className="mt-1 inline-block transition hover:text-[#E8BB44]"
+                      >
+                        {shop.address}
+                      </AnalyticsLink>
+                    ) : (
+                      <p className="mt-1">
+                        Not provided
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -191,9 +213,21 @@ const ShopDetailsPage = async ({ params }) => {
                       Phone
                     </p>
 
-                    <p className="mt-1">
-                      {shop.phone || "Not provided"}
-                    </p>
+                    {shop.phone ? (
+                      <AnalyticsLink
+                        href={`tel:${shop.phone}`}
+                        eventType="CALL_CLICK"
+                        source="shop_details"
+                        shopId={shop._id}
+                        className="mt-1 inline-block transition hover:text-[#E8BB44]"
+                      >
+                        {shop.phone}
+                      </AnalyticsLink>
+                    ) : (
+                      <p className="mt-1">
+                        Not provided
+                      </p>
+                    )}
                   </div>
                 </div>
 

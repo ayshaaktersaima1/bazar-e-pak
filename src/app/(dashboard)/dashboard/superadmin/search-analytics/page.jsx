@@ -1,5 +1,6 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
 import {
     Search,
     SearchX,
@@ -7,99 +8,71 @@ import {
     Clock,
 } from "lucide-react";
 
-import { auth } from "@/lib/auth";
-import { getData } from "@/lib/api";
-import { serverApi } from "@/lib/server";
+import useApi from "@/hooks/use-api";
 
-const AdminSearchAnalyticsPage = async () => {
-    const requestHeaders = await headers();
+const SearchAnalyticsPage = () => {
+    const api = useApi();
 
-    const session = await auth.api.getSession({
-        headers: requestHeaders,
-    });
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    if (!session?.user) {
-        redirect("/login");
-    }
+    useEffect(() => {
+        const loadAnalytics = async () => {
+            setLoading(true);
 
-    const { token } = await auth.api.getToken({
-        headers: requestHeaders,
-    });
+            const result = await api.get(
+                "/api/analytics/search",
+                {},
+                {
+                    showError: true,
+                },
+            );
 
-    const users = await getData(
-        "/api/users",
-        token,
-    );
+            if (result?.success) {
+                setData(result.data);
+            }
 
-    const currentUser = users.find(
-        (user) =>
-            String(user._id) ===
-            String(session.user.id) ||
-            user.email ===
-            session.user.email,
-    );
+            setLoading(false);
+        };
 
-    const role = session.user.role;
+        loadAnalytics();
+    }, []);
 
-    const permissions =
-        currentUser?.permissions ?? [];
-
-    const canViewAnalytics =
-        role === "super_admin" ||
-        permissions.includes(
-            "analytics.view",
-        );
-
-    if (!canViewAnalytics) {
-        redirect("/dashboard/admin");
-    }
-
-    const response = await serverApi.get(
-        "/api/analytics/search",
-        {},
-        {
-            auth: true,
-            includeMeta: true,
-        },
-    );
-
-    const data = response?.data ?? {};
-
-    const summary = data.summary ?? {
+    const summary = data?.summary || {
         totalSearches: 0,
         zeroResultSearches: 0,
         averageResultsPerSearch: 0,
     };
 
-    const topKeywords =
-        data.topKeywords ?? [];
-
+    const topKeywords = data?.topKeywords || [];
     const zeroResultKeywords =
-        data.zeroResultKeywords ?? [];
-
-    const recentSearches =
-        data.recentSearches ?? [];
+        data?.zeroResultKeywords || [];
+    const recentSearches = data?.recentSearches || [];
 
     const formatDate = (date) => {
         if (!date) return "-";
 
-        return new Date(
-            date,
-        ).toLocaleString();
+        return new Date(date).toLocaleString();
     };
 
-    return (
-        <div className="space-y-8 bg-[#F7F5EF] p-6">
-            <div>
-                <p className="text-sm font-semibold uppercase tracking-widest text-[#E8BB44]">
-                    Search Analytics
+    if (loading) {
+        return (
+            <div className="p-6">
+                <p className="text-sm text-gray-500">
+                    Loading search analytics...
                 </p>
+            </div>
+        );
+    }
 
-                <h1 className="mt-2 text-3xl font-bold text-[#001B08]">
+    return (
+        <div className="space-y-8 p-6">
+            <div>
+                <h1 className="text-2xl font-bold text-[#001B08]">
                     Search Analytics
                 </h1>
 
-                <p className="mt-2 text-sm text-[#4B5563]">
+                <p className="mt-1 text-sm text-gray-500">
                     See what visitors are searching for across PakBazaar.
                 </p>
             </div>
@@ -118,7 +91,7 @@ const AdminSearchAnalyticsPage = async () => {
                     </div>
 
                     <p className="mt-3 text-3xl font-bold text-[#001B08]">
-                        {summary.totalSearches ?? 0}
+                        {summary.totalSearches}
                     </p>
                 </div>
 
@@ -135,7 +108,7 @@ const AdminSearchAnalyticsPage = async () => {
                     </div>
 
                     <p className="mt-3 text-3xl font-bold text-[#001B08]">
-                        {summary.zeroResultSearches ?? 0}
+                        {summary.zeroResultSearches}
                     </p>
                 </div>
 
@@ -152,7 +125,7 @@ const AdminSearchAnalyticsPage = async () => {
                     </div>
 
                     <p className="mt-3 text-3xl font-bold text-[#001B08]">
-                        {summary.averageResultsPerSearch ?? 0}
+                        {summary.averageResultsPerSearch}
                     </p>
                 </div>
             </div>
@@ -171,11 +144,9 @@ const AdminSearchAnalyticsPage = async () => {
                                         <th className="pb-3 font-medium">
                                             Keyword
                                         </th>
-
                                         <th className="pb-3 font-medium">
                                             Searches
                                         </th>
-
                                         <th className="pb-3 font-medium">
                                             Avg. Results
                                         </th>
@@ -183,26 +154,24 @@ const AdminSearchAnalyticsPage = async () => {
                                 </thead>
 
                                 <tbody>
-                                    {topKeywords.map(
-                                        (item) => (
-                                            <tr
-                                                key={item.keyword}
-                                                className="border-b border-gray-50"
-                                            >
-                                                <td className="py-3 font-medium text-[#001B08]">
-                                                    {item.keyword}
-                                                </td>
+                                    {topKeywords.map((item) => (
+                                        <tr
+                                            key={item.keyword}
+                                            className="border-b border-gray-50"
+                                        >
+                                            <td className="py-3 font-medium text-[#001B08]">
+                                                {item.keyword}
+                                            </td>
 
-                                                <td className="py-3 text-gray-600">
-                                                    {item.searches}
-                                                </td>
+                                            <td className="py-3 text-gray-600">
+                                                {item.searches}
+                                            </td>
 
-                                                <td className="py-3 text-gray-600">
-                                                    {item.averageResults}
-                                                </td>
-                                            </tr>
-                                        ),
-                                    )}
+                                            <td className="py-3 text-gray-600">
+                                                {item.averageResults}
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         ) : (
@@ -223,19 +192,16 @@ const AdminSearchAnalyticsPage = async () => {
                     </p>
 
                     <div className="mt-5 overflow-x-auto">
-                        {zeroResultKeywords.length >
-                            0 ? (
+                        {zeroResultKeywords.length > 0 ? (
                             <table className="w-full text-left text-sm">
                                 <thead>
                                     <tr className="border-b border-gray-100 text-gray-500">
                                         <th className="pb-3 font-medium">
                                             Keyword
                                         </th>
-
                                         <th className="pb-3 font-medium">
                                             Searches
                                         </th>
-
                                         <th className="pb-3 font-medium">
                                             Last Search
                                         </th>
@@ -243,28 +209,24 @@ const AdminSearchAnalyticsPage = async () => {
                                 </thead>
 
                                 <tbody>
-                                    {zeroResultKeywords.map(
-                                        (item) => (
-                                            <tr
-                                                key={item.keyword}
-                                                className="border-b border-gray-50"
-                                            >
-                                                <td className="py-3 font-medium text-[#001B08]">
-                                                    {item.keyword}
-                                                </td>
+                                    {zeroResultKeywords.map((item) => (
+                                        <tr
+                                            key={item.keyword}
+                                            className="border-b border-gray-50"
+                                        >
+                                            <td className="py-3 font-medium text-[#001B08]">
+                                                {item.keyword}
+                                            </td>
 
-                                                <td className="py-3 text-gray-600">
-                                                    {item.searches}
-                                                </td>
+                                            <td className="py-3 text-gray-600">
+                                                {item.searches}
+                                            </td>
 
-                                                <td className="py-3 text-gray-600">
-                                                    {formatDate(
-                                                        item.lastSearchedAt,
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ),
-                                    )}
+                                            <td className="py-3 text-gray-600">
+                                                {formatDate(item.lastSearchedAt)}
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         ) : (
@@ -296,15 +258,12 @@ const AdminSearchAnalyticsPage = async () => {
                                     <th className="pb-3 font-medium">
                                         Keyword
                                     </th>
-
                                     <th className="pb-3 font-medium">
                                         Results
                                     </th>
-
                                     <th className="pb-3 font-medium">
                                         Source
                                     </th>
-
                                     <th className="pb-3 font-medium">
                                         Date
                                     </th>
@@ -312,35 +271,28 @@ const AdminSearchAnalyticsPage = async () => {
                             </thead>
 
                             <tbody>
-                                {recentSearches.map(
-                                    (item) => (
-                                        <tr
-                                            key={item._id}
-                                            className="border-b border-gray-50"
-                                        >
-                                            <td className="py-3 font-medium text-[#001B08]">
-                                                {item.searchKeyword ||
-                                                    "-"}
-                                            </td>
+                                {recentSearches.map((item) => (
+                                    <tr
+                                        key={item._id}
+                                        className="border-b border-gray-50"
+                                    >
+                                        <td className="py-3 font-medium text-[#001B08]">
+                                            {item.searchKeyword || "-"}
+                                        </td>
 
-                                            <td className="py-3 text-gray-600">
-                                                {item.resultCount ??
-                                                    0}
-                                            </td>
+                                        <td className="py-3 text-gray-600">
+                                            {item.resultCount ?? 0}
+                                        </td>
 
-                                            <td className="py-3 text-gray-600">
-                                                {item.source ||
-                                                    "-"}
-                                            </td>
+                                        <td className="py-3 text-gray-600">
+                                            {item.source || "-"}
+                                        </td>
 
-                                            <td className="py-3 text-gray-600">
-                                                {formatDate(
-                                                    item.createdAt,
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ),
-                                )}
+                                        <td className="py-3 text-gray-600">
+                                            {formatDate(item.createdAt)}
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     ) : (
@@ -354,4 +306,4 @@ const AdminSearchAnalyticsPage = async () => {
     );
 };
 
-export default AdminSearchAnalyticsPage;
+export default SearchAnalyticsPage;

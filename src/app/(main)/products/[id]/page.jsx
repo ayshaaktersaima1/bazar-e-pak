@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import { useProduct } from "@/hooks/use-product";
 import { useShop } from "@/hooks/use-shop";
+import useApi from "@/hooks/use-api";
 
 import ShopInfo from "../../../../components/shared/ShopInfo";
 import ProductInfo from "../../../../components/shared/ProductInfo";
@@ -13,6 +15,9 @@ import ReviewSection from "@/components/reviews/ReviewSection";
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const router = useRouter();
+  const api = useApi();
+
+  const trackedProductRef = useRef(null);
 
   const {
     products,
@@ -28,7 +33,34 @@ const ProductDetailsPage = () => {
     ? getShopById(product.shopId)
     : null;
 
-  // Wait until products finish loading
+  useEffect(() => {
+    if (!product?._id) return;
+
+    if (trackedProductRef.current === product._id) return;
+
+    trackedProductRef.current = product._id;
+
+    const timer = setTimeout(async () => {
+      await api.post(
+        "/api/analytics/events",
+        {
+          eventType: "PRODUCT_VIEW",
+          productId: product._id,
+          source: "product_details",
+          page: `/products/${product._id}`,
+        },
+        {},
+        {
+          auth: false,
+          showError: false,
+          showSuccess: false,
+        },
+      );
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [product?._id]);
+
   if (loading) {
     return (
       <main className="bg-[#F7F5EF] py-20">
@@ -41,7 +73,6 @@ const ProductDetailsPage = () => {
     );
   }
 
-  // Only show not found after loading is finished
   if (!product) {
     return (
       <main className="bg-[#F7F5EF] py-20">
