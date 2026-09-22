@@ -4,10 +4,13 @@ import Image from "next/image";
 import {
   FaArrowLeft,
   FaEnvelope,
+  FaGlobe,
   FaMapMarkerAlt,
   FaPhone,
   FaStar,
   FaStore,
+  FaWhatsapp,
+  FaYoutube,
 } from "react-icons/fa";
 
 import ProductCard from "../../../../components/shared/ProductCard";
@@ -25,7 +28,7 @@ const ShopDetailsPage = async ({ params }) => {
     `${baseUrl}/api/shops/${id}`,
     {
       cache: "no-store",
-    }
+    },
   );
 
   if (!shopRes.ok) {
@@ -56,7 +59,9 @@ const ShopDetailsPage = async ({ params }) => {
   const shop = shopData.data;
 
   const locationUrl = shop.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}`
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        shop.address,
+      )}`
     : null;
 
   // Get products of this shop
@@ -64,7 +69,7 @@ const ShopDetailsPage = async ({ params }) => {
     `${baseUrl}/api/products?shopId=${shop._id}`,
     {
       cache: "no-store",
-    }
+    },
   );
 
   const productData = await productRes.json();
@@ -75,7 +80,7 @@ const ShopDetailsPage = async ({ params }) => {
     `${baseUrl}/api/reviews?reviewType=shop&shopId=${shop._id}`,
     {
       cache: "no-store",
-    }
+    },
   );
 
   const reviewData = await reviewRes.json();
@@ -84,20 +89,18 @@ const ShopDetailsPage = async ({ params }) => {
   const averageRating =
     shopReviews.length > 0
       ? shopReviews.reduce(
-        (total, review) => total + review.rating,
-        0
-      ) / shopReviews.length
+          (total, review) => total + review.rating,
+          0,
+        ) / shopReviews.length
       : 0;
 
   return (
     <main className="min-h-screen bg-[#F7F5EF]">
-
       <ShopViewTracker shopId={shop._id} />
 
       {/* Shop Hero */}
       <section className="bg-[#001B08] py-12 md:py-16">
         <div className="mx-auto w-[90%]">
-
           <Link
             href="/shops"
             className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-white transition duration-300 hover:text-[#E8BB44]"
@@ -107,7 +110,6 @@ const ShopDetailsPage = async ({ params }) => {
           </Link>
 
           <div className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-
             {/* Shop Image */}
             <div className="overflow-hidden rounded-2xl bg-[#F7F5EF]">
               <Image
@@ -125,18 +127,30 @@ const ShopDetailsPage = async ({ params }) => {
 
             {/* Shop Information */}
             <div className="text-white">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-[#E8BB44]">
+                  <FaStore />
+                  {shop.status}
+                </div>
 
-              <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-[#E8BB44]">
-                <FaStore />
-                {shop.status}
+                {shop.source && (
+                  <span className="rounded-full border border-white/20 px-3 py-1 text-xs capitalize text-gray-300">
+                    Source: {shop.source}
+                  </span>
+                )}
               </div>
 
               <h1 className="mt-3 text-4xl font-bold md:text-5xl">
                 {shop.name}
               </h1>
 
-              <div className="mt-5 flex flex-wrap items-center gap-4">
+              {shop.businessType && (
+                <p className="mt-2 text-sm font-medium text-gray-300">
+                  {shop.businessType}
+                </p>
+              )}
 
+              <div className="mt-5 flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-2 rounded-full bg-[#E8BB44] px-3 py-1.5 text-sm font-bold text-[#001B08]">
                   <FaStar />
 
@@ -154,12 +168,33 @@ const ShopDetailsPage = async ({ params }) => {
                 </span>
               </div>
 
-              <p className="mt-6 max-w-2xl text-sm leading-7 text-gray-300 md:text-base">
-                {shop.description}
-              </p>
+              {shop.description && (
+                <p className="mt-6 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-gray-300 md:text-base">
+                  {shop.description}
+                </p>
+              )}
 
-              <div className="mt-7 grid gap-4 text-sm text-gray-300 sm:grid-cols-2">
+              {/* Services */}
+              {shop.services?.length > 0 && (
+                <div className="mt-6">
+                  <p className="text-sm font-semibold text-white">
+                    Services
+                  </p>
 
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {shop.services.map((service, index) => (
+                      <span
+                        key={`${service}-${index}`}
+                        className="rounded-full bg-white/10 px-3 py-1.5 text-xs text-gray-200"
+                      >
+                        {service}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-7 grid gap-5 text-sm text-gray-300 sm:grid-cols-2">
                 {/* Seller */}
                 <div className="flex items-start gap-3">
                   <FaStore className="mt-1 shrink-0 text-[#E8BB44]" />
@@ -170,7 +205,7 @@ const ShopDetailsPage = async ({ params }) => {
                     </p>
 
                     <p className="mt-1 break-all">
-                      {shop.sellerId}
+                      {shop.sellerId || "Not provided"}
                     </p>
                   </div>
                 </div>
@@ -198,9 +233,25 @@ const ShopDetailsPage = async ({ params }) => {
                       </AnalyticsLink>
                     ) : (
                       <p className="mt-1">
-                        Not provided
+                        {shop.location ||
+                          "Not provided"}
                       </p>
                     )}
+                  </div>
+                </div>
+
+                {/* City */}
+                <div className="flex items-start gap-3">
+                  <FaMapMarkerAlt className="mt-1 shrink-0 text-[#E8BB44]" />
+
+                  <div>
+                    <p className="font-semibold text-white">
+                      City
+                    </p>
+
+                    <p className="mt-1">
+                      {shop.city || "Not provided"}
+                    </p>
                   </div>
                 </div>
 
@@ -231,6 +282,38 @@ const ShopDetailsPage = async ({ params }) => {
                   </div>
                 </div>
 
+                {/* WhatsApp */}
+                <div className="flex items-start gap-3">
+                  <FaWhatsapp className="mt-1 shrink-0 text-[#E8BB44]" />
+
+                  <div>
+                    <p className="font-semibold text-white">
+                      WhatsApp
+                    </p>
+
+                    {shop.whatsapp ? (
+                      <AnalyticsLink
+                        href={`https://wa.me/${shop.whatsapp.replace(
+                          /\D/g,
+                          "",
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        eventType="WHATSAPP_CLICK"
+                        source="shop_details"
+                        shopId={shop._id}
+                        className="mt-1 inline-block transition hover:text-[#E8BB44]"
+                      >
+                        {shop.whatsapp}
+                      </AnalyticsLink>
+                    ) : (
+                      <p className="mt-1">
+                        Not provided
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 {/* Email */}
                 <div className="flex items-start gap-3">
                   <FaEnvelope className="mt-1 shrink-0 text-[#E8BB44]" />
@@ -240,24 +323,255 @@ const ShopDetailsPage = async ({ params }) => {
                       Email
                     </p>
 
-                    <p className="mt-1 break-all">
-                      {shop.email || "Not provided"}
-                    </p>
+                    {shop.email ? (
+                      <a
+                        href={`mailto:${shop.email}`}
+                        className="mt-1 inline-block break-all transition hover:text-[#E8BB44]"
+                      >
+                        {shop.email}
+                      </a>
+                    ) : (
+                      <p className="mt-1">
+                        Not provided
+                      </p>
+                    )}
                   </div>
                 </div>
 
+                {/* Website */}
+                <div className="flex items-start gap-3">
+                  <FaGlobe className="mt-1 shrink-0 text-[#E8BB44]" />
+
+                  <div>
+                    <p className="font-semibold text-white">
+                      Website
+                    </p>
+
+                    {shop.website ? (
+                      <AnalyticsLink
+                        href={shop.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        eventType="WEBSITE_CLICK"
+                        source="shop_details"
+                        shopId={shop._id}
+                        className="mt-1 inline-block break-all transition hover:text-[#E8BB44]"
+                      >
+                        {shop.website}
+                      </AnalyticsLink>
+                    ) : (
+                      <p className="mt-1">
+                        Not provided
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* YouTube */}
+                <div className="flex items-start gap-3">
+                  <FaYoutube className="mt-1 shrink-0 text-[#E8BB44]" />
+
+                  <div>
+                    <p className="font-semibold text-white">
+                      YouTube
+                    </p>
+
+                    {shop.youtube ? (
+                      <AnalyticsLink
+                        href={shop.youtube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        eventType="YOUTUBE_CLICK"
+                        source="shop_details"
+                        shopId={shop._id}
+                        className="mt-1 inline-block break-all transition hover:text-[#E8BB44]"
+                      >
+                        {shop.youtube}
+                      </AnalyticsLink>
+                    ) : (
+                      <p className="mt-1">
+                        Not provided
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Shop Details */}
+      <section className="py-16">
+        <div className="mx-auto w-[90%]">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Address & Coordinates */}
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-[#001B08]">
+                Location Details
+              </h2>
+
+              <div className="mt-5 space-y-4 text-sm">
+                <div>
+                  <p className="font-semibold text-[#001B08]">
+                    Address
+                  </p>
+
+                  <p className="mt-1 text-gray-500">
+                    {shop.address || "Not provided"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="font-semibold text-[#001B08]">
+                    City
+                  </p>
+
+                  <p className="mt-1 text-gray-500">
+                    {shop.city || "Not provided"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="font-semibold text-[#001B08]">
+                    Location
+                  </p>
+
+                  <p className="mt-1 text-gray-500">
+                    {shop.location || "Not provided"}
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="font-semibold text-[#001B08]">
+                      Latitude
+                    </p>
+
+                    <p className="mt-1 text-gray-500">
+                      {shop.latitude ?? "Not provided"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-[#001B08]">
+                      Longitude
+                    </p>
+
+                    <p className="mt-1 text-gray-500">
+                      {shop.longitude ?? "Not provided"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Business Hours */}
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-[#001B08]">
+                Business Hours
+              </h2>
+
+              {shop.hours &&
+              Object.keys(shop.hours).length > 0 ? (
+                <div className="mt-5 space-y-3">
+                  {Object.entries(shop.hours).map(
+                    ([day, hours]) => (
+                      <div
+                        key={day}
+                        className="flex items-center justify-between gap-4 border-b border-zinc-100 pb-3 text-sm last:border-0"
+                      >
+                        <span className="font-medium capitalize text-[#001B08]">
+                          {day}
+                        </span>
+
+                        <span className="text-right text-gray-500">
+                          {hours || "Closed"}
+                        </span>
+                      </div>
+                    ),
+                  )}
+                </div>
+              ) : (
+                <p className="mt-5 text-sm text-gray-500">
+                  Business hours not provided.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Social Links */}
+          {shop.socialLinks?.length > 0 && (
+            <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-bold text-[#001B08]">
+                Social Links
+              </h2>
+
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {shop.socialLinks.map((social, index) => (
+                  <AnalyticsLink
+                    key={`${social.platform}-${index}`}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    eventType="SOCIAL_CLICK"
+                    source="shop_details"
+                    shopId={shop._id}
+                    className="rounded-xl border border-zinc-200 p-4 transition hover:border-[#E8BB44] hover:bg-[#F7F5EF]"
+                  >
+                    <p className="font-semibold capitalize text-[#001B08]">
+                      {social.platform}
+                    </p>
+
+                    <p className="mt-1 break-all text-sm text-gray-500">
+                      {social.url}
+                    </p>
+                  </AnalyticsLink>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Gallery */}
+      {shop.gallery?.length > 0 && (
+        <section className="bg-white py-16">
+          <div className="mx-auto w-[90%]">
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#E8BB44]">
+                Shop Gallery
+              </p>
+
+              <h2 className="mt-2 text-3xl font-bold text-[#001B08] md:text-4xl">
+                More from {shop.name}
+              </h2>
+            </div>
+
+            <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {shop.gallery.map((image, index) => (
+                <div
+                  key={`${image}-${index}`}
+                  className="overflow-hidden rounded-2xl bg-[#F7F5EF]"
+                >
+                  <Image
+                    src={image}
+                    alt={`${shop.name} gallery ${index + 1}`}
+                    width={800}
+                    height={600}
+                    className="h-64 w-full object-cover transition duration-300 hover:scale-105"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Products */}
       <section className="py-16">
         <div className="mx-auto w-[90%]">
-
           <div className="text-center">
-
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#E8BB44]">
               Shop Collection
             </p>
@@ -294,7 +608,6 @@ const ShopDetailsPage = async ({ params }) => {
             </div>
           ) : (
             <div className="mt-10 rounded-xl bg-white p-10 text-center shadow-sm">
-
               <FaStore className="mx-auto text-3xl text-[#E8BB44]" />
 
               <h3 className="mt-4 text-xl font-bold text-[#001B08]">
@@ -306,16 +619,13 @@ const ShopDetailsPage = async ({ params }) => {
               </p>
             </div>
           )}
-
         </div>
       </section>
 
       {/* Reviews */}
       <section className="bg-white py-16">
         <div className="mx-auto w-[90%]">
-
           <div className="text-center">
-
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#E8BB44]">
               Customer Reviews
             </p>
@@ -339,10 +649,8 @@ const ShopDetailsPage = async ({ params }) => {
             shopId={shop._id}
             initialReviews={shopReviews}
           />
-
         </div>
       </section>
-
     </main>
   );
 };

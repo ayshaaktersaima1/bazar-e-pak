@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 
 import { useCart } from "@/hooks/use-cart";
-import useApi from "@/hooks/use-api";
+import useAnalytics from "@/hooks/use-analytics";
 
 const DiscountBadge = ({ discount }) => {
   if (typeof discount !== "number" || discount <= 0) {
@@ -52,14 +52,17 @@ const ProductCard = ({
   product,
   variant = "product",
 }) => {
-  const api = useApi();
-
   const {
     addToCart,
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
   } = useCart();
+
+  const {
+    trackProductClick,
+    trackAddToCart,
+  } = useAnalytics();
 
   const image =
     product?.productImage ||
@@ -77,24 +80,33 @@ const ProductCard = ({
     product?.name ||
     "Product";
 
-  const trackProductClick = () => {
+  const trackProductClickEvent = () => {
     if (!productId) return;
 
-    api.post(
-      "/api/analytics/events",
-      {
-        eventType: "PRODUCT_CLICK",
-        productId,
-        source: "product_card",
-        page: window.location.pathname,
+    trackProductClick({
+      productId,
+      source: "product_card",
+      metadata: {
+        page:
+          typeof window !== "undefined"
+            ? window.location.pathname
+            : undefined,
       },
-      {},
-      {
-        auth: false,
-        showError: false,
-        showSuccess: false,
-      },
-    );
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (!productId) return;
+
+    addToCart(product);
+
+    trackAddToCart({
+      productId,
+      shopId:
+        product?.shopId ||
+        product?.product?.shopId,
+      source: "product_card",
+    });
   };
 
   if (variant === "homepage") {
@@ -114,7 +126,7 @@ const ProductCard = ({
           <div className="absolute inset-0 flex items-center justify-center bg-[#001B08]/50 opacity-0 transition duration-300 group-hover:opacity-100">
             <Link
               href={`/products/${productId}`}
-              onClick={trackProductClick}
+              onClick={trackProductClickEvent}
               className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-semibold text-[#001B08] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
             >
               View Details
@@ -131,7 +143,7 @@ const ProductCard = ({
 
           <button
             type="button"
-            onClick={() => addToCart(product)}
+            onClick={handleAddToCart}
             className="mt-auto inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
           >
             <FaShoppingCart />
@@ -207,7 +219,7 @@ const ProductCard = ({
   return (
     <Link
       href={`/products/${productId}`}
-      onClick={trackProductClick}
+      onClick={trackProductClickEvent}
       className="group flex h-full flex-col rounded-xl bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-[#FAFAFA]">
@@ -236,7 +248,8 @@ const ProductCard = ({
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            addToCart(product);
+
+            handleAddToCart();
           }}
           className="mt-auto inline-flex items-center justify-center gap-2 rounded-md bg-[#001B08] px-4 py-2.5 font-semibold text-white transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08]"
         >

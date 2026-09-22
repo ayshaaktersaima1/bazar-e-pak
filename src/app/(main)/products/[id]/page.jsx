@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import { useProduct } from "@/hooks/use-product";
 import { useShop } from "@/hooks/use-shop";
-import useApi from "@/hooks/use-api";
+import useAnalytics from "@/hooks/use-analytics";
 
 import ShopInfo from "../../../../components/shared/ShopInfo";
 import ProductInfo from "../../../../components/shared/ProductInfo";
@@ -15,7 +15,6 @@ import ReviewSection from "@/components/reviews/ReviewSection";
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const router = useRouter();
-  const api = useApi();
 
   const trackedProductRef = useRef(null);
 
@@ -26,6 +25,8 @@ const ProductDetailsPage = () => {
   } = useProduct();
 
   const { getShopById } = useShop();
+
+  const { trackProductView } = useAnalytics();
 
   const product = getProductFromState(id);
 
@@ -40,26 +41,18 @@ const ProductDetailsPage = () => {
 
     trackedProductRef.current = product._id;
 
-    const timer = setTimeout(async () => {
-      await api.post(
-        "/api/analytics/events",
-        {
-          eventType: "PRODUCT_VIEW",
-          productId: product._id,
-          source: "product_details",
+    const timer = setTimeout(() => {
+      trackProductView({
+        productId: product._id,
+        source: "product_details",
+        metadata: {
           page: `/products/${product._id}`,
         },
-        {},
-        {
-          auth: false,
-          showError: false,
-          showSuccess: false,
-        },
-      );
+      });
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [product?._id]);
+  }, [product?._id, trackProductView]);
 
   if (loading) {
     return (
@@ -116,11 +109,12 @@ const ProductDetailsPage = () => {
               priority
             />
 
-            {typeof product.discount === "number" && product.discount > 0 && (
-              <span className="absolute right-5 top-5 rounded-full bg-[#E8BB44] px-3 py-1.5 text-sm font-bold text-[#001B08] shadow-sm">
-                -{product.discount}%
-              </span>
-            )}
+            {typeof product.discount === "number" &&
+              product.discount > 0 && (
+                <span className="absolute right-5 top-5 rounded-full bg-[#E8BB44] px-3 py-1.5 text-sm font-bold text-[#001B08] shadow-sm">
+                  -{product.discount}%
+                </span>
+              )}
           </div>
 
           {/* Product Information */}
