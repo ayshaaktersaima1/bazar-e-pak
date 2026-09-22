@@ -67,7 +67,6 @@ const RegisterPage = () => {
         email: data.email,
         password: data.password,
         name: data.name,
-        role: data.role,
         phoneNumber: data.phoneNumber,
       });
 
@@ -229,7 +228,7 @@ const RegisterPage = () => {
                 </h2>
 
                 <p className="mt-2 text-sm text-gray-600">
-                  Choose your role and get started
+                  Create your customer account and get started
                 </p>
               </div>
 
@@ -238,69 +237,15 @@ const RegisterPage = () => {
                 className="mt-7"
                 noValidate
               >
-                {/* Roles */}
-                <p className="mb-3 text-sm font-semibold text-[#001B08]">
-                  I want to register as
-                </p>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Customer */}
-                  <label className="cursor-pointer">
-                    <input
-                      type="radio"
-                      value="customer"
-                      className="peer hidden"
-                      {...register("role", {
-                        required: "Please select a role.",
-                      })}
-                    />
-
-                    <div className="h-full rounded-xl border-2 border-gray-200 p-4 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
-                      <FaUser className="mx-auto text-3xl text-[#001B08]" />
-
-                      <h3 className="mt-3 font-semibold text-[#001B08]">
-                        Customer
-                      </h3>
-
-                      <p className="mt-1 text-xs leading-5 text-gray-500">
-                        Shop products from stores
-                      </p>
-                    </div>
-                  </label>
-
-                  {/* Seller */}
-                  <label className="cursor-pointer">
-                    <input
-                      type="radio"
-                      value="seller"
-                      className="peer hidden"
-                      {...register("role", {
-                        required: "Please select a role.",
-                      })}
-                    />
-
-                    <div className="h-full rounded-xl border-2 border-gray-200 p-4 text-center transition peer-checked:border-[#001B08] peer-checked:bg-[#001B08]/5">
-                      <FaStore className="mx-auto text-3xl text-[#E8BB44]" />
-
-                      <h3 className="mt-3 font-semibold text-[#001B08]">
-                        Seller
-                      </h3>
-
-                      <p className="mt-1 text-xs leading-5 text-gray-500">
-                        Create and manage your store
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                {errors.role && (
-                  <p className="mt-2 text-sm text-red-500">
-                    {errors.role.message}
-                  </p>
-                )}
+                {/* Hidden Role */}
+                <input
+                  type="hidden"
+                  value="customer"
+                  {...register("role")}
+                />
 
                 {/* Name + Email */}
-                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                   <fieldset className="fieldset">
                     <legend className="fieldset-legend whitespace-nowrap text-[#001B08]">
                       Full Name
