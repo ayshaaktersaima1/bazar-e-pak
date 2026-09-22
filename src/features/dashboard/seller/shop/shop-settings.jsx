@@ -1,7 +1,10 @@
+// src/modules/shops/shop-settings.jsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
 import { useShop } from "../../../../hooks/use-shop";
 import ShopForm from "./shop-form";
 import ConfirmationModal from "../../../../components/shared/confirmation-modal";
@@ -9,27 +12,47 @@ import ConfirmationModal from "../../../../components/shared/confirmation-modal"
 export default function ShopSettings({ sellerId }) {
   const router = useRouter();
 
-  const { fetchShops, updateShop, deleteShop, loading, actionLoading } =
-    useShop();
+  const {
+    fetchShops,
+    updateShop,
+    deleteShop,
+    loading,
+    actionLoading,
+  } = useShop();
 
   const [shop, setShop] = useState(null);
+  const [loaded, setLoaded] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     if (!sellerId) return;
 
-    const loadShop = async () => {
-      const result = await fetchShops({
-        page: 1,
-        limit: 1,
-        sellerId,
-      });
+    let mounted = true;
 
-      setShop(result?.[0] || null);
+    const loadShop = async () => {
+      try {
+        const result = await fetchShops({
+          page: 1,
+          limit: 1,
+          sellerId,
+        });
+
+        if (mounted) {
+          setShop(result?.[0] || null);
+        }
+      } finally {
+        if (mounted) {
+          setLoaded(true);
+        }
+      }
     };
 
     loadShop();
-  }, [sellerId]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [sellerId, fetchShops]);
 
   const handleUpdate = async (data) => {
     if (!shop?._id) return;
@@ -55,10 +78,10 @@ export default function ShopSettings({ sellerId }) {
     }
   };
 
-  if (loading) {
+  if (!loaded || loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-7 w-7 animate-spin rounded-full border-2 border-zinc-200 border-t-[#002B12]" />
+      <div className="flex min-h-[500px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 border-t-[#002B12]" />
       </div>
     );
   }
@@ -66,8 +89,10 @@ export default function ShopSettings({ sellerId }) {
   if (!shop) {
     return (
       <div className="mx-auto max-w-4xl">
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-zinc-900">No Shop Found</h1>
+        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-lg font-semibold text-zinc-900">
+            No Shop Found
+          </h1>
 
           <p className="mt-2 text-sm text-zinc-500">
             You do not have a shop yet.
@@ -78,7 +103,7 @@ export default function ShopSettings({ sellerId }) {
             onClick={() => router.push("/dashboard/seller/shop")}
             className="mt-5 rounded-lg bg-[#002B12] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#001F0D]"
           >
-            Go to Shop
+            Create Shop
           </button>
         </div>
       </div>
@@ -87,16 +112,19 @@ export default function ShopSettings({ sellerId }) {
 
   return (
     <>
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="mx-auto max-w-5xl space-y-6">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">Shop Settings</h1>
+          <h1 className="text-xl font-semibold text-zinc-900">
+            Shop Settings
+          </h1>
 
           <p className="mt-1 text-sm text-zinc-500">
-            Update your shop information, contact details, and branding.
+            Update your shop information, contact details, location, and
+            branding.
           </p>
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
           <ShopForm
             initialData={shop}
             onSubmit={handleUpdate}
@@ -115,7 +143,9 @@ export default function ShopSettings({ sellerId }) {
         </div>
 
         <div className="rounded-xl border border-red-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-red-700">Danger Zone</h2>
+          <h2 className="text-base font-semibold text-red-700">
+            Danger Zone
+          </h2>
 
           <p className="mt-1 text-sm text-zinc-500">
             Permanently delete your shop and its shop information.

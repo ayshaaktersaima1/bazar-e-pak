@@ -1,6 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 const CategoryContext = createContext();
 
@@ -12,16 +17,26 @@ export const CategoryProvider = ({ children }) => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch(`${baseUrl}/api/categories`, {
-                method: "GET",
-                cache: "no-store",
-            });
+            if (!baseUrl) {
+                throw new Error(
+                    "NEXT_PUBLIC_SERVER_URL is not configured",
+                );
+            }
+
+            const response = await fetch(
+                `${baseUrl}/api/categories`,
+                {
+                    method: "GET",
+                    cache: "no-store",
+                },
+            );
 
             const data = await response.json();
 
             if (!response.ok || !data.success) {
                 throw new Error(
-                    data.message || "Failed to fetch categories"
+                    data.message ||
+                        "Failed to fetch categories",
                 );
             }
 
@@ -29,7 +44,10 @@ export const CategoryProvider = ({ children }) => {
 
             return data.data || [];
         } catch (error) {
-            console.error("Fetch categories error:", error);
+            console.error(
+                "Fetch categories error:",
+                error,
+            );
 
             setCategories([]);
 
@@ -40,11 +58,7 @@ export const CategoryProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const loadCategories = async () => {
-            await fetchCategories();
-        };
-
-        loadCategories();
+        fetchCategories();
     }, []);
 
     return (
@@ -64,7 +78,9 @@ export const useCategory = () => {
     const context = useContext(CategoryContext);
 
     if (!context) {
-        throw new Error("useCategory must be used inside CategoryProvider");
+        throw new Error(
+            "useCategory must be used inside CategoryProvider",
+        );
     }
 
     return context;
