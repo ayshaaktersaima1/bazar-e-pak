@@ -1,89 +1,71 @@
 "use client";
 
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const CategoryContext = createContext();
 
 export const CategoryProvider = ({ children }) => {
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const fetchCategories = async () => {
-        try {
-            if (!baseUrl) {
-                throw new Error(
-                    "NEXT_PUBLIC_SERVER_URL is not configured",
-                );
-            }
+  const fetchCategories = async () => {
+    try {
+      if (!baseUrl) {
+        throw new Error("NEXT_PUBLIC_SERVER_URL is not configured");
+      }
 
-            const response = await fetch(
-                `${baseUrl}/api/categories`,
-                {
-                    method: "GET",
-                    cache: "no-store",
-                },
-            );
+      const response = await fetch(`${baseUrl}/api/categories`, {
+        method: "GET",
+        cache: "no-store",
+      });
 
-            const data = await response.json();
+      const data = await response.json();
 
-            if (!response.ok || !data.success) {
-                throw new Error(
-                    data.message ||
-                        "Failed to fetch categories",
-                );
-            }
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to fetch categories");
+      }
 
-            setCategories(data.data || []);
+      setCategories(data.data || []);
 
-            return data.data || [];
-        } catch (error) {
-            console.error(
-                "Fetch categories error:",
-                error,
-            );
+      return data.data || [];
+    } catch (error) {
+      console.error("Fetch categories error:", error);
 
-            setCategories([]);
+      setCategories([]);
 
-            return [];
-        } finally {
-            setLoading(false);
-        }
-    };
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchCategories();
-    }, []);
+  useEffect(() => {
+    setTimeout(() => fetchCategories(), 0);
+  }, []);
 
-    return (
-        <CategoryContext.Provider
-            value={{
-                categories,
-                loading,
-                fetchCategories,
-            }}
-        >
-            {children}
-        </CategoryContext.Provider>
-    );
+  return (
+    <CategoryContext.Provider
+      value={{
+        categories,
+        loading,
+        fetchCategories,
+      }}
+    >
+      {children}
+    </CategoryContext.Provider>
+  );
 };
 
 export const useCategory = () => {
-    const context = useContext(CategoryContext);
+  const context = useContext(CategoryContext);
 
-    if (!context) {
-        throw new Error(
-            "useCategory must be used inside CategoryProvider",
-        );
-    }
+  if (!context) {
+    throw new Error("useCategory must be used inside CategoryProvider");
+  }
 
-    return context;
+  return context;
 };
 
 export default CategoryContext;
