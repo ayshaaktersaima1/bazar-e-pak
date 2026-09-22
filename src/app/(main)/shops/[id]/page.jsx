@@ -168,11 +168,19 @@ const ShopDetailsPage = async ({ params }) => {
                 </span>
               </div>
 
-              {shop.description && (
-                <p className="mt-6 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-gray-300 md:text-base">
-                  {shop.description}
-                </p>
-              )}
+             {shop.description && (
+  <div className="mt-6 max-w-2xl">
+    <p className="text-sm font-semibold text-white">
+      Description
+    </p>
+
+    <div className="mt-2 max-h-32 overflow-y-auto rounded-lg bg-white/5 p-3">
+      <p className="whitespace-pre-wrap break-words text-sm leading-7 text-gray-300 md:text-base">
+        {shop.description}
+      </p>
+    </div>
+  </div>
+)}
 
               {/* Services */}
               {shop.services?.length > 0 && (
