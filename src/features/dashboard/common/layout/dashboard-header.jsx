@@ -7,6 +7,7 @@ import { BiChevronRight } from "react-icons/bi";
 import { SidebarTrigger } from "./dashboard-sidebar";
 import { useSession } from "@/lib/auth-client";
 import AvatarDropdown from "@/components/shared/AvatarDropdown";
+import NotificationBell from "@/components/shared/NotificationBell";
 
 function buildCrumbs(pathname, labels) {
     const segments = pathname
@@ -53,6 +54,8 @@ export function DashboardHeader({
 
     const { data: session } =
         useSession();
+
+    const role = session?.user?.role;
 
     return (
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-[#D9A928]/20 bg-white/95 px-4 backdrop-blur">
@@ -107,6 +110,8 @@ export function DashboardHeader({
                     {actions}
                 </div>
             )}
+
+            <NotificationBell role={role} />
 
             <AvatarDropdown
                 variant="dashboard"

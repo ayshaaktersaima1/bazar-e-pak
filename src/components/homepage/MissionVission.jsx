@@ -13,11 +13,11 @@ const MissionVission = ({ cmsItem = null }) => {
 
   const founderImage =
     content.founderImage ||
-    "/images/owner.png";
+    "/images/ceo-bep.png";
 
   const founderName =
     content.founderName ||
-    "Monkey Ali Zinna";
+    "MR BAZAR E PAK";
 
   const founderRole =
     content.founderRole ||
