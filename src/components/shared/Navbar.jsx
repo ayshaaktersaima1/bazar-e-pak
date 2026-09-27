@@ -18,266 +18,502 @@ import useApi from "@/hooks/use-api";
 import { navLinks, authNavLinks } from "@/data/navbar";
 
 const Navbar = ({ needAuth = true }) => {
-  const { data: session } = useSession();
-  const user = session?.user;
+    const { data: session } = useSession();
+    const user = session?.user;
 
-  const { categories } = useCategory();
-  const api = useApi();
+    const { categories } = useCategory();
+    const api = useApi();
 
-  const [whatsappNumber, setWhatsappNumber] = useState("923260882255");
+    const [whatsappNumber, setWhatsappNumber] =
+        useState("923260882255");
 
-  const pathname = usePathname();
-  const navbarRef = useRef(null);
+    const pathname = usePathname();
+    const navbarRef = useRef(null);
 
-  const activeLinkClass =
-    "rounded-none border-b border-[#E8BB44] text-[#E8BB44]";
+    const activeLinkClass =
+        "border-b border-[#E8BB44] text-[#E8BB44]";
 
-  const defaultLinkClass =
-    "rounded-none border-b border-transparent text-white";
+    const defaultLinkClass =
+        "border-b border-transparent text-white";
 
-  const getLinkClass = (href) =>
-    pathname === href ? activeLinkClass : defaultLinkClass;
+    const getLinkClass = (href) =>
+        pathname === href
+            ? activeLinkClass
+            : defaultLinkClass;
 
-  const isCollectionActive = pathname?.startsWith("/collection");
-  const isShopsActive = pathname?.startsWith("/shops");
+    const isCollectionActive =
+        pathname?.startsWith("/collection");
 
-  const closeDropdowns = () => {
-    document.activeElement?.blur();
+    const isShopsActive =
+        pathname?.startsWith("/shops");
 
-    navbarRef.current?.querySelectorAll("details[open]")?.forEach((details) => {
-      details.removeAttribute("open");
-    });
-  };
+    const closeDropdowns = () => {
+        document.activeElement?.blur();
 
-  useEffect(() => {
-    closeDropdowns();
-  }, [pathname]);
+        navbarRef.current
+            ?.querySelectorAll("details[open]")
+            ?.forEach((details) => {
+                details.removeAttribute("open");
+            });
+    };
 
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (!navbarRef.current?.contains(event.target)) {
+    useEffect(() => {
         closeDropdowns();
-      }
-    };
+    }, [pathname]);
 
-    document.addEventListener("mousedown", handleOutsideClick);
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (
+                !navbarRef.current?.contains(
+                    event.target,
+                )
+            ) {
+                closeDropdowns();
+            }
+        };
 
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
+        document.addEventListener(
+            "mousedown",
+            handleOutsideClick,
+        );
 
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      const result = await api.get(
-        "/api/settings/public",
-        {},
-        {
-          auth: false,
-          showError: false,
+        return () => {
+            document.removeEventListener(
+                "mousedown",
+                handleOutsideClick,
+            );
+        };
+    }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            const result = await api.get(
+                "/api/settings/public",
+                {},
+                {
+                    auth: false,
+                    showError: false,
+                },
+            );
+
+            if (
+                !result?.success ||
+                !Array.isArray(result.data)
+            ) {
+                return;
+            }
+
+            const contactSetting =
+                result.data.find(
+                    (item) => item.key === "contact",
+                );
+
+            const savedWhatsapp =
+                contactSetting?.value?.whatsapp;
+
+            if (!savedWhatsapp) return;
+
+            const cleaned = String(savedWhatsapp)
+                .replace(/\s+/g, "")
+                .replace(/-/g, "")
+                .replace(/\+/g, "");
+
+            if (cleaned.startsWith("0")) {
+                setWhatsappNumber(
+                    `92${cleaned.slice(1)}`,
+                );
+            } else {
+                setWhatsappNumber(cleaned);
+            }
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    const visibleNavLinks = navLinks.filter(
+        (link) => {
+            if (link.auth === "authenticated") {
+                return !!user;
+            }
+
+            if (link.auth === "guest") {
+                return !user;
+            }
+
+            return true;
         },
-      );
+    );
 
-      if (!result?.success || !Array.isArray(result.data)) return;
+    const visibleAuthLinks = needAuth
+        ? authNavLinks.filter((link) => {
+              if (link.auth === "guest") {
+                  return !user;
+              }
 
-      const contactSetting = result.data.find(
-        (item) => item.key === "contact",
-      );
+              if (
+                  link.auth === "authenticated"
+              ) {
+                  return !!user;
+              }
 
-      const savedWhatsapp = contactSetting?.value?.whatsapp;
+              return true;
+          })
+        : [];
 
-      if (!savedWhatsapp) return;
-
-      const cleaned = String(savedWhatsapp)
-        .replace(/\s+/g, "")
-        .replace(/-/g, "")
-        .replace(/\+/g, "");
-
-      if (cleaned.startsWith("0")) {
-        setWhatsappNumber(`92${cleaned.slice(1)}`);
-      } else {
-        setWhatsappNumber(cleaned);
-      }
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const visibleNavLinks = navLinks.filter((link) => {
-    if (link.auth === "authenticated") return !!user;
-    if (link.auth === "guest") return !user;
-
-    return true;
-  });
-
-  const visibleAuthLinks = needAuth
-    ? authNavLinks.filter((link) => {
-      if (link.auth === "guest") return !user;
-      if (link.auth === "authenticated") return !!user;
-
-      return true;
-    })
-    : [];
-
-  const renderNavItems = (isMobile = false) => (
-    <>
-      {visibleNavLinks.map((link) => (
-        <li key={link.href}>
-          <Link
-            href={link.href}
-            onClick={closeDropdowns}
-            className={
-              link.href === "/shops"
-                ? isShopsActive
-                  ? activeLinkClass
-                  : defaultLinkClass
-                : getLinkClass(link.href)
-            }
-          >
-            {link.label}
-          </Link>
-        </li>
-      ))}
-
-      {/* Categories */}
-      <li>
-        <details>
-          <summary
-            className={
-              isCollectionActive
-                ? activeLinkClass
-                : defaultLinkClass
-            }
-          >
-            Categories
-          </summary>
-
-          <ul
-            className={
-              isMobile
-                ? "mt-2 gap-2 bg-[#001B08] p-2"
-                : "z-50 mt-3 w-60 gap-2 rounded-md bg-[#001B08] p-3 text-base shadow-lg"
-            }
-          >
-            {categories?.map((category) => (
-              <li key={category?._id}>
-                <Link
-                  href={`/collection/${category?.slug}`}
-                  onClick={closeDropdowns}
-                  className={
-                    pathname === `/collection/${category?.slug}`
-                      ? "rounded-md bg-[#E8BB44] text-[#001B08]"
-                      : "rounded-md text-white"
-                  }
-                >
-                  {category?.name}
-                </Link>
-              </li>
+    const renderNavItems = (isMobile = false) => (
+        <>
+            {visibleNavLinks.map((link) => (
+                <li key={link.href}>
+                    <Link
+                        href={link.href}
+                        onClick={closeDropdowns}
+                        className={`
+                            ${link.href === "/shops"
+                                ? isShopsActive
+                                    ? activeLinkClass
+                                    : defaultLinkClass
+                                : getLinkClass(link.href)}
+                            block
+                            rounded-none
+                            px-2
+                            py-2
+                            transition-colors
+                            duration-200
+                            hover:text-[#E8BB44]
+                        `}
+                    >
+                        {link.label}
+                    </Link>
+                </li>
             ))}
-          </ul>
-        </details>
-      </li>
 
-      {/* Auth Links */}
-      {visibleAuthLinks.map((link) => (
-        <li key={link.href}>
-          <Link
-            href={link.href}
-            onClick={closeDropdowns}
-            className={getLinkClass(link.href)}
-          >
-            {link.label}
-          </Link>
-        </li>
-      ))}
-    </>
-  );
+            {/* Categories */}
+            <li>
+                <details>
+                    <summary
+                        className={`
+                            cursor-pointer
+                            rounded-none
+                            px-2
+                            py-2
+                            transition-colors
+                            duration-200
+                            hover:text-[#E8BB44]
+                            ${
+                                isCollectionActive
+                                    ? activeLinkClass
+                                    : defaultLinkClass
+                            }
+                        `}
+                    >
+                        Categories
+                    </summary>
 
-  return (
-    <nav
-      ref={navbarRef}
-      className="sticky top-0 z-50 bg-[#001B08] text-white"
-    >
-      <div className="mx-auto flex min-h-20 w-[92%] max-w-[1600px] items-center justify-between gap-2 py-1.5 sm:gap-3 lg:gap-4">
+                    <ul
+                        className={
+                            isMobile
+                                ? "mt-2 max-h-72 gap-1 overflow-y-auto rounded-md bg-[#001B08] p-2"
+                                : "z-50 mt-3 max-h-[70vh] w-60 gap-1 overflow-y-auto rounded-md bg-[#001B08] p-3 text-base shadow-xl"
+                        }
+                    >
+                        {categories?.map(
+                            (category) => (
+                                <li
+                                    key={
+                                        category?._id
+                                    }
+                                >
+                                    <Link
+                                        href={`/collection/${category?.slug}`}
+                                        onClick={
+                                            closeDropdowns
+                                        }
+                                        className={`
+                                            block
+                                            rounded-md
+                                            px-3
+                                            py-2
+                                            transition-colors
+                                            duration-200
+                                            ${
+                                                pathname ===
+                                                `/collection/${category?.slug}`
+                                                    ? "bg-[#E8BB44] text-[#001B08]"
+                                                    : "text-white hover:bg-white/10 hover:text-[#E8BB44]"
+                                            }
+                                        `}
+                                    >
+                                        {
+                                            category?.name
+                                        }
+                                    </Link>
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </details>
+            </li>
 
-        {/* Logo + Mobile Menu */}
-        <div className="flex min-w-0 shrink-0 items-center">
-          <div className="dropdown lg:hidden">
+            {/* Auth Links */}
+            {visibleAuthLinks.map((link) => (
+                <li key={link.href}>
+                    <Link
+                        href={link.href}
+                        onClick={closeDropdowns}
+                        className={`
+                            ${getLinkClass(link.href)}
+                            block
+                            rounded-none
+                            px-2
+                            py-2
+                            transition-colors
+                            duration-200
+                            hover:text-[#E8BB44]
+                        `}
+                    >
+                        {link.label}
+                    </Link>
+                </li>
+            ))}
+        </>
+    );
+
+    return (
+        <nav
+            ref={navbarRef}
+            className="sticky top-0 z-50 w-full bg-[#001B08] text-white"
+        >
             <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost h-10 min-h-10 w-10 px-0 text-white sm:h-11 sm:min-h-11 sm:w-11"
+                className="
+                    mx-auto
+                    flex
+                    min-h-16
+                    w-full
+                    max-w-[1600px]
+                    items-center
+                    gap-2
+                    px-3
+                    sm:min-h-[72px]
+                    sm:px-4
+                    md:px-5
+                    lg:min-h-20
+                    lg:px-6
+                    xl:px-8
+                    2xl:px-10
+                "
             >
-              <FaBars className="text-lg sm:text-xl" />
+                {/* ==================== */}
+                {/* Logo + Mobile Menu */}
+                {/* ==================== */}
+
+                <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+                    {/* Mobile Menu */}
+                    <div className="dropdown lg:hidden">
+                        <div
+                            tabIndex={0}
+                            role="button"
+                            aria-label="Open navigation menu"
+                            className="
+                                btn
+                                btn-ghost
+                                h-10
+                                min-h-10
+                                w-10
+                                px-0
+                                text-white
+                                hover:bg-white/10
+                                sm:h-11
+                                sm:min-h-11
+                                sm:w-11
+                            "
+                        >
+                            <FaBars className="text-lg sm:text-xl" />
+                        </div>
+
+                        <ul
+                            tabIndex={0}
+                            className="
+                                menu
+                                menu-sm
+                                dropdown-content
+                                left-0
+                                z-50
+                                mt-3
+                                w-[calc(100vw-24px)]
+                                max-w-[360px]
+                                gap-1
+                                rounded-lg
+                                border
+                                border-white/10
+                                bg-[#001B08]
+                                p-3
+                                text-base
+                                shadow-2xl
+                                sm:w-[360px]
+                                sm:p-4
+                            "
+                        >
+                            <li className="mb-2 block">
+                                <ProductSearch />
+                            </li>
+
+                            {renderNavItems(true)}
+                        </ul>
+                    </div>
+
+                    {/* Logo */}
+                    <Link
+                        href="/"
+                        onClick={closeDropdowns}
+                        className="block shrink-0"
+                    >
+                        <Image
+                            src="/images/logo.webp"
+                            alt="Bazaar E Pak"
+                            width={110}
+                            height={110}
+                            className="
+                                h-12
+                                w-12
+                                object-contain
+                                sm:h-14
+                                sm:w-14
+                                md:h-16
+                                md:w-16
+                                lg:h-[72px]
+                                lg:w-[72px]
+                                xl:h-20
+                                xl:w-20
+                            "
+                            priority
+                        />
+                    </Link>
+                </div>
+
+                {/* ==================== */}
+                {/* Desktop Navigation */}
+                {/* ==================== */}
+
+                <div
+                    className="
+                        hidden
+                        min-w-0
+                        flex-1
+                        items-center
+                        justify-center
+                        lg:flex
+                    "
+                >
+                    <ul
+                        className="
+                            menu
+                            menu-horizontal
+                            flex-nowrap
+                            items-center
+                            justify-center
+                            gap-1
+                            whitespace-nowrap
+                            px-0
+                            text-sm
+                            font-medium
+                            xl:gap-2
+                            xl:text-base
+                            2xl:gap-3
+                            2xl:text-lg
+                        "
+                    >
+                        {renderNavItems(false)}
+                    </ul>
+                </div>
+
+                {/* ==================== */}
+                {/* Right Actions */}
+                {/* ==================== */}
+
+                <div
+                    className="
+                        flex
+                        shrink-0
+                        items-center
+                        justify-end
+                        gap-1
+                        sm:gap-2
+                    "
+                >
+                    {/* Desktop Search */}
+                    <div
+                        className="
+                            hidden
+                            min-w-0
+                            lg:block
+                            lg:w-[160px]
+                            xl:w-[200px]
+                            2xl:w-[240px]
+                        "
+                    >
+                        <ProductSearch />
+                    </div>
+
+                    {/* WhatsApp */}
+                    <AnalyticsLink
+                        href={`https://wa.me/${whatsappNumber}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        eventType="WHATSAPP_CLICK"
+                        source="navbar"
+                        className="
+                            btn
+                            btn-circle
+                            btn-ghost
+                            h-9
+                            min-h-9
+                            w-9
+                            shrink-0
+                            px-0
+                            text-[#E8BB44]
+                            hover:bg-white/10
+                            sm:h-10
+                            sm:min-h-10
+                            sm:w-10
+                            md:h-11
+                            md:min-h-11
+                            md:w-11
+                        "
+                        aria-label="Contact on WhatsApp"
+                    >
+                        <FaWhatsapp className="text-lg sm:text-xl md:text-2xl" />
+                    </AnalyticsLink>
+
+                    {/* Cart */}
+                    <div
+                        className="
+                            flex
+                            h-9
+                            w-9
+                            shrink-0
+                            items-center
+                            justify-center
+                            sm:h-10
+                            sm:w-10
+                            md:h-11
+                            md:w-11
+                        "
+                    >
+                        <CartButton />
+                    </div>
+
+                    {/* User */}
+                    {user && (
+                        <div className="shrink-0">
+                            <AvatarDropdown
+                                user={user}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
-
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content z-50 mt-3 w-[calc(100vw-32px)] max-w-72 gap-2 rounded-md bg-[#001B08] p-4 text-base shadow-lg sm:text-lg"
-            >
-              <li className="mb-2 block">
-                <ProductSearch />
-              </li>
-
-              {renderNavItems(true)}
-            </ul>
-          </div>
-
-          <Link
-            href="/"
-            onClick={closeDropdowns}
-            className="block shrink-0"
-          >
-            <Image
-              src="/images/logo.webp"
-              alt="Bazaar E Pak"
-              width={110}
-              height={110}
-              className="h-14 w-14 object-contain sm:h-16 sm:w-16 md:h-[72px] md:w-[72px] lg:h-20 lg:w-20 xl:h-24 xl:w-24"
-              priority
-            />
-          </Link>
-        </div>
-
-        {/* Desktop Navigation */}
-        <div className="hidden min-w-0 flex-1 justify-center lg:flex">
-          <ul className="menu menu-horizontal flex-nowrap items-center gap-2 whitespace-nowrap px-0 text-sm font-medium xl:gap-4 xl:text-base 2xl:gap-5 2xl:text-lg">
-            {renderNavItems(false)}
-          </ul>
-        </div>
-
-        {/* Right Actions */}
-        <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
-
-          {/* Search */}
-          <div className="hidden w-[180px] shrink-0 lg:block xl:w-[220px] 2xl:w-[250px]">
-            <ProductSearch />
-          </div>
-
-          {/* WhatsApp */}
-          <AnalyticsLink
-            href={`https://wa.me/${whatsappNumber}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            eventType="WHATSAPP_CLICK"
-            source="navbar"
-            className="btn btn-circle btn-ghost h-10 min-h-10 w-10 shrink-0 px-0 text-[#E8BB44] sm:h-11 sm:min-h-11 sm:w-11"
-            aria-label="Contact on WhatsApp"
-          >
-            <FaWhatsapp className="text-xl sm:text-2xl" />
-          </AnalyticsLink>
-
-          {/* Cart */}
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center sm:h-11 sm:w-11">
-            <CartButton />
-          </div>
-
-          {/* User */}
-          {user && <AvatarDropdown user={user} />}
-        </div>
-      </div>
-    </nav>
-  );
+        </nav>
+    );
 };
 
 export default Navbar;
