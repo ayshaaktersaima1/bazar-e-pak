@@ -73,17 +73,12 @@ export const dashboardNav = {
             items: [
                 {
                     label: "Analytics",
-                    href: "/dashboard/admin/analytics",
+                    href: "/dashboard/seller/analytics",
                     icon: BarChart3,
                     permission: "analytics.view",
                 },
 
-                {
-                    label: "Search Analytics",
-                    href: "/dashboard/admin/search-analytics",
-                    icon: Search,
-                    permission: "analytics.view",
-                },
+        
             ],
         },
 
