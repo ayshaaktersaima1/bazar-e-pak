@@ -1,5 +1,4 @@
 import { auth } from "@/lib/auth";
-import { getData } from "@/lib/api";
 import { serverApi } from "@/lib/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -19,18 +18,46 @@ const AdminProductsPage = async () => {
         redirect("/login");
     }
 
-    const { token } =
-        await auth.api.getToken({
-            headers: requestHeaders,
-        });
+    const params = new URLSearchParams();
 
-    const users = await getData(
-        "/api/users",
-        token,
+    params.set(
+        "search",
+        session.user.email,
     );
 
+    params.set(
+        "role",
+        "admin",
+    );
+
+    params.set(
+        "limit",
+        "10",
+    );
+
+    const adminResponse =
+        await serverApi.get(
+            `/api/users?${params.toString()}`,
+            {},
+            {
+                auth: true,
+                includeMeta: true,
+            },
+        );
+
+    const adminUsers =
+        Array.isArray(
+            adminResponse?.data,
+        )
+            ? adminResponse.data
+            : Array.isArray(
+                adminResponse,
+            )
+                ? adminResponse
+                : [];
+
     const currentUser =
-        users.find(
+        adminUsers.find(
             (user) =>
                 String(user._id) ===
                 String(
@@ -44,8 +71,7 @@ const AdminProductsPage = async () => {
         session.user.role;
 
     const permissions =
-        currentUser?.permissions ??
-        [];
+        currentUser?.permissions ?? [];
 
     const canViewProducts =
         role === "super_admin" ||
@@ -65,15 +91,28 @@ const AdminProductsPage = async () => {
             "products.delete",
         );
 
-    const productResponse =
-        await serverApi.get(
+    const [
+        productResponse,
+        categoryResponse,
+    ] = await Promise.all([
+        serverApi.get(
             "/api/products?page=1&limit=20",
             {},
             {
                 auth: true,
                 includeMeta: true,
             },
-        );
+        ),
+
+        serverApi.get(
+            "/api/categories?status=active&page=1&limit=100",
+            {},
+            {
+                auth: false,
+                includeMeta: true,
+            },
+        ),
+    ]);
 
     return (
         <div className="bg-[#F7F5EF] p-6">
@@ -93,12 +132,13 @@ const AdminProductsPage = async () => {
 
             <AllProductsTable
                 initialProducts={
-                    productResponse?.data ??
-                    []
+                    productResponse?.data ?? []
                 }
                 initialPagination={
-                    productResponse?.pagination ??
-                    {}
+                    productResponse?.pagination ?? {}
+                }
+                categories={
+                    categoryResponse?.data ?? []
                 }
                 canDelete={
                     canDeleteProducts

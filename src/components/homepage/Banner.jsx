@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaCheck, FaWhatsapp } from "react-icons/fa";
 
-const products = [
+const fallbackSlides = [
     {
         id: 1,
         name: "Berry and Acacia Honey",
@@ -23,20 +23,80 @@ const products = [
     },
 ];
 
-const Banner = () => {
-    const [currentProduct, setCurrentProduct] = useState(0);
+const Banner = ({ cmsItem = null }) => {
+    const content = cmsItem?.content ?? {};
+
+    const slides = useMemo(() => {
+        if (
+            Array.isArray(content.slides) &&
+            content.slides.length > 0
+        ) {
+            return content.slides;
+        }
+
+        return fallbackSlides;
+    }, [content.slides]);
+
+    const [currentProduct, setCurrentProduct] =
+        useState(0);
 
     useEffect(() => {
+        if (slides.length <= 1) {
+            return;
+        }
+
         const interval = setInterval(() => {
-            setCurrentProduct((previousProduct) =>
-                previousProduct === products.length - 1
-                    ? 0
-                    : previousProduct + 1
+            setCurrentProduct(
+                (previousProduct) =>
+                    previousProduct ===
+                        slides.length - 1
+                        ? 0
+                        : previousProduct + 1,
             );
         }, 3500);
 
-        return () => clearInterval(interval);
-    }, []);
+        return () => {
+            clearInterval(interval);
+        };
+    }, [slides.length]);
+
+    const eyebrow =
+        content.eyebrow ||
+        "Trusted Digital Marketplace";
+
+    const headline =
+        content.headline ||
+        "Your Trusted Marketplace For Every Need";
+
+    const description =
+        content.description ||
+        "From premium honey and fragrances to mobile accessories and office furniture, Bazaar E Pak brings trusted products together in one place.";
+
+    const primaryButtonText =
+        content.primaryButtonText ||
+        "Explore Products";
+
+    const primaryButtonLink =
+        content.primaryButtonLink ||
+        "/products";
+
+    const secondaryButtonText =
+        content.secondaryButtonText ||
+        "Contact Us";
+
+    const secondaryButtonLink =
+        content.secondaryButtonLink ||
+        "https://wa.me/923260882255";
+
+    const benefits =
+        Array.isArray(content.benefits) &&
+            content.benefits.length > 0
+            ? content.benefits
+            : [
+                "Premium Quality",
+                "Fast Delivery",
+                "Trusted Sellers",
+            ];
 
     return (
         <section className="overflow-hidden bg-[url('/images/banner-bg.png')] bg-cover bg-center bg-no-repeat">
@@ -44,79 +104,105 @@ const Banner = () => {
                 {/* Left Content */}
                 <div className="text-white">
                     <p className="mb-3 text-base font-medium uppercase tracking-widest text-[#E8BB44] md:text-lg lg:text-base xl:text-lg">
-                        Trusted Digital Marketplace
+                        {eyebrow}
                     </p>
 
                     <h1 className="text-4xl font-bold leading-tight md:text-5xl lg:text-4xl xl:text-5xl">
-                        Your Trusted{" "}
-                        <span className="text-[#E8BB44]">
-                            Marketplace
-                        </span>{" "}
-                        For Every Need
+                        {headline}
                     </h1>
 
                     <p className="mt-6 max-w-xl text-base leading-7 text-gray-200 md:text-lg md:leading-8 lg:mt-4 lg:text-base lg:leading-7 xl:mt-6 xl:text-lg xl:leading-8">
-                        From premium honey and fragrances to mobile accessories
-                        and office furniture, Bazaar E Pak brings trusted
-                        products together in one place.
+                        {description}
                     </p>
 
                     <div className="mt-8 flex flex-wrap gap-4 lg:mt-6 xl:mt-8">
                         <Link
-                            href="/products"
+                            href={primaryButtonLink}
                             className="rounded-md bg-[#E8BB44] px-6 py-3 font-semibold text-[#001B08] transition duration-300 hover:bg-white lg:px-5 lg:py-2.5 lg:text-sm xl:px-6 xl:py-3 xl:text-base"
                         >
-                            Explore Products
+                            {primaryButtonText}
                         </Link>
 
                         <Link
-                            href="https://wa.me/923260882255"
-                            target="_blank"
+                            href={secondaryButtonLink}
+                            target={
+                                secondaryButtonLink.startsWith(
+                                    "http",
+                                )
+                                    ? "_blank"
+                                    : undefined
+                            }
+                            rel={
+                                secondaryButtonLink.startsWith(
+                                    "http",
+                                )
+                                    ? "noopener noreferrer"
+                                    : undefined
+                            }
                             className="flex items-center gap-2 rounded-md border border-[#E8BB44] px-6 py-3 font-semibold text-[#E8BB44] transition duration-300 hover:bg-[#E8BB44] hover:text-[#001B08] lg:px-5 lg:py-2.5 lg:text-sm xl:px-6 xl:py-3 xl:text-base"
                         >
                             <FaWhatsapp className="text-xl" />
-                            Contact Us
+
+                            {secondaryButtonText}
                         </Link>
                     </div>
 
                     <div className="mt-8 flex flex-wrap gap-6 text-sm md:text-base lg:mt-6 lg:gap-4 lg:text-sm xl:mt-8 xl:gap-6 xl:text-base">
-                        <div className="flex items-center gap-2">
-                            <FaCheck className="text-[#E8BB44]" />
-                            <span>Premium Quality</span>
-                        </div>
+                        {benefits.map(
+                            (benefit, index) => (
+                                <div
+                                    key={`${benefit}-${index}`}
+                                    className="flex items-center gap-2"
+                                >
+                                    <FaCheck className="text-[#E8BB44]" />
 
-                        <div className="flex items-center gap-2">
-                            <FaCheck className="text-[#E8BB44]" />
-                            <span>Fast Delivery</span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <FaCheck className="text-[#E8BB44]" />
-                            <span>Trusted Sellers</span>
-                        </div>
+                                    <span>
+                                        {benefit}
+                                    </span>
+                                </div>
+                            ),
+                        )}
                     </div>
                 </div>
 
                 {/* Changing Product Image */}
                 <div className="relative h-80 translate-y-6 md:h-96 lg:h-80 lg:translate-x-9 lg:translate-y-10 xl:h-96 xl:translate-x-14 xl:translate-y-20">
-                    {products.map((product, index) => (
-                        <div
-                            key={product._id}
-                            className={`absolute inset-0 flex items-end justify-center transition-all duration-700 ease-in-out ${currentProduct === index
-                                ? "translate-x-0 opacity-100"
-                                : "translate-x-full opacity-0"
-                                }`}
-                        >
-                            <Image
-                                src={product.image}
-                                alt={product.name}
-                                width={700}
-                                height={600}
-                                className="h-full w-full scale-110 object-contain md:scale-125 lg:scale-105 xl:scale-125"
-                                priority={index === 0}
-                            />
-                        </div>
-                    ))}
+                    {slides.map(
+                        (slide, index) => (
+                            <div
+                                key={
+                                    slide._id ||
+                                    slide.id ||
+                                    `${slide.image}-${index}`
+                                }
+                                className={`absolute inset-0 flex items-end justify-center transition-all duration-700 ease-in-out ${currentProduct ===
+                                        index
+                                        ? "translate-x-0 opacity-100"
+                                        : "translate-x-full opacity-0"
+                                    }`}
+                            >
+                                {slide.image && (
+                                    <Image
+                                        src={
+                                            slide.image
+                                        }
+                                        alt={
+                                            slide.name ||
+                                            slide.alt ||
+                                            "Banner"
+                                        }
+                                        width={700}
+                                        height={600}
+                                        className="h-full w-full scale-110 object-contain md:scale-125 lg:scale-105 xl:scale-125"
+                                        priority={
+                                            index ===
+                                            0
+                                        }
+                                    />
+                                )}
+                            </div>
+                        ),
+                    )}
                 </div>
             </div>
         </section>

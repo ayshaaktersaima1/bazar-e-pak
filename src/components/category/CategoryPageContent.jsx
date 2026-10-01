@@ -27,7 +27,7 @@ const CategoryPageContent = ({ category, categoryInfo }) => {
                         </div>
                     </div>
 
-                    <CategoryProducts categorySlug={category} />
+                    <CategoryProducts categoryId={categoryInfo?._id} />
                 </div>
             </section>
         </main>

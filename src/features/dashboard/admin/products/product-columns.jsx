@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Trash2 } from "lucide-react";
 
 const ProductColumns = ({
+    categories = [],
     onDelete,
     canDelete = false,
 }) => {
@@ -42,9 +43,15 @@ const ProductColumns = ({
                         </p>
 
                         <p className="text-xs text-[#667085]">
-                            {product
-                                .categoryId
-                                ?.name ||
+                            {product.categoryId?.name ||
+                                categories.find(
+                                    (category) =>
+                                        String(category._id) ===
+                                        String(
+                                            product.categoryId?._id ||
+                                            product.categoryId,
+                                        ),
+                                )?.name ||
                                 "Uncategorized"}
                         </p>
                     </div>
@@ -123,9 +130,9 @@ const ProductColumns = ({
             render: (product) => (
                 <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${product.status ===
-                            "active"
-                            ? "bg-[#DCFCE7] text-[#166534]"
-                            : "bg-[#F3F4F6] text-[#667085]"
+                        "active"
+                        ? "bg-[#DCFCE7] text-[#166534]"
+                        : "bg-[#F3F4F6] text-[#667085]"
                         }`}
                 >
                     {product.status}
@@ -140,8 +147,8 @@ const ProductColumns = ({
             render: (product) => (
                 <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${product.isFeatured
-                            ? "bg-[#FEF3C7] text-[#92400E]"
-                            : "bg-[#F3F4F6] text-[#667085]"
+                        ? "bg-[#FEF3C7] text-[#92400E]"
+                        : "bg-[#F3F4F6] text-[#667085]"
                         }`}
                 >
                     {product.isFeatured

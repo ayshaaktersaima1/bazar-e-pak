@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaBars, FaWhatsapp } from "react-icons/fa";
+import Marquee from "react-fast-marquee";
 
 import CartButton from "./CartButton";
 import ProductSearch from "./ProductSearch";
@@ -26,6 +27,8 @@ const Navbar = ({ needAuth = true }) => {
 
     const [whatsappNumber, setWhatsappNumber] =
         useState("923260882255");
+
+    const [offers, setOffers] = useState([]);
 
     const pathname = usePathname();
     const navbarRef = useRef(null);
@@ -130,6 +133,28 @@ const Navbar = ({ needAuth = true }) => {
         return () => clearTimeout(timer);
     }, []);
 
+    useEffect(() => {
+        const fetchOffers = async () => {
+            const result = await api.get(
+                "/api/offers/active",
+                {},
+                {
+                    auth: false,
+                    showError: false,
+                },
+            );
+
+            if (
+                result?.success &&
+                Array.isArray(result.data)
+            ) {
+                setOffers(result.data);
+            }
+        };
+
+        fetchOffers();
+    }, []);
+
     const visibleNavLinks = navLinks.filter(
         (link) => {
             if (link.auth === "authenticated") {
@@ -146,18 +171,18 @@ const Navbar = ({ needAuth = true }) => {
 
     const visibleAuthLinks = needAuth
         ? authNavLinks.filter((link) => {
-              if (link.auth === "guest") {
-                  return !user;
-              }
+            if (link.auth === "guest") {
+                return !user;
+            }
 
-              if (
-                  link.auth === "authenticated"
-              ) {
-                  return !!user;
-              }
+            if (
+                link.auth === "authenticated"
+            ) {
+                return !!user;
+            }
 
-              return true;
-          })
+            return true;
+        })
         : [];
 
     const renderNavItems = (isMobile = false) => (
@@ -172,14 +197,9 @@ const Navbar = ({ needAuth = true }) => {
                                 ? isShopsActive
                                     ? activeLinkClass
                                     : defaultLinkClass
-                                : getLinkClass(link.href)}
-                            block
-                            rounded-none
-                            px-2
-                            py-2
-                            transition-colors
-                            duration-200
-                            hover:text-[#E8BB44]
+                                : getLinkClass(link.href)
+                            }
+                            block rounded-none px-2 py-2 transition-colors duration-200 hover:text-[#E8BB44]
                         `}
                     >
                         {link.label}
@@ -192,17 +212,10 @@ const Navbar = ({ needAuth = true }) => {
                 <details>
                     <summary
                         className={`
-                            cursor-pointer
-                            rounded-none
-                            px-2
-                            py-2
-                            transition-colors
-                            duration-200
-                            hover:text-[#E8BB44]
-                            ${
-                                isCollectionActive
-                                    ? activeLinkClass
-                                    : defaultLinkClass
+                            cursor-pointer rounded-none px-2 py-2 transition-colors duration-200 hover:text-[#E8BB44]
+                            ${isCollectionActive
+                                ? activeLinkClass
+                                : defaultLinkClass
                             }
                         `}
                     >
@@ -229,17 +242,11 @@ const Navbar = ({ needAuth = true }) => {
                                             closeDropdowns
                                         }
                                         className={`
-                                            block
-                                            rounded-md
-                                            px-3
-                                            py-2
-                                            transition-colors
-                                            duration-200
-                                            ${
-                                                pathname ===
+                                            block rounded-md px-3 py-2 transition-colors duration-200
+                                            ${pathname ===
                                                 `/collection/${category?.slug}`
-                                                    ? "bg-[#E8BB44] text-[#001B08]"
-                                                    : "text-white hover:bg-white/10 hover:text-[#E8BB44]"
+                                                ? "bg-[#E8BB44] text-[#001B08]"
+                                                : "text-white hover:bg-white/10 hover:text-[#E8BB44]"
                                             }
                                         `}
                                     >
@@ -262,13 +269,7 @@ const Navbar = ({ needAuth = true }) => {
                         onClick={closeDropdowns}
                         className={`
                             ${getLinkClass(link.href)}
-                            block
-                            rounded-none
-                            px-2
-                            py-2
-                            transition-colors
-                            duration-200
-                            hover:text-[#E8BB44]
+                            block rounded-none px-2 py-2 transition-colors duration-200 hover:text-[#E8BB44]
                         `}
                     >
                         {link.label}
@@ -283,25 +284,29 @@ const Navbar = ({ needAuth = true }) => {
             ref={navbarRef}
             className="sticky top-0 z-50 w-full bg-[#001B08] text-white"
         >
-            <div
-                className="
-                    mx-auto
-                    flex
-                    min-h-16
-                    w-full
-                    max-w-[1600px]
-                    items-center
-                    gap-2
-                    px-3
-                    sm:min-h-[72px]
-                    sm:px-4
-                    md:px-5
-                    lg:min-h-20
-                    lg:px-6
-                    xl:px-8
-                    2xl:px-10
-                "
-            >
+            {offers.length > 0 && (
+                <div className="bg-[#E8BB44] py-2 text-[#001B08]">
+                    <Marquee
+                        speed={70}
+                        pauseOnHover
+                        gradient={false}
+                    >
+                        {offers.map((offer) => (
+                            <span
+                                key={offer._id}
+                                className="mx-8 text-sm font-semibold"
+                            >
+                                {offer.discountPercent}% OFF on{" "}
+                                {offer.productId?.name ||
+                                    "selected product"}
+                            </span>
+                        ))}
+                    </Marquee>
+                </div>
+            )}
+
+            <div className="mx-auto flex min-h-16 w-full max-w-[1600px] items-center gap-2 px-3 sm:min-h-[72px] sm:px-4 md:px-5 lg:min-h-20 lg:px-6 xl:px-8 2xl:px-10">
+
                 {/* ==================== */}
                 {/* Logo + Mobile Menu */}
                 {/* ==================== */}
@@ -313,45 +318,14 @@ const Navbar = ({ needAuth = true }) => {
                             tabIndex={0}
                             role="button"
                             aria-label="Open navigation menu"
-                            className="
-                                btn
-                                btn-ghost
-                                h-10
-                                min-h-10
-                                w-10
-                                px-0
-                                text-white
-                                hover:bg-white/10
-                                sm:h-11
-                                sm:min-h-11
-                                sm:w-11
-                            "
+                            className="btn btn-ghost h-10 min-h-10 w-10 px-0 text-white hover:bg-white/10 sm:h-11 sm:min-h-11 sm:w-11"
                         >
                             <FaBars className="text-lg sm:text-xl" />
                         </div>
 
                         <ul
                             tabIndex={0}
-                            className="
-                                menu
-                                menu-sm
-                                dropdown-content
-                                left-0
-                                z-50
-                                mt-3
-                                w-[calc(100vw-24px)]
-                                max-w-[360px]
-                                gap-1
-                                rounded-lg
-                                border
-                                border-white/10
-                                bg-[#001B08]
-                                p-3
-                                text-base
-                                shadow-2xl
-                                sm:w-[360px]
-                                sm:p-4
-                            "
+                            className="menu menu-sm dropdown-content left-0 z-50 mt-3 w-[calc(100vw-24px)] max-w-[360px] gap-1 rounded-lg border border-white/10 bg-[#001B08] p-3 text-base shadow-2xl sm:w-[360px] sm:p-4"
                         >
                             <li className="mb-2 block">
                                 <ProductSearch />
@@ -372,19 +346,7 @@ const Navbar = ({ needAuth = true }) => {
                             alt="Bazaar E Pak"
                             width={110}
                             height={110}
-                            className="
-                                h-12
-                                w-12
-                                object-contain
-                                sm:h-14
-                                sm:w-14
-                                md:h-16
-                                md:w-16
-                                lg:h-[72px]
-                                lg:w-[72px]
-                                xl:h-20
-                                xl:w-20
-                            "
+                            className="h-12 w-12 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-[72px] lg:w-[72px] xl:h-20 xl:w-20"
                             priority
                         />
                     </Link>
@@ -394,34 +356,8 @@ const Navbar = ({ needAuth = true }) => {
                 {/* Desktop Navigation */}
                 {/* ==================== */}
 
-                <div
-                    className="
-                        hidden
-                        min-w-0
-                        flex-1
-                        items-center
-                        justify-center
-                        lg:flex
-                    "
-                >
-                    <ul
-                        className="
-                            menu
-                            menu-horizontal
-                            flex-nowrap
-                            items-center
-                            justify-center
-                            gap-1
-                            whitespace-nowrap
-                            px-0
-                            text-sm
-                            font-medium
-                            xl:gap-2
-                            xl:text-base
-                            2xl:gap-3
-                            2xl:text-lg
-                        "
-                    >
+                <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
+                    <ul className="menu menu-horizontal flex-nowrap items-center justify-center gap-1 whitespace-nowrap px-0 text-sm font-medium xl:gap-2 xl:text-base 2xl:gap-3 2xl:text-lg">
                         {renderNavItems(false)}
                     </ul>
                 </div>
@@ -430,27 +366,9 @@ const Navbar = ({ needAuth = true }) => {
                 {/* Right Actions */}
                 {/* ==================== */}
 
-                <div
-                    className="
-                        flex
-                        shrink-0
-                        items-center
-                        justify-end
-                        gap-1
-                        sm:gap-2
-                    "
-                >
+                <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
                     {/* Desktop Search */}
-                    <div
-                        className="
-                            hidden
-                            min-w-0
-                            lg:block
-                            lg:w-[160px]
-                            xl:w-[200px]
-                            2xl:w-[240px]
-                        "
-                    >
+                    <div className="hidden min-w-0 lg:block lg:w-[160px] xl:w-[200px] 2xl:w-[240px]">
                         <ProductSearch />
                     </div>
 
@@ -461,44 +379,14 @@ const Navbar = ({ needAuth = true }) => {
                         rel="noopener noreferrer"
                         eventType="WHATSAPP_CLICK"
                         source="navbar"
-                        className="
-                            btn
-                            btn-circle
-                            btn-ghost
-                            h-9
-                            min-h-9
-                            w-9
-                            shrink-0
-                            px-0
-                            text-[#E8BB44]
-                            hover:bg-white/10
-                            sm:h-10
-                            sm:min-h-10
-                            sm:w-10
-                            md:h-11
-                            md:min-h-11
-                            md:w-11
-                        "
+                        className="btn btn-circle btn-ghost h-9 min-h-9 w-9 shrink-0 px-0 text-[#E8BB44] hover:bg-white/10 sm:h-10 sm:min-h-10 sm:w-10 md:h-11 md:min-h-11 md:w-11"
                         aria-label="Contact on WhatsApp"
                     >
                         <FaWhatsapp className="text-lg sm:text-xl md:text-2xl" />
                     </AnalyticsLink>
 
                     {/* Cart */}
-                    <div
-                        className="
-                            flex
-                            h-9
-                            w-9
-                            shrink-0
-                            items-center
-                            justify-center
-                            sm:h-10
-                            sm:w-10
-                            md:h-11
-                            md:w-11
-                        "
-                    >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center sm:h-10 sm:w-10 md:h-11 md:w-11">
                         <CartButton />
                     </div>
 

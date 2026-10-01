@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 import useApi from "@/hooks/use-api";
@@ -8,8 +9,10 @@ import ShopForm from "@/features/dashboard/seller/shop/shop-form";
 
 export default function CreateNativeShopPage() {
     const api = useApi();
+    const router = useRouter();
 
     const [loading, setLoading] = useState(false);
+    const [formKey, setFormKey] = useState(0);
 
     const handleCreate = async (shopData) => {
         try {
@@ -37,6 +40,12 @@ export default function CreateNativeShopPage() {
 
             toast.success(
                 "Native shop created successfully.",
+            );
+
+            setFormKey((current) => current + 1);
+
+            router.push(
+                "/dashboard/superadmin/native-shops",
             );
         } catch (error) {
             console.error(
@@ -68,6 +77,7 @@ export default function CreateNativeShopPage() {
 
             <div className="rounded-xl border border-zinc-200 bg-white p-6 md:p-8">
                 <ShopForm
+                    key={formKey}
                     showSlug
                     onSubmit={handleCreate}
                     loading={loading}

@@ -77,17 +77,23 @@ const ReviewColumns = ({
             key: "status",
             label: "Status",
 
-            render: (review) => (
-                <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${STATUS_STYLES[
-                        review.status
-                        ] ??
-                        "bg-[#F3F4F6] text-[#667085]"
-                        }`}
-                >
-                    {review.status}
-                </span>
-            ),
+            render: (review) => {
+                const status =
+                    review.status ||
+                    "published";
+
+                return (
+                    <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${STATUS_STYLES[
+                            status
+                            ] ??
+                            "bg-[#F3F4F6] text-[#667085]"
+                            }`}
+                    >
+                        {status}
+                    </span>
+                );
+            },
         },
 
         {

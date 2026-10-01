@@ -2,52 +2,96 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
-import { getData } from "@/lib/api";
 import { serverApi } from "@/lib/server";
 
 import AnalyticsOverview from "@/features/dashboard/admin/analytics/analytics-overview";
 
 const AdminAnalyticsPage = async () => {
-    const requestHeaders = await headers();
+    const requestHeaders =
+        await headers();
 
-    const session = await auth.api.getSession({
-        headers: requestHeaders,
-    });
+    const session =
+        await auth.api.getSession({
+            headers: requestHeaders,
+        });
 
     if (!session?.user) {
         redirect("/login");
     }
 
-    const { token } = await auth.api.getToken({
-        headers: requestHeaders,
-    });
+    if (
+        session.user.role !==
+        "admin"
+    ) {
+        redirect("/dashboard");
+    }
 
-    const users = await getData(
-        "/api/users",
-        token,
+    const params =
+        new URLSearchParams();
+
+    params.set(
+        "search",
+        session.user.email,
     );
 
-    const currentUser = users.find(
-        (user) =>
-            String(user._id) ===
-            String(session.user.id) ||
-            user.email ===
-            session.user.email,
+    params.set(
+        "role",
+        "admin",
     );
 
-    const role = session.user.role;
+    params.set(
+        "limit",
+        "10",
+    );
+
+    const adminResponse =
+        await serverApi.get(
+            `/api/users?${params.toString()}`,
+            {},
+            {
+                auth: true,
+                includeMeta: true,
+            },
+        );
+
+    const adminUsers =
+        Array.isArray(
+            adminResponse?.data,
+        )
+            ? adminResponse.data
+            : Array.isArray(
+                adminResponse,
+            )
+                ? adminResponse
+                : [];
+
+    const currentUser =
+        adminUsers.find(
+            (user) =>
+                String(user._id) ===
+                String(
+                    session.user.id,
+                ) ||
+                user.email ===
+                session.user.email,
+        );
 
     const permissions =
-        currentUser?.permissions ?? [];
+        Array.isArray(
+            currentUser?.permissions,
+        )
+            ? currentUser.permissions
+            : [];
 
     const canViewAnalytics =
-        role === "super_admin" ||
         permissions.includes(
             "analytics.view",
         );
 
     if (!canViewAnalytics) {
-        redirect("/dashboard/admin");
+        redirect(
+            "/dashboard/admin",
+        );
     }
 
     const [
@@ -92,10 +136,12 @@ const AdminAnalyticsPage = async () => {
 
             <AnalyticsOverview
                 analytics={
-                    dashboardResponse?.data ?? {}
+                    dashboardResponse?.data ??
+                    {}
                 }
                 rankings={
-                    rankingsResponse?.data ?? []
+                    rankingsResponse?.data ??
+                    []
                 }
             />
         </div>

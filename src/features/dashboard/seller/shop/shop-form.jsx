@@ -18,6 +18,7 @@ import {
 
 const defaultValues = {
   name: "",
+  slug: "",
   description: "",
   businessType: "",
   services: "",
@@ -71,6 +72,7 @@ export default function ShopForm({
   onSubmit,
   loading = false,
   submitLabel = "Save Changes",
+  showSlug = false,
 }) {
   const {
     register,
@@ -89,6 +91,7 @@ export default function ShopForm({
 
     reset({
       name: initialData.name || "",
+      slug: initialData.slug || "",
       description: initialData.description || "",
       businessType: initialData.businessType || "",
       services: Array.isArray(initialData.services)
@@ -106,20 +109,20 @@ export default function ShopForm({
       youtube: initialData.youtube || "",
       socialLinks: Array.isArray(initialData.socialLinks)
         ? initialData.socialLinks
-            .map((item) => `${item.platform}|${item.url}`)
-            .join("\n")
+          .map((item) => `${item.platform}|${item.url}`)
+          .join("\n")
         : "",
       address: initialData.address || "",
       city: initialData.city || "",
       location: initialData.location || "",
       latitude:
         initialData.latitude !== null &&
-        initialData.latitude !== undefined
+          initialData.latitude !== undefined
           ? String(initialData.latitude)
           : "",
       longitude:
         initialData.longitude !== null &&
-        initialData.longitude !== undefined
+          initialData.longitude !== undefined
           ? String(initialData.longitude)
           : "",
       hours: {
@@ -164,6 +167,7 @@ export default function ShopForm({
 
     const payload = {
       name: formData.name.trim(),
+      ...(showSlug && { slug: formData.slug.trim() }),
       description: formData.description.trim(),
       businessType: formData.businessType.trim(),
       services,
@@ -235,6 +239,33 @@ export default function ShopForm({
               </p>
             )}
           </div>
+
+          {showSlug && (
+            <div>
+              <label className={labelClass}>
+                Shop Slug
+                {requiredMark}
+              </label>
+
+              <input
+                {...register("slug", {
+                  required: "Shop slug is required",
+                  pattern: {
+                    value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                    message: "Use lowercase letters, numbers and hyphens only",
+                  },
+                })}
+                placeholder="e.g. munna-store"
+                className={inputClass}
+              />
+
+              {errors.slug && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.slug.message}
+                </p>
+              )}
+            </div>
+          )}
 
           <div>
             <label className={labelClass}>
@@ -438,12 +469,14 @@ export default function ShopForm({
             <input
               {...register("phone", {
                 required: "Phone number is required",
-                maxLength: {
-                  value: 30,
-                  message: "Phone number cannot exceed 30 characters",
+                pattern: {
+                  value: /^03\d{9}$/,
+                  message: "Enter a valid Pakistan mobile number (03XXXXXXXXX)",
                 },
               })}
               type="tel"
+              inputMode="numeric"
+              maxLength={11}
               placeholder="03001234567"
               className={inputClass}
             />
@@ -464,12 +497,14 @@ export default function ShopForm({
             <input
               {...register("whatsapp", {
                 required: "WhatsApp number is required",
-                maxLength: {
-                  value: 30,
-                  message: "WhatsApp number cannot exceed 30 characters",
+                pattern: {
+                  value: /^03\d{9}$/,
+                  message: "Enter a valid Pakistan WhatsApp number (03XXXXXXXXX)",
                 },
               })}
               type="tel"
+              inputMode="numeric"
+              maxLength={11}
               placeholder="03001234567"
               className={inputClass}
             />
@@ -691,8 +726,8 @@ export default function ShopForm({
                 required: "Latitude is required",
                 validate: (value) =>
                   !Number.isNaN(Number(value)) &&
-                  Number(value) >= -90 &&
-                  Number(value) <= 90
+                    Number(value) >= -90 &&
+                    Number(value) <= 90
                     ? true
                     : "Latitude must be between -90 and 90",
               })}
@@ -720,8 +755,8 @@ export default function ShopForm({
                 required: "Longitude is required",
                 validate: (value) =>
                   !Number.isNaN(Number(value)) &&
-                  Number(value) >= -180 &&
-                  Number(value) <= 180
+                    Number(value) >= -180 &&
+                    Number(value) <= 180
                     ? true
                     : "Longitude must be between -180 and 180",
               })}

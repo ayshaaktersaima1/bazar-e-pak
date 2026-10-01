@@ -65,9 +65,9 @@ export const getUserColumns = ({
             render: (user) => (
                 <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${user.status ===
-                            "active"
-                            ? "bg-[#DCFCE7] text-[#166534]"
-                            : "bg-[#FEE2E2] text-[#B91C1C]"
+                        "active"
+                        ? "bg-[#DCFCE7] text-[#166534]"
+                        : "bg-[#FEE2E2] text-[#B91C1C]"
                         }`}
                 >
                     {user.status ||
@@ -135,7 +135,7 @@ export const getUserColumns = ({
                                 >
                                     {isLoading
                                         ? "..."
-                                        : "Suspend"}
+                                        : "Deactivate"}
                                 </button>
                             ))}
 

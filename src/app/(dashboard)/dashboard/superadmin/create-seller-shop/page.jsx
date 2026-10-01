@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 import { authClient } from "@/lib/auth-client";
@@ -9,6 +10,7 @@ import ShopForm from "@/features/dashboard/seller/shop/shop-form";
 
 export default function CreateSellerShopPage() {
     const api = useApi();
+    const router = useRouter();
 
     const [loading, setLoading] = useState(false);
 
@@ -20,6 +22,7 @@ export default function CreateSellerShopPage() {
     });
 
     const [sellerErrors, setSellerErrors] = useState({});
+    const [shopFormKey, setShopFormKey] = useState(0);
 
     const handleSellerChange = (event) => {
         const { name, value } = event.target;
@@ -115,7 +118,6 @@ export default function CreateSellerShopPage() {
                     email: seller.email.trim(),
                     password: seller.password,
                     role: "seller",
-
                     data: {
                         phoneNumber:
                             seller.phoneNumber.trim(),
@@ -183,6 +185,14 @@ export default function CreateSellerShopPage() {
             });
 
             setSellerErrors({});
+
+            setShopFormKey(
+                (current) => current + 1,
+            );
+
+            router.push(
+                "/dashboard/superadmin/shops",
+            );
         } catch (error) {
             console.error(
                 "Create seller and shop error:",
@@ -224,9 +234,7 @@ export default function CreateSellerShopPage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-zinc-500">
-                    Create a seller account and
-                    assign a new shop to that
-                    seller.
+                    Create a seller account and assign a new shop to that seller.
                 </p>
             </div>
 
@@ -237,9 +245,7 @@ export default function CreateSellerShopPage() {
                     </h2>
 
                     <p className="mt-1 text-xs text-zinc-500">
-                        These credentials will be
-                        used by the seller to log
-                        in.
+                        These credentials will be used by the seller to log in.
                     </p>
 
                     <div className="mt-5 grid gap-5 md:grid-cols-2">
@@ -251,9 +257,7 @@ export default function CreateSellerShopPage() {
                             <input
                                 name="name"
                                 type="text"
-                                value={
-                                    seller.name
-                                }
+                                value={seller.name}
                                 onChange={
                                     handleSellerChange
                                 }
@@ -278,9 +282,7 @@ export default function CreateSellerShopPage() {
                             <input
                                 name="email"
                                 type="email"
-                                value={
-                                    seller.email
-                                }
+                                value={seller.email}
                                 onChange={
                                     handleSellerChange
                                 }
@@ -361,12 +363,12 @@ export default function CreateSellerShopPage() {
                     </h2>
 
                     <p className="mt-1 text-xs text-zinc-500">
-                        Create the shop that will
-                        belong to this seller.
+                        Create the shop that will belong to this seller.
                     </p>
                 </div>
 
                 <ShopForm
+                    key={shopFormKey}
                     onSubmit={
                         handleCreateSellerAndShop
                     }

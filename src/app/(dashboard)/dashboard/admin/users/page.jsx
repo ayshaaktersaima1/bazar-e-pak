@@ -1,9 +1,10 @@
-import { auth } from "@/lib/auth";
-import { getData } from "@/lib/api";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import AllUsersTable from "../../../../../features/dashboard/admin/users/all-users-table";
+import { auth } from "@/lib/auth";
+import { serverApi } from "@/lib/server";
+
+import AllUsersTable from "@/features/dashboard/admin/users/all-users-table";
 
 const AllUsers = async () => {
   const requestHeaders = await headers();
@@ -12,30 +13,57 @@ const AllUsers = async () => {
     headers: requestHeaders,
   });
 
-  const { token } = await auth.api.getToken({
-    headers: requestHeaders,
-  });
+  if (!session?.user) {
+    redirect("/login");
+  }
 
-  const users = await getData(
-    "/api/users",
-    token,
+  if (session.user.role !== "admin") {
+    redirect("/dashboard");
+  }
+
+  const params = new URLSearchParams();
+
+  params.set("search", session.user.email);
+  params.set("role", "admin");
+  params.set("limit", "10");
+
+  const adminResponse = await serverApi.get(
+    `/api/users?${params.toString()}`,
+    {},
+    {
+      auth: true,
+      includeMeta: true,
+    },
   );
 
-  const currentUser = users.find(
+  const adminUsers = Array.isArray(adminResponse?.data)
+    ? adminResponse.data
+    : Array.isArray(adminResponse)
+      ? adminResponse
+      : [];
+
+  const currentUser = adminUsers.find(
     (user) =>
-      String(user._id) === String(session?.user?.id) ||
-      user.email === session?.user?.email,
+      String(user._id) === String(session.user.id) ||
+      user.email === session.user.email,
   );
 
-  const role = session?.user?.role;
+  const permissions = Array.isArray(currentUser?.permissions)
+    ? currentUser.permissions
+    : [];
 
-  const hasUsersPermission =
-    role === "super_admin" ||
-    currentUser?.permissions?.includes("users.view");
-
-  if (!hasUsersPermission) {
+  if (!permissions.includes("users.view")) {
     redirect("/dashboard/admin");
   }
+
+  const usersResponse = await serverApi.get(
+    "/api/users?page=1&limit=20",
+    {},
+    {
+      auth: true,
+      includeMeta: true,
+    },
+  );
 
   return (
     <div className="bg-[#F7F5EF] p-6">
@@ -54,9 +82,9 @@ const AllUsers = async () => {
       </div>
 
       <AllUsersTable
-        users={users}
-        currentRole={role}
-        currentUserId={session?.user?.id}
+        users={usersResponse?.data ?? []}
+        currentRole="admin"
+        currentUserId={session.user.id}
       />
     </div>
   );

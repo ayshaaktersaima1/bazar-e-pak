@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 const ProductColumns = ({
+    categories = [],
     onDelete,
     onFeatured,
 }) => [
@@ -42,6 +43,14 @@ const ProductColumns = ({
 
                         <p className="text-xs text-[#667085]">
                             {product.categoryId?.name ||
+                                categories.find(
+                                    (category) =>
+                                        String(category._id) ===
+                                        String(
+                                            product.categoryId?._id ||
+                                            product.categoryId,
+                                        ),
+                                )?.name ||
                                 "Uncategorized"}
                         </p>
                     </div>

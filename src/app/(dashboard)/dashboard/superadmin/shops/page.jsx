@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { getData } from "@/lib/api";
+import { serverApi } from "@/lib/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -16,13 +16,13 @@ const SuperAdminShopsPage = async () => {
         redirect("/dashboard");
     }
 
-    const { token } = await auth.api.getToken({
-        headers: requestHeaders,
-    });
-
-    const shops = await getData(
-        "/api/shops",
-        token,
+    const response = await serverApi.get(
+        "/api/shops?page=1&limit=20",
+        {},
+        {
+            auth: true,
+            includeMeta: true,
+        },
     );
 
     return (
@@ -42,7 +42,8 @@ const SuperAdminShopsPage = async () => {
             </div>
 
             <AllShopsTable
-                shops={shops}
+                shops={response?.data ?? []}
+                initialPagination={response?.pagination ?? {}}
                 currentRole="super_admin"
             />
         </div>

@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { getData } from "@/lib/api";
+import { serverApi } from "@/lib/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -18,18 +18,54 @@ const AdminReviewsPage = async () => {
         redirect("/login");
     }
 
-    const { token } =
-        await auth.api.getToken({
-            headers: requestHeaders,
-        });
+    if (
+        session.user.role !==
+        "admin"
+    ) {
+        redirect("/dashboard");
+    }
 
-    const users = await getData(
-        "/api/users",
-        token,
+    const params =
+        new URLSearchParams();
+
+    params.set(
+        "search",
+        session.user.email,
     );
 
+    params.set(
+        "role",
+        "admin",
+    );
+
+    params.set(
+        "limit",
+        "10",
+    );
+
+    const adminResponse =
+        await serverApi.get(
+            `/api/users?${params.toString()}`,
+            {},
+            {
+                auth: true,
+                includeMeta: true,
+            },
+        );
+
+    const adminUsers =
+        Array.isArray(
+            adminResponse?.data,
+        )
+            ? adminResponse.data
+            : Array.isArray(
+                adminResponse,
+            )
+                ? adminResponse
+                : [];
+
     const currentUser =
-        users.find(
+        adminUsers.find(
             (user) =>
                 String(user._id) ===
                 String(
@@ -39,15 +75,14 @@ const AdminReviewsPage = async () => {
                 session.user.email,
         );
 
-    const role =
-        session.user.role;
-
     const permissions =
-        currentUser?.permissions ??
-        [];
+        Array.isArray(
+            currentUser?.permissions,
+        )
+            ? currentUser.permissions
+            : [];
 
     const canViewReviews =
-        role === "super_admin" ||
         permissions.includes(
             "reviews.view",
         );
@@ -59,7 +94,6 @@ const AdminReviewsPage = async () => {
     }
 
     const canModerate =
-        role === "super_admin" ||
         permissions.includes(
             "reviews.moderate",
         );

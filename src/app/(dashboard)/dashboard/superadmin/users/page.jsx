@@ -1,5 +1,4 @@
 import { auth } from "@/lib/auth";
-import { getData } from "@/lib/api";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -15,15 +14,6 @@ const SuperAdminUsersPage = async () => {
     if (session?.user?.role !== "super_admin") {
         redirect("/dashboard");
     }
-
-    const { token } = await auth.api.getToken({
-        headers: requestHeaders,
-    });
-
-    const users = await getData(
-        "/api/users",
-        token,
-    );
 
     return (
         <div className="bg-[#F7F5EF] p-6">
@@ -42,7 +32,6 @@ const SuperAdminUsersPage = async () => {
             </div>
 
             <AllUsersTable
-                users={users}
                 currentRole="super_admin"
                 currentUserId={session?.user?.id}
             />

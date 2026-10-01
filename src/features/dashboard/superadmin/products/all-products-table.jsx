@@ -254,6 +254,8 @@ const AllProductsTable = ({
 
     const columns =
         ProductColumns({
+            categories,
+
             onDelete: (
                 product,
             ) => {

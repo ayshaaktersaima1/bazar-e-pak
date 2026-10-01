@@ -1,9 +1,10 @@
-import { getData } from "@/lib/api";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import AllShopsTable from "../../../../../features/dashboard/admin/shops/all-shops-table";
+import { auth } from "@/lib/auth";
+import { serverApi } from "@/lib/server";
+
+import AllShopsTable from "@/features/dashboard/admin/shops/all-shops-table";
 
 const AllShops = async () => {
     const requestHeaders =
@@ -14,46 +15,101 @@ const AllShops = async () => {
             headers: requestHeaders,
         });
 
-    const { token } =
-        await auth.api.getToken({
-            headers: requestHeaders,
-        });
+    if (!session?.user) {
+        redirect("/login");
+    }
 
-    const users = await getData(
-        "/api/users",
-        token,
+    if (
+        session.user.role !==
+        "admin"
+    ) {
+        redirect("/dashboard");
+    }
+
+    const params =
+        new URLSearchParams();
+
+    params.set(
+        "search",
+        session.user.email,
     );
 
+    params.set(
+        "role",
+        "admin",
+    );
+
+    params.set(
+        "limit",
+        "10",
+    );
+
+    const adminResponse =
+        await serverApi.get(
+            `/api/users?${params.toString()}`,
+            {},
+            {
+                auth: true,
+                includeMeta: true,
+            },
+        );
+
+    const adminUsers =
+        Array.isArray(
+            adminResponse?.data,
+        )
+            ? adminResponse.data
+            : Array.isArray(
+                adminResponse,
+            )
+                ? adminResponse
+                : [];
+
     const currentUser =
-        users.find(
+        adminUsers.find(
             (user) =>
                 String(user._id) ===
                 String(
-                    session?.user?.id,
+                    session.user.id,
                 ) ||
                 user.email ===
-                session?.user?.email,
+                session.user
+                    .email,
         );
 
-    const role =
-        session?.user?.role;
+    const permissions =
+        Array.isArray(
+            currentUser?.permissions,
+        )
+            ? currentUser.permissions
+            : [];
 
-    const hasShopsPermission =
-        role === "super_admin" ||
-        currentUser?.permissions?.includes(
+    if (
+        !permissions.includes(
             "shops.view",
-        );
-
-    if (!hasShopsPermission) {
+        )
+    ) {
         redirect(
             "/dashboard/admin",
         );
     }
 
-    const shops = await getData(
-        "/api/shops",
-        token,
-    );
+    const shopsResponse =
+        await serverApi.get(
+            "/api/shops?page=1&limit=20",
+            {},
+            {
+                auth: true,
+                includeMeta: true,
+            },
+        );
+
+    const shops =
+        Array.isArray(
+            shopsResponse?.data,
+        )
+            ? shopsResponse.data
+            : [];
 
     return (
         <div className="bg-[#F7F5EF] p-6">
@@ -73,7 +129,7 @@ const AllShops = async () => {
 
             <AllShopsTable
                 shops={shops}
-                currentRole={role}
+                currentRole="admin"
             />
         </div>
     );

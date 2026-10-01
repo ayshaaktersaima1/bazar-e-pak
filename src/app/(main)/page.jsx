@@ -7,6 +7,7 @@ import ShopsSection from "@/components/homepage/ShopsSection";
 import BannerDiscount from "@/components/homepage/BannerDiscount";
 import MissionVission from "@/components/homepage/MissionVission";
 import { serverApi } from "@/lib/server.js";
+import Banner from "@/components/homepage/Banner";
 
 export default async function Home() {
   let cmsContent = [];
@@ -34,6 +35,7 @@ export default async function Home() {
   return (
     <div>
       <BannerDiscount cmsItem={heroContent} />
+      <Banner cmsItem={heroContent}></Banner>
 
       <FadeUp>
         <MissionVission cmsItem={missionVisionContent} />
