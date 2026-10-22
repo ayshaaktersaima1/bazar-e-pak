@@ -18,6 +18,12 @@ import {
     Bell,
     Activity,
     ShieldCheck,
+    ShoppingBag,
+    CreditCard,
+    Undo2,
+    Wallet,
+    Landmark,
+    DatabaseBackup,
 } from "lucide-react";
 
 export const dashboardNav = {
@@ -64,6 +70,32 @@ export const dashboardNav = {
                     label: "Offers & Discounts",
                     href: "/dashboard/seller/offers",
                     icon: BadgePercent,
+                },
+            ],
+        },
+
+        {
+            section: "Orders & Earnings",
+            items: [
+                {
+                    label: "Orders",
+                    icon: ShoppingBag,
+                    children: [
+                        {
+                            label: "All Orders",
+                            href: "/dashboard/seller/orders",
+                        },
+                        {
+                            label: "Order History",
+                            href: "/dashboard/seller/orders/history",
+                        },
+                    ],
+                },
+
+                {
+                    label: "Earnings & Payouts",
+                    href: "/dashboard/seller/finance",
+                    icon: Wallet,
                 },
             ],
         },
@@ -132,6 +164,47 @@ export const dashboardNav = {
                     icon: Boxes,
                     permission: "products.view",
                 },
+            ],
+        },
+
+        {
+            section: "Orders & Payments",
+            items: [
+                {
+                    label: "Orders",
+                    href: "/dashboard/admin/orders",
+                    icon: ShoppingBag,
+                    permission: "orders.view",
+                },
+
+                {
+                    label: "Payments",
+                    href: "/dashboard/admin/payments",
+                    icon: CreditCard,
+                    permission: "payments.view",
+                },
+
+                {
+                    label: "Refunds",
+                    href: "/dashboard/admin/refunds",
+                    icon: Undo2,
+                    permission: "payments.view",
+                },
+
+                {
+                    label: "Shop Finance",
+                    href: "/dashboard/admin/finance",
+                    icon: Wallet,
+                    permission: "payments.view",
+                },
+
+                {
+                    label: "Settlements",
+                    href: "/dashboard/admin/settlements",
+                    icon: Landmark,
+                    permission: "payments.view",
+                },
+
             ],
         },
 
@@ -233,6 +306,42 @@ export const dashboardNav = {
         },
 
         {
+            section: "Orders & Payments",
+            items: [
+                {
+                    label: "Orders",
+                    href: "/dashboard/superadmin/orders",
+                    icon: ShoppingBag,
+                },
+
+                {
+                    label: "Payments",
+                    href: "/dashboard/superadmin/payments",
+                    icon: CreditCard,
+                },
+
+                {
+                    label: "Refunds",
+                    href: "/dashboard/superadmin/refunds",
+                    icon: Undo2,
+                },
+
+                {
+                    label: "Shop Finance",
+                    href: "/dashboard/superadmin/finance",
+                    icon: Wallet,
+                },
+
+                {
+                    label: "Settlements",
+                    href: "/dashboard/superadmin/settlements",
+                    icon: Landmark,
+                },
+
+            ],
+        },
+
+        {
             section: "Product Management",
             items: [
                 {
@@ -320,6 +429,17 @@ export const dashboardNav = {
                     label: "System Health",
                     href: "/dashboard/superadmin/system-health",
                     icon: Activity,
+                },
+            ],
+        },
+
+        {
+            section: "System",
+            items: [
+                {
+                    label: "Backup & Restore",
+                    href: "/dashboard/superadmin/backup",
+                    icon: DatabaseBackup,
                 },
             ],
         },

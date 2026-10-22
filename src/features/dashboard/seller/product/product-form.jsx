@@ -295,7 +295,7 @@ const ProductForm = ({
                 <div className="grid gap-5 md:grid-cols-2">
                     <div>
                         <label className={label}>
-                            Price (BDT)
+                            Price (PKR)
                         </label>
 
                         <input
@@ -403,7 +403,7 @@ const ProductForm = ({
                         <p className="mt-2 text-xs text-gray-500">
                             Final price:{" "}
                             <span className="font-semibold text-[#001B08]">
-                                BDT{" "}
+                                PKR{" "}
                                 {finalPrice.toFixed(
                                     2,
                                 )}

@@ -35,6 +35,26 @@ const ADMIN_PERMISSIONS = [
         value: "analytics.view",
         label: "Analytics - View",
     },
+    {
+        value: "orders.view",
+        label: "Orders - View",
+    },
+    {
+        value: "payments.view",
+        label: "Payments & Finance - View",
+    },
+    {
+        value: "payments.manage",
+        label: "Payments - Manage (verify, COD, fees, proofs)",
+    },
+    {
+        value: "payments.refund",
+        label: "Payments - Refund",
+    },
+    {
+        value: "settlements.manage",
+        label: "Settlements - Manage",
+    },
 ];
 
 const AdminPermissionsModal = ({

@@ -9,6 +9,7 @@ import {
   FaUserCircle,
   FaCog,
   FaStore,
+  FaShoppingBag,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { authClient } from "../../lib/auth-client";
@@ -249,6 +250,33 @@ const AvatarDropdown = ({ user, variant = "default" }) => {
 
               <div className="my-1 border-t border-zinc-100" />
             </>
+          )}
+
+          {/* My Orders — customers only */}
+          {role === "customer" && (
+            <Link
+              href="/orders"
+              onClick={() => document.activeElement?.blur()}
+              className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-colors hover:bg-[#F7F5EF]"
+            >
+              <span
+                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${theme.itemIconBg}`}
+              >
+                <FaShoppingBag />
+              </span>
+
+              <span className="flex-1">
+                <span className="block text-sm font-medium text-[#001B08]">
+                  My Orders
+                </span>
+
+                <span className="block text-[11px] text-gray-400">
+                  Track orders and payments
+                </span>
+              </span>
+
+              <FaChevronRight className="text-[10px] text-gray-300 transition-transform group-hover:translate-x-1" />
+            </Link>
           )}
 
           {/* Become a Seller — customers only */}

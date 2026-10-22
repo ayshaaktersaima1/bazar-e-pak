@@ -34,7 +34,7 @@ export default async function Home() {
 
   return (
     <div>
-      <BannerDiscount cmsItem={heroContent} />
+      {/* <BannerDiscount cmsItem={heroContent} /> */}
       <Banner cmsItem={heroContent}></Banner>
 
       <FadeUp>

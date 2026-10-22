@@ -7,6 +7,7 @@ import { serverApi } from "@/lib/server";
 import StatsCard from "@/features/dashboard/common/ui/stats-card";
 import DashboardCard from "@/features/dashboard/common/ui/dahboard-card";
 import TopProductsTable from "@/features/dashboard/seller/product/top-products-table";
+import { formatMinor } from "@/utils/payments";
 
 
 const SellerDashboard = async () => {
@@ -59,6 +60,14 @@ const SellerDashboard = async () => {
   const rankings =
     rankingsResponse?.data ?? [];
 
+  let finance = null;
+
+  try {
+    finance = await serverApi.get("/api/finance/seller/summary");
+  } catch {
+    finance = null;
+  }
+
   const totalEvents =
     events.reduce(
       (sum, event) =>
@@ -105,6 +114,10 @@ const SellerDashboard = async () => {
       href: "/dashboard/seller/orders",
     },
     {
+      label: "Earnings & Payouts",
+      href: "/dashboard/seller/finance",
+    },
+    {
       label: "Reviews",
       href: "/dashboard/seller/reviews",
     },
@@ -129,6 +142,36 @@ const SellerDashboard = async () => {
           Manage your shop and see your recent activity.
         </p>
       </div>
+
+      {finance && (
+        <div className="mb-8">
+          <h2 className="mb-4 text-xl font-bold text-[#001B08]">
+            Earnings
+          </h2>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <StatsCard
+              label="Paid Orders"
+              value={finance.orders ?? 0}
+            />
+
+            <StatsCard
+              label="Your Share (60%)"
+              value={formatMinor(finance.sellerShareMinor)}
+            />
+
+            <StatsCard
+              label="Online Payable"
+              value={formatMinor(finance.online?.sellerPayableMinor)}
+            />
+
+            <StatsCard
+              label="Settled to You"
+              value={formatMinor(finance.online?.sellerSettledMinor)}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard

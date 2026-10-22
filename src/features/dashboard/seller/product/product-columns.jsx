@@ -57,12 +57,12 @@ const ProductColumns = ({ onEdit, onDelete, onFeatured }) => [
       return (
         <div>
           <p className="font-semibold text-[#001B08]">
-            BDT {finalPrice.toFixed(2)}
+            PKR {finalPrice.toFixed(2)}
           </p>
 
           {discount > 0 && (
             <p className="text-xs text-[#98A2B3] line-through">
-              BDT {price.toFixed(2)}
+              PKR {price.toFixed(2)}
             </p>
           )}
         </div>

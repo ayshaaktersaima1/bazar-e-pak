@@ -8,6 +8,11 @@ const ADMIN_PERMISSIONS = [
     "reviews.view",
     "reviews.moderate",
     "analytics.view",
+    "orders.view",
+    "payments.view",
+    "payments.manage",
+    "payments.refund",
+    "settlements.manage",
 ];
 
 const ManageUserModal = ({

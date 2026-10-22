@@ -4,8 +4,8 @@ import Link from "next/link";
 import { FaTrashAlt } from "react-icons/fa";
 
 export const CartSummary = ({ cartTotal, clearCart }) => {
-  const shippingFee = cartTotal > 0 ? 250 : 0;
-  const grandTotal = cartTotal + (cartTotal > 0 ? shippingFee : 0);
+  // The server charges item totals only; delivery charges (if any) are agreed with the seller.
+  const grandTotal = cartTotal;
 
   const formatPKR = (amount) => {
     return new Intl.NumberFormat("en-PK", {
@@ -28,10 +28,8 @@ export const CartSummary = ({ cartTotal, clearCart }) => {
           </span>
         </div>
         <div className="flex justify-between">
-          <span>Shipping Fee</span>
-          <span className="font-semibold text-[#001B08]">
-            {shippingFee === 0 ? "Free" : formatPKR(shippingFee)}
-          </span>
+          <span>Delivery</span>
+          <span className="font-semibold text-[#001B08]">Confirmed by seller</span>
         </div>
         <div className="flex justify-between border-t border-gray-100 pt-3 text-base font-bold text-[#001B08]">
           <span>Total</span>

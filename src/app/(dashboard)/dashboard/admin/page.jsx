@@ -9,10 +9,15 @@ import {
     FaStar,
     FaChartBar,
     FaBell,
+    FaShoppingBag,
+    FaCreditCard,
+    FaWallet,
 } from "react-icons/fa";
 
 import { auth } from "@/lib/auth";
 import { serverApi } from "@/lib/server";
+import { getFinanceCaps } from "@/lib/dashboard-access";
+import FinanceOverview from "@/features/dashboard/finance/finance-overview";
 
 const accessItems = [
     {
@@ -49,6 +54,27 @@ const accessItems = [
         description: "View platform activity and performance.",
         href: "/dashboard/admin/analytics",
         icon: FaChartBar,
+    },
+    {
+        permission: "orders.view",
+        title: "Orders",
+        description: "Track marketplace orders and COD collection.",
+        href: "/dashboard/admin/orders",
+        icon: FaShoppingBag,
+    },
+    {
+        permission: "payments.view",
+        title: "Payments",
+        description: "Review PayFast payments, refunds and settlements.",
+        href: "/dashboard/admin/payments",
+        icon: FaCreditCard,
+    },
+    {
+        permission: "payments.view",
+        title: "Shop Finance",
+        description: "Open any shop's earnings and transaction history.",
+        href: "/dashboard/admin/finance",
+        icon: FaWallet,
     },
 ];
 
@@ -128,6 +154,7 @@ const AdminDashboard = async () => {
     }
 
     const totals = analytics?.totals ?? {};
+    const financeCaps = getFinanceCaps(false, permissions);
 
     return (
         <div className="min-h-full bg-[#F7F5EF] p-5 md:p-6">
@@ -198,6 +225,8 @@ const AdminDashboard = async () => {
                 </div>
             )}
 
+            <FinanceOverview base="/dashboard/admin" caps={financeCaps} />
+
             {/* Permission Access */}
             <div>
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -223,7 +252,7 @@ const AdminDashboard = async () => {
 
                             return (
                                 <Link
-                                    key={item.permission}
+                                    key={item.href}
                                     href={item.href}
                                     className="group rounded-xl bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
                                 >
