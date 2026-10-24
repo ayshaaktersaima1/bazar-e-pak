@@ -24,6 +24,7 @@ const SuperAdminAnalyticsPage = async () => {
     const [
         dashboardResponse,
         rankingsResponse,
+        shopRankingsResponse,
     ] = await Promise.all([
         serverApi.get(
             "/api/analytics/dashboard",
@@ -36,6 +37,14 @@ const SuperAdminAnalyticsPage = async () => {
 
         serverApi.get(
             "/api/analytics/rankings/products",
+            {},
+            {
+                auth: true,
+                includeMeta: true,
+            },
+        ),
+        serverApi.get(
+            "/api/analytics/rankings/shops",
             {},
             {
                 auth: true,
@@ -61,12 +70,9 @@ const SuperAdminAnalyticsPage = async () => {
             </div>
 
             <AnalyticsOverview
-                analytics={
-                    dashboardResponse?.data ?? {}
-                }
-                rankings={
-                    rankingsResponse?.data ?? []
-                }
+                analytics={dashboardResponse?.data ?? {}}
+                rankings={rankingsResponse?.data ?? []}
+                shopRankings={shopRankingsResponse?.data ?? []}
             />
         </div>
     );

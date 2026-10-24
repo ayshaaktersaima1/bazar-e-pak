@@ -7,6 +7,7 @@ import StatsCard from "../../common/ui/stats-card";
 const AnalyticsOverview = ({
     analytics = {},
     rankings = [],
+    shopRankings = [],
 }) => {
     const totals = analytics.totals ?? {};
     const sourceComparison = analytics.sourceComparison ?? {};
@@ -48,10 +49,10 @@ const AnalyticsOverview = ({
     const rankingColumns = [
         {
             key: "product",
-            label: "Product ID",
+            label: "Product",
             render: (product) => (
-                <span className="font-mono text-xs">
-                    {product._id}
+                <span className="font-medium text-[#001B08]">
+                    {product.name || "Unknown Product"}
                 </span>
             ),
         },
@@ -72,6 +73,48 @@ const AnalyticsOverview = ({
             label: "Add to Cart",
             render: (product) =>
                 product.carts ?? 0,
+        },
+    ];
+
+    const shopRankingColumns = [
+        {
+            key: "shop",
+            label: "Shop",
+            render: (shop) => (
+                <span className="font-medium text-[#001B08]">
+                    {shop.name || "Unknown Shop"}
+                </span>
+            ),
+        },
+        {
+            key: "views",
+            label: "Views",
+            render: (shop) =>
+                shop.views ?? 0,
+        },
+        {
+            key: "clicks",
+            label: "Clicks",
+            render: (shop) =>
+                shop.clicks ?? 0,
+        },
+        {
+            key: "whatsapp",
+            label: "WhatsApp",
+            render: (shop) =>
+                shop.whatsapp ?? 0,
+        },
+        {
+            key: "calls",
+            label: "Calls",
+            render: (shop) =>
+                shop.calls ?? 0,
+        },
+        {
+            key: "shares",
+            label: "Shares",
+            render: (shop) =>
+                shop.shares ?? 0,
         },
     ];
 
@@ -187,7 +230,7 @@ const AnalyticsOverview = ({
                 />
             </DashboardCard>
 
-            <DashboardCard title="Top Product Rankings">
+            <DashboardCard title="Product Performance">
                 <DataTable
                     columns={rankingColumns}
                     data={rankings}
@@ -197,7 +240,21 @@ const AnalyticsOverview = ({
                         total: rankings.length,
                         totalPages: 1,
                     }}
-                    emptyMessage="No product ranking data found."
+                    emptyMessage="No product analytics data found."
+                />
+            </DashboardCard>
+
+            <DashboardCard title="Shop Performance">
+                <DataTable
+                    columns={shopRankingColumns}
+                    data={shopRankings}
+                    page={1}
+                    limit={20}
+                    meta={{
+                        total: shopRankings.length,
+                        totalPages: 1,
+                    }}
+                    emptyMessage="No shop analytics data found."
                 />
             </DashboardCard>
         </div>

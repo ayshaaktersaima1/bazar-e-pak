@@ -56,6 +56,7 @@ const useAnalytics = () => {
                 data,
                 {},
                 {
+                    auth: false,
                     showSuccess: false,
                     showError: false,
                 },
