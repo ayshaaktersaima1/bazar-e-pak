@@ -5,11 +5,20 @@ import DataTable from "@/features/dashboard/common/table/data-table";
 const TopProductsTable = ({ rankings = [] }) => {
     const rankingColumns = [
         {
-            key: "product",
+            key: "productId",
             label: "Product ID",
             render: (product) => (
                 <span className="font-mono text-xs">
                     {product._id}
+                </span>
+            ),
+        },
+        {
+            key: "productName",
+            label: "Product Name",
+            render: (product) => (
+                <span className="font-medium text-[#001B08]">
+                    {product.name || "Unknown Product"}
                 </span>
             ),
         },

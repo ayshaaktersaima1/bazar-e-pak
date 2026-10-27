@@ -18,11 +18,13 @@ import {
 } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 
+
 const LoginPage = () => {
   const router = useRouter();
 
   const [isDemoLogin, setIsDemoLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleLogin, setIsGoogleLogin] = useState(false);
 
   const {
     register,
@@ -102,7 +104,7 @@ const LoginPage = () => {
 
       toast.error(
         error?.message ||
-          "Something went wrong while logging in. Please try again.",
+        "Something went wrong while logging in. Please try again.",
         {
           duration: 5000,
         },
@@ -112,11 +114,41 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setIsGoogleLogin(true);
+
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+
+      if (error) {
+        toast.error(
+          error.message || "Google login failed. Please try again."
+        );
+        setIsGoogleLogin(false);
+      }
+    } catch (error) {
+      console.error("Google Login Error:", error);
+
+      toast.error(
+        error?.message ||
+        "Something went wrong with Google login."
+      );
+
+      setIsGoogleLogin(false);
+    }
+  };
+
   const onSubmit = async (data) => {
     await loginUser(data.email, data.password);
   };
 
-  const isLoading = isSubmitting || isDemoLogin;
+  const isLoading =
+    isSubmitting ||
+    isDemoLogin ||
+    isGoogleLogin;
 
   return (
     <main className="relative min-h-screen bg-[#F7F5EF]">
@@ -351,11 +383,10 @@ const LoginPage = () => {
                     type="email"
                     placeholder="Enter your email address"
                     disabled={isLoading}
-                    className={`input w-full border bg-white text-[#001B08] focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 ${
-                      errors.email
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-gray-300 focus:border-[#E8BB44]"
-                    }`}
+                    className={`input w-full border bg-white text-[#001B08] focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 ${errors.email
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:border-[#E8BB44]"
+                      }`}
                     {...register("email", {
                       required: "Email address is required.",
                       pattern: {
@@ -383,11 +414,10 @@ const LoginPage = () => {
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       disabled={isLoading}
-                      className={`input w-full border bg-white pr-11 text-[#001B08] focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 ${
-                        errors.password
-                          ? "border-red-500 focus:border-red-500"
-                          : "border-gray-300 focus:border-[#E8BB44]"
-                      }`}
+                      className={`input w-full border bg-white pr-11 text-[#001B08] focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 ${errors.password
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:border-[#E8BB44]"
+                        }`}
                       {...register("password", {
                         required: "Password is required.",
                         minLength: {
@@ -441,11 +471,14 @@ const LoginPage = () => {
                 {/* Google */}
                 <button
                   type="button"
+                  onClick={handleGoogleLogin}
                   disabled={isLoading}
                   className="btn w-full border border-gray-300 bg-white text-[#001B08] shadow-none hover:border-[#E8BB44] hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <FaGoogle />
-                  Continue with Google
+                  {isGoogleLogin
+                    ? "Connecting to Google..."
+                    : "Continue with Google"}
                 </button>
 
                 {/* Mobile Register */}

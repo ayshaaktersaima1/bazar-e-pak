@@ -1,164 +1,100 @@
-"use client";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-import { useMemo, useState } from "react";
-import toast from "react-hot-toast";
-import useApi from "../../../../../hooks/use-api";
-import {
-    ReviewColumns,
-  ReviewFilters,
-  ReviewSummary,
-} from "../../../../../features/dashboard/seller/reviews";
-import DataTable from "../../../../../features/dashboard/common/table/data-table";
-import ConfirmationModal from "../../../../../components/shared/confirmation-modal";
+import { auth } from "@/lib/auth";
+import { ReviewTable } from "@/features/dashboard/seller/reviews";
+import { serverApi } from "@/lib/server";
 
-const ReviewTable = ({
-  reviews = [],
-  pagination = {},
-  summary = {},
-  shopName = "",
-}) => {
-  const api = useApi();
 
-  const [search, setSearch] = useState("");
+const SellerReviewsPage = async () => {
+  const requestHeaders = await headers();
 
-  const [filterValues, setFilterValues] = useState({
-    rating: "",
+  const session = await auth.api.getSession({
+    headers: requestHeaders,
   });
 
-  const [selectedReview, setSelectedReview] = useState(null);
+  if (!session?.user) {
+    redirect("/login");
+  }
 
-  const filters = [
+  if (session.user.role !== "seller") {
+    redirect("/dashboard");
+  }
+
+  const productsResponse = await serverApi.get(
+    "/api/products/seller?page=1&limit=100",
+    {},
     {
-      key: "rating",
-      label: "Rating",
-      options: [
-        {
-          value: "5",
-          label: "5 Stars",
-        },
-        {
-          value: "4",
-          label: "4 Stars",
-        },
-        {
-          value: "3",
-          label: "3 Stars",
-        },
-        {
-          value: "2",
-          label: "2 Stars",
-        },
-        {
-          value: "1",
-          label: "1 Star",
-        },
-      ],
+      auth: true,
+      includeMeta: true,
     },
-  ];
+  );
 
-  const handleFilter = (key, value) => {
-    setFilterValues((current) => ({
-      ...current,
-      [key]: value,
-    }));
+  const products = productsResponse?.data?.products ?? productsResponse?.data ?? [];
+
+  const productIds = products
+    .map((product) => product._id)
+    .filter(Boolean);
+
+  const reviewResponses = await Promise.all(
+    productIds.map((productId) =>
+      serverApi.get(
+        `/api/reviews?productId=${productId}&page=1&limit=100`,
+        {},
+        {
+          auth: true,
+          includeMeta: true,
+        },
+      ),
+    ),
+  );
+
+  const reviews = reviewResponses.flatMap((response) =>
+    Array.isArray(response?.data?.reviews)
+      ? response.data.reviews
+      : Array.isArray(response?.data)
+        ? response.data
+        : [],
+  );
+
+  const totalReviews = reviews.length;
+
+  const averageRating =
+    totalReviews > 0
+      ? reviews.reduce(
+        (sum, review) => sum + Number(review.rating || 0),
+        0,
+      ) / totalReviews
+      : 0;
+
+  const ratingCounts = {
+    5: reviews.filter((review) => Number(review.rating) === 5).length,
+    4: reviews.filter((review) => Number(review.rating) === 4).length,
+    3: reviews.filter((review) => Number(review.rating) === 3).length,
+    2: reviews.filter((review) => Number(review.rating) === 2).length,
+    1: reviews.filter((review) => Number(review.rating) === 1).length,
   };
 
-  const filteredReviews = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
-    return reviews.filter((review) => {
-      const matchesSearch =
-        !query ||
-        String(review.userName ?? "")
-          .toLowerCase()
-          .includes(query) ||
-        String(review.comment ?? "")
-          .toLowerCase()
-          .includes(query);
-
-      const matchesRating =
-        !filterValues.rating ||
-        Number(review.rating) === Number(filterValues.rating);
-
-      return matchesSearch && matchesRating;
-    });
-  }, [reviews, search, filterValues.rating]);
-
-  const handleDelete = async () => {
-    if (!selectedReview?._id) {
-      return;
-    }
-
-    const result = await api.delete(`/api/reviews/${selectedReview._id}`);
-
-    if (result?.error) {
-      return;
-    }
-
-    toast.success("Review deleted successfully.");
-
-    setSelectedReview(null);
-
-    window.location.reload();
+  const summary = {
+    totalReviews,
+    averageRating: Number(averageRating.toFixed(1)),
+    ratingCounts,
   };
-
-  const columns = ReviewColumns({
-    onDelete: setSelectedReview,
-  });
 
   return (
-    <div className="space-y-5">
-      <div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-[#002B12]">Reviews</h1>
-
-          {shopName && (
-            <span className="rounded-full bg-[#002B12]/5 px-3 py-1 text-xs font-semibold text-[#002B12]">
-              {shopName}
-            </span>
-          )}
-        </div>
-
-        <p className="mt-1 text-sm text-[#667085]">
-          Manage and monitor customer reviews for your shop.
-        </p>
-      </div>
-
-      <ReviewSummary summary={summary} />
-
-      <ReviewFilters
-        searchValue={search}
-        onSearch={setSearch}
-        filters={filters}
-        filterValues={filterValues}
-        onFilter={handleFilter}
-      />
-
-      <DataTable
-        columns={columns}
-        data={filteredReviews}
-        meta={{
-          total: filteredReviews.length,
+    <div className="bg-[#F7F5EF] p-6">
+      <ReviewTable
+        reviews={reviews}
+        pagination={{
+          page: 1,
+          limit: 100,
+          total: totalReviews,
           totalPages: 1,
         }}
-        page={1}
-        limit={pagination.limit ?? 20}
-        loading={false}
-        emptyMessage="No reviews found."
-      />
-
-      <ConfirmationModal
-        open={Boolean(selectedReview)}
-        title="Delete Review?"
-        description={`Are you sure you want to delete the review from "${selectedReview?.userName ?? "Customer"}"?`}
-        confirmText="Delete Review"
-        cancelText="Cancel"
-        loading={api.loading}
-        onCancel={() => setSelectedReview(null)}
-        onConfirm={handleDelete}
+        summary={summary}
       />
     </div>
   );
 };
 
-export default ReviewTable;
+export default SellerReviewsPage;
